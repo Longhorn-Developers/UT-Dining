@@ -5,7 +5,7 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
 ## Tech Stack
 
 - **Framework:** Expo, React Native
-- **State Management:** Zustand (configured in [`useDataStore`](client/store/useDataStore.ts))
+- **State Management:** Zustand
 - **Styling:** NativeWind and Tailwind CSS
 - **Build Tools:** pnpm, Metro bundler
 
@@ -14,7 +14,7 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
 1. **Clone the Repository**
 
    ```sh
-   git clone <repository-url>
+   git clone https://github.com/EthanL06/ut-dining-hall.git
    cd ut-dining-hall
    ```
 
