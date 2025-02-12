@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Notifier } from 'react-native-notifier';
 
 import { Container } from '~/components/Container';
 import TopBar from '~/components/TopBar';
@@ -110,6 +111,12 @@ export default function Home() {
     setCurrentTime(new Date());
     setLastUpdated();
     setRefreshing(false);
+
+    Notifier.showNotification({
+      title: 'Data Refreshed!',
+      description: 'The menu data has been refreshed.',
+      duration: 5000,
+    });
   };
 
   if (!data)
@@ -137,7 +144,7 @@ export default function Home() {
     const hour = currentTime.getHours();
     if (hour < 11) {
       return 'Good Morning! ☀️';
-    } else if (hour < 16) {
+    } else if (hour < 18) {
       return 'Good Afternoon! 🌤️';
     } else {
       return 'Good Evening! 🌙';
@@ -148,7 +155,7 @@ export default function Home() {
     const hour = currentTime.getHours();
     if (hour < 11) {
       return 'Breakfast is served.';
-    } else if (hour < 16) {
+    } else if (hour < 18) {
       return 'Lunch is served.';
     } else {
       return 'Dinner is served.';
