@@ -38,10 +38,12 @@ const HomeTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
-            Alert.alert(
-              'Coming Soon!',
-              'The favorites feature will be available in an upcoming update.'
-            );
+            // Alert.alert(
+            //   'Coming Soon!',
+            //   'The favorites feature will be available in an upcoming update.'
+            // );
+
+            router.push(`/favorites`);
           }}>
           <Heart size={20} color={COLORS['ut-grey']} />
         </TouchableOpacity>
@@ -89,10 +91,11 @@ const LocationTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
-            Alert.alert(
-              'Coming Soon!',
-              'The favorites feature will be available in an upcoming update.'
-            );
+            // Alert.alert(
+            //   'Coming Soon!',
+            //   'The favorites feature will be available in an upcoming update.'
+            // );
+            router.push(`/favorites`);
           }}>
           <Heart size={20} color={COLORS['ut-grey']} />
         </TouchableOpacity>
