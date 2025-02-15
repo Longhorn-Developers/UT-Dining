@@ -100,7 +100,6 @@ export function getLocationTimeMessage(
       const nextSchedule = getTodaySchedule(locationName, nextDate);
 
       if (nextSchedule && nextSchedule.intervals.length === 0) {
-        console.log('No intervals found for', weekdayName(nextDate));
         break;
       }
 

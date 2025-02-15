@@ -63,7 +63,37 @@ export type Menu = Location['menu'][number];
 export type MenuCategory = Menu['menu_category'][number];
 export type FoodItem = MenuCategory['food_item'][number];
 
-interface DataStore {
+export type FavoriteFoodItem = FoodItem & {
+  categoryName: string;
+  locationName: string;
+  menuName: string;
+};
+
+type DataLookup = {
+  locations: Map<string, Location>;
+  foodItems: Map<string, FoodItem>;
+};
+
+const createLookupMaps = (data: DataQuery): DataLookup => {
+  const locations = new Map<string, Location>();
+  const foodItems = new Map<string, FoodItem>();
+
+  data.forEach((location) => {
+    locations.set(location.name as string, location);
+
+    location.menu.forEach((menu) => {
+      menu.menu_category.forEach((category) => {
+        category.food_item.forEach((item) => {
+          foodItems.set(`${location.name}-${menu.name}-${category.title}-${item.name}`, item);
+        });
+      });
+    });
+  });
+
+  return { locations, foodItems };
+};
+
+interface DataStore extends DataLookup {
   data: DataQuery | null;
   fetchData: () => Promise<void>;
   forceFetchData: () => Promise<void>;
@@ -77,36 +107,51 @@ interface DataStore {
   lastUpdated: Date | null;
   getLastUpdated: () => Promise<string | null>;
   setLastUpdated: () => void;
+  favoriteFoodItems: FavoriteFoodItem[];
+  addFavoriteFoodItem: (item: FavoriteFoodItem) => void;
+  toggleFavoriteFoodItem: (item: FavoriteFoodItem) => void;
+  removeFavoriteFoodItem: (item: FavoriteFoodItem) => void;
+  isFavoriteFoodItem: (item: FavoriteFoodItem) => boolean;
 }
 // Zustand Store
 export const useDataStore = create<DataStore>((set, get) => ({
   data: null,
 
+  locations: new Map(),
+
+  foodItems: new Map(),
+
   fetchData: async () => {
     try {
-      // Get stored data & timestamp
-      const storedData = await AsyncStorage.getItem(STORAGE_KEY_DATA);
-      const lastQueryTime = await AsyncStorage.getItem(STORAGE_KEY_TIMESTAMP);
+      // Batch storage reads
+      const [storedData, lastQueryTime] = await AsyncStorage.multiGet([
+        STORAGE_KEY_DATA,
+        STORAGE_KEY_TIMESTAMP,
+      ]);
 
-      // Check if we need to fetch fresh data
-      if (storedData && lastQueryTime && !shouldRequery(lastQueryTime)) {
-        console.log('using stored data');
-        set({ data: JSON.parse(storedData) });
+      if (storedData[1] && lastQueryTime[1] && !shouldRequery(lastQueryTime[1])) {
+        const parsedData = JSON.parse(storedData[1]);
+        set({
+          data: parsedData,
+          ...createLookupMaps(parsedData),
+        });
         return;
       }
 
-      // Fetch new data from Supabase
       const { data: fetchedData, error } = await dataQuery;
-
       if (error) throw error;
 
-      // Store new data & timestamp
-      await AsyncStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(fetchedData));
-      await AsyncStorage.setItem(STORAGE_KEY_TIMESTAMP, new Date().toISOString());
+      // Batch storage writes
+      await AsyncStorage.multiSet([
+        [STORAGE_KEY_DATA, JSON.stringify(fetchedData)],
+        [STORAGE_KEY_TIMESTAMP, new Date().toISOString()],
+      ]);
 
-      set({ data: fetchedData, lastUpdated: new Date() });
-
-      console.log('fetching new data');
+      set({
+        data: fetchedData,
+        ...createLookupMaps(fetchedData),
+        lastUpdated: new Date(),
+      });
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -131,34 +176,12 @@ export const useDataStore = create<DataStore>((set, get) => ({
     }
   },
 
-  getLocationData: (name: string) => {
-    const data = get().data;
-    if (!data) return null;
-
-    return data.find((location) => location.name === name) || null;
+  getLocationData: (name) => {
+    return get().locations.get(name) || null;
   },
 
-  getFoodItem: (locationName: string, menuName: string, categoryName: string, itemName: string) => {
-    const location = get().getLocationData(locationName);
-    if (!location) return null;
-
-    const menu = location.menu.find((menu) => {
-      return menu.name === menuName;
-    });
-
-    if (!menu) return null;
-
-    const category = menu.menu_category.find((category) => {
-      return category.title === categoryName;
-    });
-
-    if (!category) return null;
-
-    const foodItem = category.food_item.find((item) => {
-      return item.name === itemName;
-    });
-
-    return foodItem || null;
+  getFoodItem: (locationName, menuName, categoryName, itemName) => {
+    return get().foodItems.get(`${locationName}-${menuName}-${categoryName}-${itemName}`) || null;
   },
 
   getLastUpdated: async () => {
@@ -174,4 +197,46 @@ export const useDataStore = create<DataStore>((set, get) => ({
   },
 
   lastUpdated: null,
+
+  favoriteFoodItems: [],
+
+  addFavoriteFoodItem: (item) => {
+    set((state) => {
+      // Assuming that 'name' uniquely identifies a food item,
+      // adjust the comparison if there's a unique id or other identifier.
+      const alreadyExists = state.favoriteFoodItems.some((favItem) => favItem.name === item.name);
+      if (alreadyExists) return state;
+      return {
+        favoriteFoodItems: [...state.favoriteFoodItems, item],
+      };
+    });
+  },
+
+  toggleFavoriteFoodItem: (item) => {
+    set((state) => {
+      const alreadyExists = state.favoriteFoodItems.some(
+        (favItem) => favItem.name === item.name && favItem.categoryName === item.categoryName
+      );
+      if (alreadyExists) {
+        return {
+          favoriteFoodItems: state.favoriteFoodItems.filter(
+            (i) => !(i.name === item.name && i.categoryName === item.categoryName)
+          ),
+        };
+      }
+      return {
+        favoriteFoodItems: [...state.favoriteFoodItems, item],
+      };
+    });
+  },
+
+  removeFavoriteFoodItem: (item) => {
+    set((state) => ({
+      favoriteFoodItems: state.favoriteFoodItems.filter((i) => i !== item),
+    }));
+  },
+
+  isFavoriteFoodItem: (item) => {
+    return get().favoriteFoodItems.some((i) => i.name === item.name);
+  },
 }));

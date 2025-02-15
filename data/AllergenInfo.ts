@@ -1,19 +1,19 @@
 import { ImageSourcePropType } from 'react-native';
 
-const BeefIcon = require('../assets/allergen-icons/Beef.png');
-const EggIcon = require('../assets/allergen-icons/Eggs.png');
-const FishIcon = require('../assets/allergen-icons/Fish.png');
-const HalalIcon = require('../assets/allergen-icons/Halal.png');
-const MilkIcon = require('../assets/allergen-icons/Milk.png');
-const PeanutsIcon = require('../assets/allergen-icons/Peanuts.png');
-const PorkIcon = require('../assets/allergen-icons/Pork.png');
-const SesameSeedsIcon = require('../assets/allergen-icons/Sesame.png');
-const ShellfishIcon = require('../assets/allergen-icons/Shellfish.png');
-const SoyIcon = require('../assets/allergen-icons/Soy.png');
-const TreeNutsIcon = require('../assets/allergen-icons/Tree_Nuts.png');
-const VeganIcon = require('../assets/allergen-icons/Vegan.png');
-const VegetarianIcon = require('../assets/allergen-icons/Veggie.png');
-const WheatIcon = require('../assets/allergen-icons/Wheat.png');
+const BeefIcon = require('../assets/allergen-icons/Beef.webp');
+const EggIcon = require('../assets/allergen-icons/Eggs.webp');
+const FishIcon = require('../assets/allergen-icons/Fish.webp');
+const HalalIcon = require('../assets/allergen-icons/Halal.webp');
+const MilkIcon = require('../assets/allergen-icons/Milk.webp');
+const PeanutsIcon = require('../assets/allergen-icons/Peanuts.webp');
+const PorkIcon = require('../assets/allergen-icons/Pork.webp');
+const SesameSeedsIcon = require('../assets/allergen-icons/Sesame.webp');
+const ShellfishIcon = require('../assets/allergen-icons/Shellfish.webp');
+const SoyIcon = require('../assets/allergen-icons/Soy.webp');
+const TreeNutsIcon = require('../assets/allergen-icons/Tree_Nuts.webp');
+const VeganIcon = require('../assets/allergen-icons/Vegan.webp');
+const VegetarianIcon = require('../assets/allergen-icons/Veggie.webp');
+const WheatIcon = require('../assets/allergen-icons/Wheat.webp');
 
 const ALLERGEN_ICONS: Record<string, ImageSourcePropType> = {
   beef: BeefIcon,
