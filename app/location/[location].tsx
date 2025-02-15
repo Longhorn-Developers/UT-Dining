@@ -1,358 +1,74 @@
 import { FlashList } from '@shopify/flash-list';
-import * as Haptics from 'expo-haptics';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import {
-  BicepsFlexed,
-  ChefHatIcon,
-  ChevronDown,
-  ChevronRight,
-  Clock,
-  Droplet,
-  Filter,
-  Flame,
-  HeartIcon,
-} from 'lucide-react-native';
-import React, { useRef, useState } from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { ChevronDown, Clock, Filter } from 'lucide-react-native';
+import React, { useState, useCallback, useMemo } from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import ReanimatedSwipeable, {
-  SwipeableMethods,
-} from 'react-native-gesture-handler/ReanimatedSwipeable';
-import { Notifier } from 'react-native-notifier';
-import Reanimated, {
-  Extrapolation,
-  interpolate,
-  SharedValue,
-  useAnimatedStyle,
-  withTiming,
-  Easing,
-  interpolateColor,
-} from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Container } from '~/components/Container';
+import FoodComponent from '~/components/FoodComponent';
 import TopBar from '~/components/TopBar';
-import { ALLERGEN_ICONS } from '~/data/AllergenInfo';
 import { FoodItem, MenuCategory, useDataStore } from '~/store/useDataStore';
 import { COLORS } from '~/utils/colors';
 import { generateSchedule, isLocationOpen } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
-const RightActions = (
-  progressAnimatedValue: SharedValue<number>,
-  dragAnimatedValue: SharedValue<number>,
-  swipeable: SwipeableMethods
-) => {
-  const heartAnimation = useAnimatedStyle<ViewStyle>(() => {
-    const translateXValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 1],
-      [50, -20],
-      Extrapolation.CLAMP
-    );
+const MenuCategoryItem = React.memo(
+  ({
+    categoryName,
+    foodItems,
+    selectedMenu,
+  }: {
+    categoryName: string;
+    foodItems: FoodItem[];
+    selectedMenu: string;
+  }) => {
+    const [showFood, setShowFood] = useState(true);
+    const { location } = useLocalSearchParams();
 
-    const scaleValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 1],
-      [0.4, 1.2],
-      Extrapolation.CLAMP
-    );
+    const toggleShowFood = useCallback(() => {
+      setShowFood((prev) => !prev);
+    }, []);
 
-    const opacityValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 0.2, 1],
-      [0, 1, 1],
-      Extrapolation.CLAMP
-    );
-
-    return {
-      transform: [
-        {
-          scale: withTiming(scaleValue, { duration: 300, easing: Easing.out(Easing.exp) }),
-        },
-        {
-          translateX: withTiming(translateXValue, {
-            duration: 300,
-            easing: Easing.out(Easing.exp),
-          }),
-        },
-      ],
-      opacity: withTiming(opacityValue, { duration: 300 }),
-    };
-  });
-
-  const backgroundAnimation = useAnimatedStyle<ViewStyle>(() => {
-    return {
-      backgroundColor: interpolateColor(
-        progressAnimatedValue.value,
-        [0, 0.8, 1],
-        ['white', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
-      ),
-    };
-  });
-
-  return (
-    <Reanimated.View
-      style={backgroundAnimation}
-      className="min-w-[6.5rem] flex-row items-center justify-end pr-4">
-      <Reanimated.View style={heartAnimation}>
-        <HeartIcon fill="#fff" stroke="#fff" />
-      </Reanimated.View>
-    </Reanimated.View>
-  );
-};
-
-const LeftActions = (
-  progressAnimatedValue: SharedValue<number>,
-  dragAnimatedValue: SharedValue<number>,
-  swipeable: SwipeableMethods
-) => {
-  const heartAnimation = useAnimatedStyle<ViewStyle>(() => {
-    const translateXValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 1],
-      [-110, -20],
-      Extrapolation.CLAMP
-    );
-
-    const scaleValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 1],
-      [0.4, 1.2],
-      Extrapolation.CLAMP
-    );
-
-    const opacityValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 0.2, 1],
-      [0, 1, 1],
-      Extrapolation.CLAMP
-    );
-
-    return {
-      transform: [
-        {
-          scale: withTiming(scaleValue, { duration: 300, easing: Easing.out(Easing.exp) }),
-        },
-        {
-          translateX: withTiming(translateXValue, {
-            duration: 300,
-            easing: Easing.out(Easing.exp),
-          }),
-        },
-      ],
-      opacity: withTiming(opacityValue, { duration: 300 }),
-    };
-  });
-
-  const backgroundAnimation = useAnimatedStyle<ViewStyle>(() => {
-    return {
-      backgroundColor: interpolateColor(
-        progressAnimatedValue.value,
-        [0, 0.8, 1],
-        ['white', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
-      ),
-    };
-  });
-
-  return (
-    <Reanimated.View
-      style={backgroundAnimation}
-      className="min-w-[6.5rem] flex-row items-center justify-end pr-4">
-      <Reanimated.View style={heartAnimation}>
-        <ChefHatIcon fill="#fff" stroke="#fff" />
-      </Reanimated.View>
-    </Reanimated.View>
-  );
-};
-
-const CustomNotification = ({ title, description }: { title: string; description: string }) => (
-  <SafeAreaView className="px-4">
-    <View className="flex-row items-center gap-x-3 rounded-lg border border-ut-grey/25 bg-white p-4 pr-12">
-      <View className="h-full w-1 rounded-full bg-ut-burnt-orange" />
-
-      <View className="gap-y-1">
-        <Text className="text-lg font-bold leading-snug">{title}</Text>
-        <Text className="text-sm">{description}</Text>
-      </View>
-    </View>
-  </SafeAreaView>
-);
-
-const FoodComponent = ({
-  food,
-  selectedFilter,
-  categoryName,
-  location,
-}: {
-  food: FoodItem;
-  selectedFilter: string;
-  categoryName: string;
-  location: string;
-}) => {
-  const allergenData = Object.entries(food.allergens || {});
-  const ref = useRef<SwipeableMethods>(null);
-
-  return (
-    <ReanimatedSwipeable
-      containerStyle={{
-        borderRadius: 4,
-        overflow: 'hidden',
-        marginBottom: 8,
-        backgroundColor: COLORS['ut-burnt-orange'],
-      }}
-      ref={ref}
-      friction={3}
-      onSwipeableWillOpen={(direction) => {
-        if (direction === 'left') {
-          Notifier.showNotification({
-            title: `${food.name} added to today's meal plan!`,
-            description: 'Tap the chef hat (top right) to view your\nmeal plan for today.',
-            swipeEnabled: true,
-            Component: CustomNotification,
-            duration: 3000,
-            queueMode: 'immediate',
-          });
-        } else {
-          Notifier.showNotification({
-            title: `${food.name} added to Favorites!`,
-            description: 'Tap the heart (top right) to view your saved favorites.',
-            swipeEnabled: true,
-            Component: CustomNotification,
-            duration: 3000,
-            queueMode: 'immediate',
-          });
-        }
-        ref.current?.close();
-      }}
-      overshootLeft={false}
-      overshootRight={false}
-      leftThreshold={50}
-      rightThreshold={50}
-      renderRightActions={RightActions}
-      renderLeftActions={LeftActions}>
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={async () => {
-          await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-          router.push({
-            pathname: `/location/food/[food]`,
-            params: {
-              food: food.name as string,
-              menu: selectedFilter,
-              category: categoryName,
-              location,
-            },
-          });
-        }}
-        className={cn(
-          'flex-row items-center justify-between rounded border border-ut-grey/15 bg-white px-3 py-2'
-        )}>
-        <View className="gap-1">
-          <Text className="line-clamp-2 max-w-[16rem] text-lg font-medium leading-6">
-            {food.name}
-          </Text>
-          <View className="flex flex-row gap-2 ">
-            <View className="flex-row items-center gap-x-0.5">
-              <Flame fill={COLORS['ut-burnt-orange']} size={10} color={COLORS['ut-burnt-orange']} />
-              <Text className="text-xs font-medium">{food.nutrition?.calories} kCal</Text>
-            </View>
-            <View className="flex-row items-center gap-x-0.5">
-              <BicepsFlexed
-                fill={COLORS['ut-burnt-orange']}
-                size={10}
-                color={COLORS['ut-burnt-orange']}
-              />
-              <Text className="text-xs font-medium">{food.nutrition?.protein} Protein</Text>
-            </View>
-            <View className="flex-row items-center gap-x-0.5">
-              <Droplet
-                fill={COLORS['ut-burnt-orange']}
-                size={10}
-                color={COLORS['ut-burnt-orange']}
-              />
-              <Text className="text-xs font-medium">{food.nutrition?.total_fat} Fat</Text>
-            </View>
+    return (
+      <View className="my-4 flex-col px-6">
+        <TouchableOpacity
+          onPress={toggleShowFood}
+          className="mb-3 flex-row items-center justify-between overflow-hidden">
+          <Text className="text-2xl font-bold">{categoryName}</Text>
+          <View
+            className={cn(
+              'transition-transform duration-200 ease-in-out',
+              showFood ? 'rotate-180 transform' : 'rotate-0'
+            )}>
+            <ChevronDown size={20} color={COLORS['ut-grey']} />
           </View>
-
-          <View className="flex-row flex-wrap gap-1">
-            {allergenData.map(
-              ([key, value]) =>
-                value && (
-                  <Image
-                    key={key}
-                    source={ALLERGEN_ICONS[key]}
-                    className="size-3 rounded-full"
-                    resizeMode="contain"
-                  />
-                )
+        </TouchableOpacity>
+        {showFood && (
+          <FlashList
+            data={foodItems}
+            estimatedItemSize={20}
+            renderItem={({ item: food }) => (
+              <FoodComponent
+                food={food}
+                selectedMenu={selectedMenu}
+                categoryName={categoryName}
+                location={location as string}
+              />
             )}
-          </View>
-        </View>
-
-        <View className="flex-row items-center gap-x-1">
-          <ChevronRight size={20} color={COLORS['ut-burnt-orange']} />
-        </View>
-      </TouchableOpacity>
-    </ReanimatedSwipeable>
-  );
-};
-
-const MenuCategoryItem = ({
-  categoryName,
-  foodItems,
-  selectedFilter,
-}: {
-  categoryName: string;
-  foodItems: FoodItem[];
-  selectedFilter: string;
-}) => {
-  const [showFood, setShowFood] = useState(true);
-  const { location } = useLocalSearchParams();
-
-  return (
-    <View className="my-4 flex-col px-6">
-      <TouchableOpacity
-        onPress={() => {
-          setShowFood(!showFood);
-        }}
-        className="mb-3 flex-row items-center justify-between">
-        <Text className="text-2xl font-bold">{categoryName}</Text>
-
-        <View
-          className={cn(
-            'transition-transform duration-200 ease-in-out',
-            showFood ? 'rotate-180 transform' : 'rotate-0'
-          )}>
-          <ChevronDown size={20} color={COLORS['ut-grey']} />
-        </View>
-      </TouchableOpacity>
-
-      {showFood && (
-        <FlashList
-          data={foodItems}
-          estimatedItemSize={15}
-          renderItem={({ item: food }) => (
-            <FoodComponent
-              food={food}
-              selectedFilter={selectedFilter}
-              categoryName={categoryName}
-              location={location as string}
-            />
-          )}
-        />
-      )}
-    </View>
-  );
-};
+          />
+        )}
+      </View>
+    );
+  }
+);
 
 const MenuItem = ({
   menuCategories,
-  selectedFilter,
+  selectedMenu,
 }: {
   menuCategories: MenuCategory[];
-  selectedFilter: string;
+  selectedMenu: string;
 }) => {
   return (
     <>
@@ -361,7 +77,7 @@ const MenuItem = ({
           key={menuCategory.title}
           categoryName={menuCategory.title as string}
           foodItems={menuCategory.food_item}
-          selectedFilter={selectedFilter}
+          selectedMenu={selectedMenu}
         />
       ))}
     </>
@@ -377,7 +93,7 @@ const Location = () => {
   const { getLocationData } = useDataStore();
   const data = getLocationData(location);
 
-  const [selectedFilter, setSelectedFilter] = useState(data?.menu[0]?.name || '');
+  const [selectedMenu, setSelectedMenu] = useState(data?.menu[0]?.name || '');
   const [timeDropdownOpen, setTimeDropdownOpen] = useState(false);
 
   if (!data) {
@@ -385,9 +101,9 @@ const Location = () => {
     return null;
   }
 
-  const filteredData = data.menu.filter((menu) => {
-    return menu.name === selectedFilter;
-  });
+  const filteredData = useMemo(() => {
+    return data.menu.filter((menu) => menu.name === selectedMenu);
+  }, [data, selectedMenu]);
 
   const schedule = generateSchedule(location);
 
@@ -399,6 +115,7 @@ const Location = () => {
           <FlashList
             data={filteredData}
             estimatedItemSize={5}
+            removeClippedSubviews
             ListHeaderComponent={
               <View className="mx-6 mt-6 flex gap-y-5">
                 <TopBar variant="location" />
@@ -464,18 +181,18 @@ const Location = () => {
                         contentContainerClassName="gap-x-2">
                         {data.menu.map((item) => (
                           <TouchableOpacity
-                            onPress={() => setSelectedFilter(item.name as string)}
+                            onPress={() => setSelectedMenu(item.name as string)}
                             key={item.name}
                             className={cn(
                               'self-start rounded-full p-2',
-                              selectedFilter === item.name
+                              selectedMenu === item.name
                                 ? 'bg-ut-burnt-orange'
                                 : 'border border-ut-grey/75'
                             )}>
                             <Text
                               className={cn(
                                 'text-xs',
-                                selectedFilter === item.name
+                                selectedMenu === item.name
                                   ? 'font-bold text-white'
                                   : 'font-medium text-ut-grey/75'
                               )}>
@@ -501,9 +218,7 @@ const Location = () => {
               </View>
             }
             renderItem={({ item: menu }) => {
-              return (
-                <MenuItem selectedFilter={selectedFilter} menuCategories={menu.menu_category} />
-              );
+              return <MenuItem selectedMenu={selectedMenu} menuCategories={menu.menu_category} />;
             }}
           />
         </GestureHandlerRootView>

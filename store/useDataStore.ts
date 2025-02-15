@@ -63,6 +63,12 @@ export type Menu = Location['menu'][number];
 export type MenuCategory = Menu['menu_category'][number];
 export type FoodItem = MenuCategory['food_item'][number];
 
+export type FavoriteFoodItem = FoodItem & {
+  categoryName: string;
+  locationName: string;
+  menuName: string;
+};
+
 type DataLookup = {
   locations: Map<string, Location>;
   foodItems: Map<string, FoodItem>;
@@ -101,6 +107,11 @@ interface DataStore extends DataLookup {
   lastUpdated: Date | null;
   getLastUpdated: () => Promise<string | null>;
   setLastUpdated: () => void;
+  favoriteFoodItems: FavoriteFoodItem[];
+  addFavoriteFoodItem: (item: FavoriteFoodItem) => void;
+  toggleFavoriteFoodItem: (item: FavoriteFoodItem) => void;
+  removeFavoriteFoodItem: (item: FavoriteFoodItem) => void;
+  isFavoriteFoodItem: (item: FavoriteFoodItem) => boolean;
 }
 // Zustand Store
 export const useDataStore = create<DataStore>((set, get) => ({
@@ -123,18 +134,6 @@ export const useDataStore = create<DataStore>((set, get) => ({
         set({
           data: parsedData,
           ...createLookupMaps(parsedData),
-        });
-
-        // print out async storage data
-        AsyncStorage.getAllKeys((_err, keys) => {
-          if (keys) {
-            AsyncStorage.multiGet(keys, (_error, stores) => {
-              stores?.map((_result, i, store) => {
-                console.log(JSON.stringify({ [store[i][0]]: store[i][1] }, null, 2));
-                return true;
-              });
-            });
-          }
         });
         return;
       }
@@ -198,4 +197,46 @@ export const useDataStore = create<DataStore>((set, get) => ({
   },
 
   lastUpdated: null,
+
+  favoriteFoodItems: [],
+
+  addFavoriteFoodItem: (item) => {
+    set((state) => {
+      // Assuming that 'name' uniquely identifies a food item,
+      // adjust the comparison if there's a unique id or other identifier.
+      const alreadyExists = state.favoriteFoodItems.some((favItem) => favItem.name === item.name);
+      if (alreadyExists) return state;
+      return {
+        favoriteFoodItems: [...state.favoriteFoodItems, item],
+      };
+    });
+  },
+
+  toggleFavoriteFoodItem: (item) => {
+    set((state) => {
+      const alreadyExists = state.favoriteFoodItems.some(
+        (favItem) => favItem.name === item.name && favItem.categoryName === item.categoryName
+      );
+      if (alreadyExists) {
+        return {
+          favoriteFoodItems: state.favoriteFoodItems.filter(
+            (i) => !(i.name === item.name && i.categoryName === item.categoryName)
+          ),
+        };
+      }
+      return {
+        favoriteFoodItems: [...state.favoriteFoodItems, item],
+      };
+    });
+  },
+
+  removeFavoriteFoodItem: (item) => {
+    set((state) => ({
+      favoriteFoodItems: state.favoriteFoodItems.filter((i) => i !== item),
+    }));
+  },
+
+  isFavoriteFoodItem: (item) => {
+    return get().favoriteFoodItems.some((i) => i.name === item.name);
+  },
 }));

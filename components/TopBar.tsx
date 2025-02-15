@@ -38,11 +38,6 @@ const HomeTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
-            // Alert.alert(
-            //   'Coming Soon!',
-            //   'The favorites feature will be available in an upcoming update.'
-            // );
-
             router.push(`/favorites`);
           }}>
           <Heart size={20} color={COLORS['ut-grey']} />
@@ -91,10 +86,6 @@ const LocationTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
-            // Alert.alert(
-            //   'Coming Soon!',
-            //   'The favorites feature will be available in an upcoming update.'
-            // );
             router.push(`/favorites`);
           }}>
           <Heart size={20} color={COLORS['ut-grey']} />
@@ -115,13 +106,24 @@ const LocationTopBar = () => {
   );
 };
 
+const FavoritesTopBar = () => {
+  return (
+    <View className="flex w-full flex-row items-center justify-between ">
+      <TouchableOpacity className="flex items-center" onPress={() => router.back()}>
+        <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
 interface TopBarProps {
-  variant?: 'home' | 'location';
+  variant?: 'home' | 'location' | 'favorites';
 }
 
 const BarComponent = {
   home: <HomeTopBar />,
   location: <LocationTopBar />,
+  favorites: <FavoritesTopBar />,
 };
 
 const TopBar = ({ variant = 'home' }: TopBarProps) => {
