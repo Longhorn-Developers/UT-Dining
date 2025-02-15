@@ -2,11 +2,13 @@
 
 import { registerSheet, SheetDefinition } from 'react-native-actions-sheet';
 
+import FoodInfoSheet from './FoodInfoSheet';
 import LocationAboutSheet from './LocationAboutSheet';
 
 import { LocationInfo } from '~/data/LocationInfo';
 
 registerSheet('location-about', LocationAboutSheet);
+registerSheet('food-info', FoodInfoSheet);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -17,6 +19,7 @@ declare module 'react-native-actions-sheet' {
         location: LocationInfo;
       };
     }>;
+    'food-info': SheetDefinition;
   }
 }
 

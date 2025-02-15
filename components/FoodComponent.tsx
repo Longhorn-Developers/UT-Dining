@@ -236,12 +236,7 @@ const FoodComponent = ({
 }) => {
   const { toggleFavoriteFoodItem, isFavoriteFoodItem } = useDataStore();
   const allergenData = Object.entries(food.allergens || {});
-  const isFavorite = isFavoriteFoodItem({
-    ...food,
-    categoryName,
-    locationName: location,
-    menuName: selectedMenu,
-  });
+  const isFavorite = isFavoriteFoodItem(food.name as string);
 
   return (
     <ReanimatedSwipeable
@@ -292,7 +287,7 @@ const FoodComponent = ({
               locationName: location,
               menuName: selectedMenu,
             });
-          }, 100);
+          }, 200);
         }
       }}
       overshootLeft={false}

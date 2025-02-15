@@ -29,7 +29,9 @@ const Favorites = () => {
                     fill={COLORS['ut-burnt-orange']}
                   />
                 </View>
-                <Text className="font-medium text-ut-grey">Quick access to the food you love!</Text>
+                <Text className="font-medium text-ut-grey">
+                  To add a favorite, swipe left on a food item!
+                </Text>
               </View>
 
               <View className="my-1 w-full border-b border-b-ut-grey/15" />

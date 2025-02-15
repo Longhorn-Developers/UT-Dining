@@ -6,6 +6,7 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { Container } from '~/components/Container';
+import FilterBar from '~/components/FilterBar';
 import FoodComponent from '~/components/FoodComponent';
 import TopBar from '~/components/TopBar';
 import { FoodItem, MenuCategory, useDataStore } from '~/store/useDataStore';
@@ -93,19 +94,28 @@ const Location = () => {
   const { getLocationData } = useDataStore();
   const data = getLocationData(location);
 
-  const [selectedMenu, setSelectedMenu] = useState(data?.menu[0]?.name || '');
+  const [selectedMenu, setSelectedMenu] = useState(
+    data?.menu.length === 1 ? data.menu[0].name : ''
+  );
   const [timeDropdownOpen, setTimeDropdownOpen] = useState(false);
+
+  const filteredData = useMemo(() => {
+    return data?.menu.filter((menu) => menu.name === selectedMenu);
+  }, [data, selectedMenu]);
 
   if (!data) {
     router.back();
     return null;
   }
 
-  const filteredData = useMemo(() => {
-    return data.menu.filter((menu) => menu.name === selectedMenu);
-  }, [data, selectedMenu]);
-
   const schedule = generateSchedule(location);
+
+  const filters = data.menu
+    .filter((item) => item.name !== null)
+    .map((item) => ({
+      id: item.name as string,
+      title: item.name as string,
+    }));
 
   return (
     <>
@@ -173,41 +183,12 @@ const Location = () => {
 
                   <View className="my-1 w-full border-b border-b-ut-grey/15" />
 
-                  <View className="flex-row items-center">
-                    <View className="flex-1">
-                      <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerClassName="gap-x-2">
-                        {data.menu.map((item) => (
-                          <TouchableOpacity
-                            onPress={() => setSelectedMenu(item.name as string)}
-                            key={item.name}
-                            className={cn(
-                              'self-start rounded-full p-2',
-                              selectedMenu === item.name
-                                ? 'bg-ut-burnt-orange'
-                                : 'border border-ut-grey/75'
-                            )}>
-                            <Text
-                              className={cn(
-                                'text-xs',
-                                selectedMenu === item.name
-                                  ? 'font-bold text-white'
-                                  : 'font-medium text-ut-grey/75'
-                              )}>
-                              {item.name}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </ScrollView>
-                    </View>
-                    <View className="pl-2">
-                      <TouchableOpacity>
-                        <Filter size={20} color={COLORS['ut-grey']} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                  <FilterBar
+                    selectedItem={selectedMenu}
+                    setSelectedItem={setSelectedMenu}
+                    useTimeOfDayDefault={filters.length > 1}
+                    items={filters}
+                  />
                 </View>
               </View>
             }
