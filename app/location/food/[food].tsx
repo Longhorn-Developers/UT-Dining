@@ -118,7 +118,7 @@ const FoodScreen = () => {
           renderItem={renderNutritionRow}
           ListHeaderComponent={
             <View className="mx-6 mt-6 flex gap-y-5">
-              <TopBar variant="location" />
+              <TopBar variant="food" />
 
               <View>
                 <Text className="font-sans text-3xl font-extrabold">{foodItem.name}</Text>

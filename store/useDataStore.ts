@@ -7,6 +7,7 @@ import { shouldRequery } from '~/utils/time';
 
 const STORAGE_KEY_DATA = 'localData';
 const STORAGE_KEY_TIMESTAMP = 'lastQueryTime';
+const STORAGE_KEY_FAVORITES = 'favoriteFoodItems';
 
 // Supabase query
 const dataQuery = supabase.from('location').select(`
@@ -109,16 +110,14 @@ interface DataStore extends DataLookup {
   setLastUpdated: () => void;
   favoriteFoodItems: FavoriteFoodItem[];
   addFavoriteFoodItem: (item: FavoriteFoodItem) => void;
-  toggleFavoriteFoodItem: (item: FavoriteFoodItem) => void;
+  toggleFavoriteFoodItem: (item: FavoriteFoodItem) => boolean;
   removeFavoriteFoodItem: (item: FavoriteFoodItem) => void;
-  isFavoriteFoodItem: (item: FavoriteFoodItem) => boolean;
+  isFavoriteFoodItem: (item: string) => boolean;
 }
-// Zustand Store
+
 export const useDataStore = create<DataStore>((set, get) => ({
   data: null,
-
   locations: new Map(),
-
   foodItems: new Map(),
 
   fetchData: async () => {
@@ -159,17 +158,14 @@ export const useDataStore = create<DataStore>((set, get) => ({
 
   forceFetchData: async () => {
     try {
-      // Fetch new data from Supabase
       const { data: fetchedData, error } = await dataQuery;
 
       if (error) throw error;
 
-      // Store new data & timestamp
       await AsyncStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(fetchedData));
       await AsyncStorage.setItem(STORAGE_KEY_TIMESTAMP, new Date().toISOString());
 
       set({ data: fetchedData });
-
       console.log('fetching new data');
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -187,7 +183,6 @@ export const useDataStore = create<DataStore>((set, get) => ({
   getLastUpdated: async () => {
     const storedData = await AsyncStorage.getItem(STORAGE_KEY_DATA);
     set({ data: storedData ? JSON.parse(storedData) : null });
-
     return AsyncStorage.getItem(STORAGE_KEY_TIMESTAMP);
   },
 
@@ -202,13 +197,13 @@ export const useDataStore = create<DataStore>((set, get) => ({
 
   addFavoriteFoodItem: (item) => {
     set((state) => {
-      // Assuming that 'name' uniquely identifies a food item,
-      // adjust the comparison if there's a unique id or other identifier.
-      const alreadyExists = state.favoriteFoodItems.some((favItem) => favItem.name === item.name);
+      const alreadyExists = state.favoriteFoodItems.some(
+        (favItem) => favItem.name === item.name && favItem.categoryName === item.categoryName
+      );
       if (alreadyExists) return state;
-      return {
-        favoriteFoodItems: [...state.favoriteFoodItems, item],
-      };
+      const newFavorites = [...state.favoriteFoodItems, item];
+      AsyncStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(newFavorites));
+      return { favoriteFoodItems: newFavorites };
     });
   },
 
@@ -217,26 +212,34 @@ export const useDataStore = create<DataStore>((set, get) => ({
       const alreadyExists = state.favoriteFoodItems.some(
         (favItem) => favItem.name === item.name && favItem.categoryName === item.categoryName
       );
+      let newFavorites;
       if (alreadyExists) {
-        return {
-          favoriteFoodItems: state.favoriteFoodItems.filter(
-            (i) => !(i.name === item.name && i.categoryName === item.categoryName)
-          ),
-        };
+        newFavorites = state.favoriteFoodItems.filter(
+          (i) => !(i.name === item.name && i.categoryName === item.categoryName)
+        );
+      } else {
+        newFavorites = [...state.favoriteFoodItems, item];
       }
-      return {
-        favoriteFoodItems: [...state.favoriteFoodItems, item],
-      };
+      AsyncStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(newFavorites));
+      return { favoriteFoodItems: newFavorites };
     });
+    // Since set() runs synchronously in Zustand, we can now check the updated state.
+    return get().favoriteFoodItems.some(
+      (i) => i.name === item.name && i.categoryName === item.categoryName
+    );
   },
 
   removeFavoriteFoodItem: (item) => {
-    set((state) => ({
-      favoriteFoodItems: state.favoriteFoodItems.filter((i) => i !== item),
-    }));
+    set((state) => {
+      const newFavorites = state.favoriteFoodItems.filter(
+        (i) => !(i.name === item.name && i.categoryName === item.categoryName)
+      );
+      AsyncStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(newFavorites));
+      return { favoriteFoodItems: newFavorites };
+    });
   },
 
   isFavoriteFoodItem: (item) => {
-    return get().favoriteFoodItems.some((i) => i.name === item.name);
+    return get().favoriteFoodItems.some((i) => i.name === item);
   },
 }));
