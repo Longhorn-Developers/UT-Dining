@@ -26,6 +26,14 @@ export const shouldRequery = (lastQueryTime: string | null): boolean => {
 // Returns weekday name, e.g., 'Monday'
 const weekdayName = (date: Date): WeekDay => format(date, 'EEEE') as WeekDay;
 
+// Returns time of day: 'morning', 'afternoon', or 'evening'
+export const timeOfDay = (date: Date): 'morning' | 'afternoon' | 'evening' => {
+  const hour = date.getHours();
+  if (hour < 11) return 'morning';
+  if (hour < 18) return 'afternoon';
+  return 'evening';
+};
+
 // Returns today's schedule for a given location
 export function getTodaySchedule(locationName: string, date: Date = new Date()) {
   const location = LOCATION_INFO.find((loc) => loc.name === locationName);
@@ -60,75 +68,51 @@ export function getLocationTimeMessage(
   currentTime: Date = new Date()
 ): string {
   const schedule = getTodaySchedule(locationName, currentTime);
-  if (!schedule) return 'Closed.';
+  if (!schedule || schedule.intervals.length === 0) return 'Closed.';
 
   const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
 
-  // If currently open in one of the intervals, show closing message.
-  for (const interval of schedule.intervals) {
-    const openM = convertToMinutes(interval.openTime);
-    const closeM = convertToMinutes(interval.closeTime);
+  // Check if currently open and return closing time
+  for (const { openTime, closeTime } of schedule.intervals) {
+    const openM = convertToMinutes(openTime);
+    const closeM = convertToMinutes(closeTime);
     if (currentMinutes >= openM && currentMinutes < closeM) {
       const diffMins = closeM - currentMinutes;
-      if (diffMins < 60) {
-        return `Closes in ${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'}`;
-      }
-      const hoursDiff = Math.ceil(diffMins / 60);
-      return `Closes in ${hoursDiff} ${hoursDiff > 1 ? 'hours' : 'hour'}`;
+      return diffMins < 60
+        ? `Closes in ${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'}`
+        : `Closes in ${Math.ceil(diffMins / 60)} ${Math.ceil(diffMins / 60) > 1 ? 'hours' : 'hour'}`;
     }
   }
 
-  // Not open – find the next opening time.
-  const upcoming = schedule.intervals
-    .map((interval) => convertToMinutes(interval.openTime))
+  // Check for next opening time today
+  const nextOpening = schedule.intervals
+    .map(({ openTime }) => convertToMinutes(openTime))
     .filter((openM) => openM > currentMinutes)
-    .sort((a, b) => a - b);
+    .sort((a, b) => a - b)[0];
 
-  if (upcoming.length > 0) {
-    const diffMins = upcoming[0] - currentMinutes;
-    if (diffMins < 60) {
-      return `Opens in ${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'}`;
-    }
-    const hoursDiff = Math.ceil(diffMins / 60);
-    return `Opens in ${hoursDiff} ${hoursDiff > 1 ? 'hours' : 'hour'}`;
-  } else {
-    // No more intervals today, find the next opening day (tomorrow or later)
-    let dayOffset = 1;
-    let nextOpeningMinutes: number | null = null;
-    while (dayOffset <= 7) {
-      const nextDate = addDays(currentTime, dayOffset);
-      const nextSchedule = getTodaySchedule(locationName, nextDate);
-
-      if (nextSchedule && nextSchedule.intervals.length === 0) {
-        break;
-      }
-
-      if (nextSchedule && nextSchedule.intervals.length > 0) {
-        nextOpeningMinutes = convertToMinutes(nextSchedule.intervals[0].openTime);
-        break;
-      }
-      dayOffset++;
-    }
-
-    if (nextOpeningMinutes === null) {
-      // No opening found in the next week.
-      return 'Closed.';
-    }
-
-    // Calculate time difference from currentTime until the next opening.
-    const currentDayMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
-    const diffMins = dayOffset * 24 * 60 - currentDayMinutes + nextOpeningMinutes;
-    if (diffMins < 60) {
-      return `Opens in ${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'}`;
-    }
-    const hoursDiff = Math.ceil(diffMins / 60);
-    if (hoursDiff >= 24) {
-      const days = Math.ceil(hoursDiff / 24);
-      return `Opens in ${days} ${days > 1 ? 'days' : 'day'}`;
-    } else {
-      return `Opens in ${hoursDiff} ${hoursDiff > 1 ? 'hours' : 'hour'}`;
-    }
+  if (nextOpening !== undefined) {
+    const diffMins = nextOpening - currentMinutes;
+    return diffMins < 60
+      ? `Opens in ${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'}`
+      : `Opens in ${Math.ceil(diffMins / 60)} ${Math.ceil(diffMins / 60) > 1 ? 'hours' : 'hour'}`;
   }
+
+  // Find the next open day
+  let dayOffset = 1;
+  while (dayOffset <= 7) {
+    const nextDate = addDays(currentTime, dayOffset);
+    const nextSchedule = getTodaySchedule(locationName, nextDate);
+    if (nextSchedule && nextSchedule.intervals.length > 0) {
+      const nextOpeningMins = convertToMinutes(nextSchedule.intervals[0].openTime);
+      const totalDiffMins = dayOffset * 24 * 60 - currentMinutes + nextOpeningMins;
+      return totalDiffMins >= 1440
+        ? `Opens in ${Math.ceil(totalDiffMins / 1440)} ${Math.ceil(totalDiffMins / 1440) > 1 ? 'days' : 'day'}`
+        : `Opens in ${Math.ceil(totalDiffMins / 60)} ${Math.ceil(totalDiffMins / 60) > 1 ? 'hours' : 'hour'}`;
+    }
+    dayOffset++;
+  }
+
+  return 'Closed.';
 }
 
 // Helper: convert HHMM number to a formatted time string.

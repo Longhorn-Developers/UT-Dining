@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
-  ScrollView,
   Text,
   TouchableOpacity,
   View,
@@ -14,67 +13,13 @@ import {
 import { Notifier } from 'react-native-notifier';
 
 import { Container } from '~/components/Container';
+import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
 import { LOCATION_INFO } from '~/data/LocationInfo';
 import { DataQuery, useDataStore } from '~/store/useDataStore';
 import { COLORS } from '~/utils/colors';
-import { getLocationTimeMessage, isLocationOpen } from '~/utils/time';
+import { getLocationTimeMessage, isLocationOpen, timeOfDay } from '~/utils/time';
 import { cn } from '~/utils/utils';
-
-type FilterBarProps = {
-  selectedFilter: string;
-  setSelectedFilter: (filter: string) => void;
-};
-
-const FilterBar = ({ selectedFilter, setSelectedFilter }: FilterBarProps) => {
-  const filters = [
-    { id: 'all', title: 'All' },
-    { id: 'dining', title: 'Dining Hall' },
-    { id: 'restaurants', title: 'Restaurants' },
-    { id: 'convenience', title: 'Convenience Store' },
-  ];
-
-  const onPressFilter = async (id: string) => {
-    setSelectedFilter(id);
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-  };
-
-  return (
-    <View className="flex-row items-center">
-      <View className="flex-1">
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerClassName="gap-x-2">
-          {filters.map((item) => (
-            <TouchableOpacity
-              key={item.id}
-              onPress={() => onPressFilter(item.id)}
-              className={cn(
-                'self-start rounded-full p-2',
-                selectedFilter === item.id ? 'bg-ut-burnt-orange' : 'border border-ut-grey/75'
-              )}>
-              <Text
-                className={cn(
-                  'text-xs',
-                  selectedFilter === item.id
-                    ? 'font-bold text-white'
-                    : 'font-medium text-ut-grey/75'
-                )}>
-                {item.title}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-      {/* <View className="pl-2">
-        <TouchableOpacity>
-          <Filter size={20} color={COLORS['ut-grey']} />
-        </TouchableOpacity>
-      </View> */}
-    </View>
-  );
-};
 
 const sortLocations = (data: DataQuery) => {
   // Make a copy of data and sort based on the index in LOCATION_INFO.
@@ -152,13 +97,13 @@ export default function Home() {
   };
 
   const getSubtitleMessage = () => {
-    const hour = currentTime.getHours();
-    if (hour < 11) {
-      return 'Breakfast is served.';
-    } else if (hour < 18) {
-      return 'Lunch is served.';
-    } else {
-      return 'Dinner is served.';
+    switch (timeOfDay(currentTime)) {
+      case 'morning':
+        return 'Breakfast is served.';
+      case 'afternoon':
+        return 'Lunch is served.';
+      case 'evening':
+        return 'Dinner is served.';
     }
   };
 
@@ -246,7 +191,16 @@ export default function Home() {
                   </View>
                 </View>
 
-                <FilterBar selectedFilter={selectedFilter} setSelectedFilter={setSelectedFilter} />
+                <FilterBar
+                  selectedItem={selectedFilter}
+                  setSelectedItem={setSelectedFilter}
+                  items={[
+                    { id: 'all', title: 'All' },
+                    { id: 'dining', title: 'Dining Hall' },
+                    { id: 'restaurants', title: 'Restaurants' },
+                    { id: 'convenience', title: 'Convenience Store' },
+                  ]}
+                />
               </View>
             </View>
           }
