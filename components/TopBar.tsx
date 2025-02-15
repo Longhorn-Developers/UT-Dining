@@ -32,10 +32,11 @@ const HomeTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
-            NativeAlert.alert(
-              'Coming Soon!',
-              'The meal planner feature will be available in an upcoming update.'
-            );
+            // NativeAlert.alert(
+            //   'Coming Soon!',
+            //   'The meal planner feature will be available in an upcoming update.'
+            // );
+            router.push(`/meal-plan`);
           }}>
           <ChefHat size={20} color={COLORS['ut-grey']} />
         </TouchableOpacity>
@@ -80,10 +81,12 @@ const LocationTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
-            NativeAlert.alert(
-              'Coming Soon!',
-              'The meal planner feature will be available in an upcoming update.'
-            );
+            // NativeAlert.alert(
+            //   'Coming Soon!',
+            //   'The meal planner feature will be available in an upcoming update.'
+            // );
+
+            router.push(`/meal-plan`);
           }}>
           <ChefHat size={20} color={COLORS['ut-grey']} />
         </TouchableOpacity>
@@ -118,7 +121,13 @@ const FoodTopBar = () => {
     menu: string;
   }>();
 
-  const { toggleFavoriteFoodItem, getFoodItem, isFavoriteFoodItem } = useDataStore();
+  const {
+    toggleFavoriteFoodItem,
+    toggleMealPlanItem,
+    getFoodItem,
+    isFavoriteFoodItem,
+    isMealPlanItem,
+  } = useDataStore();
 
   const foodItem = getFoodItem(location, menu, category, food);
 
@@ -129,6 +138,46 @@ const FoodTopBar = () => {
       </TouchableOpacity>
 
       <View className="flex-row gap-x-5">
+        <TouchableOpacity
+          onPress={() => {
+            if (foodItem) {
+              if (isMealPlanItem(food)) {
+                Notifier.showNotification({
+                  title: `${foodItem.name} removed from today's meal plan!`,
+                  description: 'You removed this item from your meal plan.',
+                  swipeEnabled: true,
+                  Component: Alert,
+                  duration: 3000,
+                  queueMode: 'immediate',
+                });
+              } else {
+                Notifier.showNotification({
+                  title: `${foodItem.name} added to today's meal plan!`,
+                  description: 'You added this item to your meal plan.',
+                  swipeEnabled: true,
+                  Component: Alert,
+                  duration: 3000,
+                  queueMode: 'immediate',
+                });
+              }
+
+              setTimeout(() => {
+                toggleMealPlanItem({
+                  ...foodItem,
+                  categoryName: category,
+                  locationName: location,
+                  menuName: menu,
+                });
+              }, 200);
+            }
+          }}>
+          <ChefHat
+            size={20}
+            color={isMealPlanItem(food) ? COLORS['ut-burnt-orange'] : COLORS['ut-grey']}
+            fill={isMealPlanItem(food) ? COLORS['ut-burnt-orange'] : 'white'}
+          />
+        </TouchableOpacity>
+
         <TouchableOpacity
           onPress={() => {
             if (foodItem) {
@@ -144,7 +193,7 @@ const FoodTopBar = () => {
               } else {
                 Notifier.showNotification({
                   title: `${foodItem.name} added to Favorites!`,
-                  description: 'You added this item to your favorites.',
+                  description: 'You added this item to your Favorites.',
                   swipeEnabled: true,
                   Component: Alert,
                   duration: 3000,
@@ -179,7 +228,7 @@ const FoodTopBar = () => {
   );
 };
 
-const FavoritesTopBar = () => {
+const BackTopBar = () => {
   return (
     <View className="flex w-full flex-row items-center justify-between ">
       <TouchableOpacity className="flex items-center" onPress={() => router.back()}>
@@ -190,13 +239,13 @@ const FavoritesTopBar = () => {
 };
 
 interface TopBarProps {
-  variant?: 'home' | 'location' | 'favorites' | 'food';
+  variant?: 'home' | 'location' | 'back' | 'food';
 }
 
 const BarComponent = {
   home: <HomeTopBar />,
   location: <LocationTopBar />,
-  favorites: <FavoritesTopBar />,
+  back: <BackTopBar />,
   food: <FoodTopBar />,
 };
 

@@ -1,7 +1,8 @@
 import * as Haptics from 'expo-haptics';
 import { router, Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { ChevronRight } from 'lucide-react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -12,6 +13,7 @@ import {
 } from 'react-native';
 import { Notifier } from 'react-native-notifier';
 
+import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
@@ -20,6 +22,15 @@ import { DataQuery, useDataStore } from '~/store/useDataStore';
 import { COLORS } from '~/utils/colors';
 import { getLocationTimeMessage, isLocationOpen, timeOfDay } from '~/utils/time';
 import { cn } from '~/utils/utils';
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
+
+// Set the animation options. This is optional.
+SplashScreen.setOptions({
+  duration: 1000,
+  fade: true,
+});
 
 const sortLocations = (data: DataQuery) => {
   // Make a copy of data and sort based on the index in LOCATION_INFO.
@@ -34,13 +45,42 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
-  const [hasMounted, setHasMounted] = useState(false);
+  const [appIsReady, setAppIsReady] = useState(false);
   const { data, fetchData, forceFetchData, setLastUpdated, lastUpdated } = useDataStore();
 
   useEffect(() => {
     fetchData();
-    setHasMounted(true);
   }, []);
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        // Pre-load fonts, make any API calls you need to do here
+        fetchData();
+        // Artificially delay for two seconds to simulate a slow loading
+        // experience. Remove this if you copy and paste the code!
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the application to render
+        setAppIsReady(true);
+      }
+    }
+
+    prepare();
+  }, []);
+
+  const onLayoutRootView = useCallback(() => {
+    if (appIsReady) {
+      // This tells the splash screen to hide immediately! If we call this after
+      // `setAppIsReady`, then we may see a blank screen while the app is
+      // loading its initial state and rendering its first pixels. So instead,
+      // we hide the splash screen once we know the root view has already
+      // performed layout.
+      SplashScreen.hide();
+    }
+  }, [appIsReady]);
 
   // Update current time every minute to refresh the message
   useEffect(() => {
@@ -60,7 +100,8 @@ export default function Home() {
     Notifier.showNotification({
       title: 'Data Refreshed!',
       description: 'The menu data has been refreshed.',
-      duration: 5000,
+      duration: 3000,
+      Component: Alert,
     });
   };
 
@@ -107,10 +148,14 @@ export default function Home() {
     }
   };
 
+  if (!appIsReady) {
+    return null;
+  }
+
   return (
     <>
       <Stack.Screen options={{ title: 'Home' }} />
-      <Container>
+      <Container onLayout={onLayoutRootView}>
         <FlatList
           extraData={[currentTime, selectedFilter]}
           data={filteredData}
@@ -143,7 +188,7 @@ export default function Home() {
                       className={cn(
                         `size-full rounded-full shadow`,
                         open
-                          ? hasMounted
+                          ? appIsReady
                             ? 'animate-status-blink bg-green-500 shadow-green-500'
                             : 'bg-green-500 shadow-green-500'
                           : 'bg-red-500 shadow-red-500'
