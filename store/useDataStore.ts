@@ -8,6 +8,7 @@ import { shouldRequery } from '~/utils/time';
 const STORAGE_KEY_DATA = 'localData';
 const STORAGE_KEY_TIMESTAMP = 'lastQueryTime';
 const STORAGE_KEY_FAVORITES = 'favoriteFoodItems';
+const STORAGE_KEY_MEALPLAN = 'mealPlanItems';
 
 // Supabase query
 const dataQuery = supabase.from('location').select(`
@@ -21,38 +22,38 @@ const dataQuery = supabase.from('location').select(`
             name,
             link,
             allergens: allergens!food_item_allergens_id_fkey (
-            beef,
-            egg,
-            fish,
-            peanuts,
-            pork,
-            shellfish,
-            soy,
-            tree_nuts,
-            wheat,
-            sesame_seeds,
-            vegan,
-            vegetarian,
-            halal
+              beef,
+              egg,
+              fish,
+              peanuts,
+              pork,
+              shellfish,
+              soy,
+              tree_nuts,
+              wheat,
+              sesame_seeds,
+              vegan,
+              vegetarian,
+              halal
             ),
             nutrition: nutrition_id (
-            calories,
-            total_fat,
-            saturated_fat,
-            trans_fat,
-            cholesterol,
-            sodium,
-            total_carbohydrates,
-            dietary_fiber,
-            total_sugars,
-            protein,
-            vitamin_d,
-            calcium,
-            iron,
-            potassium,
-            ingredients
+              calories,
+              total_fat,
+              saturated_fat,
+              trans_fat,
+              cholesterol,
+              sodium,
+              total_carbohydrates,
+              dietary_fiber,
+              total_sugars,
+              protein,
+              vitamin_d,
+              calcium,
+              iron,
+              potassium,
+              ingredients
             )
-        )
+          )
         )
     )
 `);
@@ -64,7 +65,8 @@ export type Menu = Location['menu'][number];
 export type MenuCategory = Menu['menu_category'][number];
 export type FoodItem = MenuCategory['food_item'][number];
 
-export type FavoriteFoodItem = FoodItem & {
+// Renamed FavoriteFoodItem to StoredFoodItem
+export type StoredFoodItem = FoodItem & {
   categoryName: string;
   locationName: string;
   menuName: string;
@@ -108,11 +110,14 @@ interface DataStore extends DataLookup {
   lastUpdated: Date | null;
   getLastUpdated: () => Promise<string | null>;
   setLastUpdated: () => void;
-  favoriteFoodItems: FavoriteFoodItem[];
-  addFavoriteFoodItem: (item: FavoriteFoodItem) => void;
-  toggleFavoriteFoodItem: (item: FavoriteFoodItem) => boolean;
-  removeFavoriteFoodItem: (item: FavoriteFoodItem) => void;
+  favoriteFoodItems: StoredFoodItem[];
+  addFavoriteFoodItem: (item: StoredFoodItem) => void;
+  toggleFavoriteFoodItem: (item: StoredFoodItem) => boolean;
   isFavoriteFoodItem: (item: string) => boolean;
+  mealPlanItems: StoredFoodItem[];
+  addMealPlanItem: (item: StoredFoodItem) => void;
+  toggleMealPlanItem: (item: StoredFoodItem) => boolean;
+  isMealPlanItem: (item: string) => boolean;
 }
 
 export const useDataStore = create<DataStore>((set, get) => ({
@@ -139,6 +144,9 @@ export const useDataStore = create<DataStore>((set, get) => ({
 
       const { data: fetchedData, error } = await dataQuery;
       if (error) throw error;
+
+      // Clear the meal plan AsyncStorage
+      await AsyncStorage.removeItem(STORAGE_KEY_MEALPLAN);
 
       // Batch storage writes
       await AsyncStorage.multiSet([
@@ -229,17 +237,42 @@ export const useDataStore = create<DataStore>((set, get) => ({
     );
   },
 
-  removeFavoriteFoodItem: (item) => {
+  isFavoriteFoodItem: (item) => {
+    return get().favoriteFoodItems.some((i) => i.name === item);
+  },
+
+  mealPlanItems: [],
+
+  addMealPlanItem: (item) => {
     set((state) => {
-      const newFavorites = state.favoriteFoodItems.filter(
-        (i) => !(i.name === item.name && i.categoryName === item.categoryName)
-      );
-      AsyncStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(newFavorites));
-      return { favoriteFoodItems: newFavorites };
+      const newMealPlanItems = [...state.mealPlanItems, item];
+      AsyncStorage.setItem(STORAGE_KEY_MEALPLAN, JSON.stringify(newMealPlanItems));
+      return { mealPlanItems: newMealPlanItems };
     });
   },
 
-  isFavoriteFoodItem: (item) => {
-    return get().favoriteFoodItems.some((i) => i.name === item);
+  toggleMealPlanItem: (item) => {
+    set((state) => {
+      const alreadyExists = state.mealPlanItems.some(
+        (mealItem) => mealItem.name === item.name && mealItem.categoryName === item.categoryName
+      );
+      let newMealPlanItems;
+      if (alreadyExists) {
+        newMealPlanItems = state.mealPlanItems.filter(
+          (i) => !(i.name === item.name && i.categoryName === item.categoryName)
+        );
+      } else {
+        newMealPlanItems = [...state.mealPlanItems, item];
+      }
+      AsyncStorage.setItem(STORAGE_KEY_MEALPLAN, JSON.stringify(newMealPlanItems));
+      return { mealPlanItems: newMealPlanItems };
+    });
+    return get().mealPlanItems.some(
+      (i) => i.name === item.name && i.categoryName === item.categoryName
+    );
+  },
+
+  isMealPlanItem: (item) => {
+    return get().mealPlanItems.some((i) => i.name === item);
   },
 }));

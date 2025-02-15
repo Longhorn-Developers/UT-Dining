@@ -19,7 +19,7 @@ const Favorites = () => {
         <FlatList
           ListHeaderComponent={
             <View className="my-6 flex gap-y-5">
-              <TopBar variant="favorites" />
+              <TopBar variant="back" />
               <View>
                 <View className="flex-row items-center gap-x-2">
                   <Text className="text-3xl font-extrabold">Your Favorites</Text>
@@ -48,8 +48,9 @@ const Favorites = () => {
           )}
           ListEmptyComponent={
             <View className="mt-12 flex items-center justify-center">
-              <Text className="text-lg font-medium text-ut-burnt-orange">
-                You have no favorites yet!
+              <Text className="text-lg font-bold text-ut-burnt-orange">No Favorites!</Text>
+              <Text className="max-w-64 text-center text-ut-grey">
+                Swipe right on a food item to add to your favorites.
               </Text>
             </View>
           }

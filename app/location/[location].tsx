@@ -184,7 +184,7 @@ const Location = () => {
                   <View className="my-1 w-full border-b border-b-ut-grey/15" />
 
                   <FilterBar
-                    selectedItem={selectedMenu}
+                    selectedItem={selectedMenu as string}
                     setSelectedItem={setSelectedMenu}
                     useTimeOfDayDefault={filters.length > 1}
                     items={filters}
@@ -194,12 +194,17 @@ const Location = () => {
             }
             ListEmptyComponent={
               <View className="mt-12 flex-1 items-center justify-center">
-                <Text className="text-xl font-medium text-ut-burnt-orange">No items found.</Text>
+                <Text className="text-xl font-bold text-ut-burnt-orange">No items found.</Text>
                 <Text className="text-sm">Please try again later.</Text>
               </View>
             }
             renderItem={({ item: menu }) => {
-              return <MenuItem selectedMenu={selectedMenu} menuCategories={menu.menu_category} />;
+              return (
+                <MenuItem
+                  selectedMenu={selectedMenu as string}
+                  menuCategories={menu.menu_category}
+                />
+              );
             }}
           />
         </GestureHandlerRootView>

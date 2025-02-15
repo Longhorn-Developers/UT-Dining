@@ -95,7 +95,7 @@ const Favorite = (
   );
 };
 
-const UnFavorite = (
+const Remove = (
   progressAnimatedValue: SharedValue<number>,
   dragAnimatedValue: SharedValue<number>,
   swipeable: SwipeableMethods
@@ -159,7 +159,7 @@ const UnFavorite = (
   );
 };
 
-const MealPrep = (
+const AddMealPlan = (
   progressAnimatedValue: SharedValue<number>,
   dragAnimatedValue: SharedValue<number>,
   swipeable: SwipeableMethods
@@ -234,9 +234,11 @@ const FoodComponent = ({
   categoryName: string;
   location: string;
 }) => {
-  const { toggleFavoriteFoodItem, isFavoriteFoodItem } = useDataStore();
+  const { toggleFavoriteFoodItem, isFavoriteFoodItem, isMealPlanItem, toggleMealPlanItem } =
+    useDataStore();
   const allergenData = Object.entries(food.allergens || {});
   const isFavorite = isFavoriteFoodItem(food.name as string);
+  const isMealPlan = isMealPlanItem(food.name as string);
 
   return (
     <ReanimatedSwipeable
@@ -250,14 +252,34 @@ const FoodComponent = ({
         swipable.close();
 
         if (direction === 'left') {
-          Notifier.showNotification({
-            title: `${food.name} added to today's meal plan!`,
-            description: 'Tap the chef hat (top right) to view your\nmeal plan for today.',
-            swipeEnabled: true,
-            Component: Alert,
-            duration: 3000,
-            queueMode: 'immediate',
-          });
+          if (isMealPlan) {
+            Notifier.showNotification({
+              title: `${food.name} removed from today's meal plan!`,
+              description: 'You removed this item from your meal plan.',
+              swipeEnabled: true,
+              Component: Alert,
+              duration: 3000,
+              queueMode: 'immediate',
+            });
+          } else {
+            Notifier.showNotification({
+              title: `${food.name} added to today's meal plan!`,
+              description: 'Tap the chef hat (top right) to view your\nmeal plan for today.',
+              swipeEnabled: true,
+              Component: Alert,
+              duration: 3000,
+              queueMode: 'immediate',
+            });
+          }
+
+          setTimeout(() => {
+            toggleMealPlanItem({
+              ...food,
+              categoryName,
+              locationName: location,
+              menuName: selectedMenu,
+            });
+          }, 200);
         } else {
           if (isFavorite) {
             Notifier.showNotification({
@@ -294,8 +316,8 @@ const FoodComponent = ({
       overshootRight={false}
       leftThreshold={50}
       rightThreshold={50}
-      renderRightActions={isFavorite ? UnFavorite : Favorite}
-      renderLeftActions={MealPrep}>
+      renderRightActions={isFavorite ? Remove : Favorite}
+      renderLeftActions={isMealPlan ? Remove : AddMealPlan}>
       <TouchableOpacity
         activeOpacity={1}
         onPress={async () => {
@@ -313,7 +335,7 @@ const FoodComponent = ({
         }}
         className={cn(
           'flex-row items-center justify-between rounded border bg-white px-3 py-2',
-          isFavorite ? 'border-ut-burnt-orange' : 'border-ut-grey/15'
+          isFavorite || isMealPlan ? 'border-ut-burnt-orange' : 'border-ut-grey/15'
         )}>
         <View className="gap-1">
           <View className="flex-row items-center gap-2">
@@ -327,6 +349,8 @@ const FoodComponent = ({
                 color={COLORS['ut-burnt-orange']}
               />
             )}
+
+            {isMealPlan && <ChefHatIcon size={12} color={COLORS['ut-burnt-orange']} />}
           </View>
           <View className="flex flex-row gap-2 ">
             <View className="flex-row items-center gap-x-0.5">
