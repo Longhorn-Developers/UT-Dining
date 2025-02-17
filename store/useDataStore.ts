@@ -34,7 +34,8 @@ const dataQuery = supabase.from('location').select(`
               sesame_seeds,
               vegan,
               vegetarian,
-              halal
+              halal,
+              milk
             ),
             nutrition: nutrition_id (
               calories,
@@ -70,6 +71,7 @@ export type StoredFoodItem = FoodItem & {
   categoryName: string;
   locationName: string;
   menuName: string;
+  quantity?: number; // added quantity (default can be 1 when adding)
 };
 
 type DataLookup = {
@@ -111,13 +113,14 @@ interface DataStore extends DataLookup {
   getLastUpdated: () => Promise<string | null>;
   setLastUpdated: () => void;
   favoriteFoodItems: StoredFoodItem[];
-  addFavoriteFoodItem: (item: StoredFoodItem) => void;
-  toggleFavoriteFoodItem: (item: StoredFoodItem) => boolean;
+  toggleFavoriteFoodItem: (item: StoredFoodItem) => Promise<boolean>;
   isFavoriteFoodItem: (item: string) => boolean;
   mealPlanItems: StoredFoodItem[];
-  addMealPlanItem: (item: StoredFoodItem) => void;
-  toggleMealPlanItem: (item: StoredFoodItem) => boolean;
+  removeMealPlanItem: (name: string) => Promise<void>;
+  getMealPlanItem: (name: string) => StoredFoodItem | null;
+  toggleMealPlanItem: (item: StoredFoodItem) => Promise<boolean>;
   isMealPlanItem: (item: string) => boolean;
+  updateMealPlanItemQuantity: (item: StoredFoodItem, quantity: number) => void;
 }
 
 export const useDataStore = create<DataStore>((set, get) => ({
@@ -203,19 +206,7 @@ export const useDataStore = create<DataStore>((set, get) => ({
 
   favoriteFoodItems: [],
 
-  addFavoriteFoodItem: (item) => {
-    set((state) => {
-      const alreadyExists = state.favoriteFoodItems.some(
-        (favItem) => favItem.name === item.name && favItem.categoryName === item.categoryName
-      );
-      if (alreadyExists) return state;
-      const newFavorites = [...state.favoriteFoodItems, item];
-      AsyncStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(newFavorites));
-      return { favoriteFoodItems: newFavorites };
-    });
-  },
-
-  toggleFavoriteFoodItem: (item) => {
+  toggleFavoriteFoodItem: async (item) => {
     set((state) => {
       const alreadyExists = state.favoriteFoodItems.some(
         (favItem) => favItem.name === item.name && favItem.categoryName === item.categoryName
@@ -228,12 +219,15 @@ export const useDataStore = create<DataStore>((set, get) => ({
       } else {
         newFavorites = [...state.favoriteFoodItems, item];
       }
-      AsyncStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(newFavorites));
+      (async () => {
+        await AsyncStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(newFavorites));
+      })();
       return { favoriteFoodItems: newFavorites };
     });
-    // Since set() runs synchronously in Zustand, we can now check the updated state.
-    return get().favoriteFoodItems.some(
-      (i) => i.name === item.name && i.categoryName === item.categoryName
+    return Promise.resolve(
+      get().favoriteFoodItems.some(
+        (i) => i.name === item.name && i.categoryName === item.categoryName
+      )
     );
   },
 
@@ -243,15 +237,19 @@ export const useDataStore = create<DataStore>((set, get) => ({
 
   mealPlanItems: [],
 
-  addMealPlanItem: (item) => {
+  removeMealPlanItem: async (name) => {
     set((state) => {
-      const newMealPlanItems = [...state.mealPlanItems, item];
-      AsyncStorage.setItem(STORAGE_KEY_MEALPLAN, JSON.stringify(newMealPlanItems));
+      const newMealPlanItems = state.mealPlanItems.filter((i) => i.name !== name);
       return { mealPlanItems: newMealPlanItems };
     });
+    await AsyncStorage.setItem(STORAGE_KEY_MEALPLAN, JSON.stringify(get().mealPlanItems));
   },
 
-  toggleMealPlanItem: (item) => {
+  getMealPlanItem: (name) => {
+    return get().mealPlanItems.find((i) => i.name === name) || null;
+  },
+
+  toggleMealPlanItem: async (item) => {
     set((state) => {
       const alreadyExists = state.mealPlanItems.some(
         (mealItem) => mealItem.name === item.name && mealItem.categoryName === item.categoryName
@@ -262,14 +260,35 @@ export const useDataStore = create<DataStore>((set, get) => ({
           (i) => !(i.name === item.name && i.categoryName === item.categoryName)
         );
       } else {
-        newMealPlanItems = [...state.mealPlanItems, item];
+        newMealPlanItems = [...state.mealPlanItems, { ...item, quantity: item.quantity ?? 1 }];
       }
-      AsyncStorage.setItem(STORAGE_KEY_MEALPLAN, JSON.stringify(newMealPlanItems));
+      (async () => {
+        await AsyncStorage.setItem(STORAGE_KEY_MEALPLAN, JSON.stringify(newMealPlanItems));
+      })();
       return { mealPlanItems: newMealPlanItems };
     });
-    return get().mealPlanItems.some(
-      (i) => i.name === item.name && i.categoryName === item.categoryName
+    return Promise.resolve(
+      get().mealPlanItems.some((i) => i.name === item.name && i.categoryName === item.categoryName)
     );
+  },
+
+  updateMealPlanItemQuantity: (item, quantity) => {
+    set((state) => {
+      const newMealPlanItems = state.mealPlanItems.map((mealItem) =>
+        mealItem.name === item.name && mealItem.categoryName === item.categoryName
+          ? { ...mealItem, quantity }
+          : mealItem
+      );
+      // Optimistic update then persist asynchronously.
+      (async () => {
+        try {
+          await AsyncStorage.setItem(STORAGE_KEY_MEALPLAN, JSON.stringify(newMealPlanItems));
+        } catch (error) {
+          console.error('Failed to persist meal plan:', error);
+        }
+      })();
+      return { mealPlanItems: newMealPlanItems };
+    });
   },
 
   isMealPlanItem: (item) => {

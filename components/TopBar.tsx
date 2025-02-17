@@ -139,9 +139,16 @@ const FoodTopBar = () => {
 
       <View className="flex-row gap-x-5">
         <TouchableOpacity
-          onPress={() => {
+          onPress={async () => {
             if (foodItem) {
-              if (isMealPlanItem(food)) {
+              await toggleMealPlanItem({
+                ...foodItem,
+                categoryName: category,
+                locationName: location,
+                menuName: menu,
+              });
+
+              if (!isMealPlanItem(food)) {
                 Notifier.showNotification({
                   title: `${foodItem.name} removed from today's meal plan!`,
                   description: 'You removed this item from your meal plan.',
@@ -160,15 +167,6 @@ const FoodTopBar = () => {
                   queueMode: 'immediate',
                 });
               }
-
-              setTimeout(() => {
-                toggleMealPlanItem({
-                  ...foodItem,
-                  categoryName: category,
-                  locationName: location,
-                  menuName: menu,
-                });
-              }, 200);
             }
           }}>
           <ChefHat
@@ -179,9 +177,16 @@ const FoodTopBar = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => {
+          onPress={async () => {
             if (foodItem) {
-              if (isFavoriteFoodItem(food)) {
+              await toggleFavoriteFoodItem({
+                ...foodItem,
+                categoryName: category,
+                locationName: location,
+                menuName: menu,
+              });
+
+              if (!isFavoriteFoodItem(food)) {
                 Notifier.showNotification({
                   title: `${foodItem.name} removed from Favorites!`,
                   description: 'You removed this item from your favorites.',
@@ -200,15 +205,6 @@ const FoodTopBar = () => {
                   queueMode: 'immediate',
                 });
               }
-
-              setTimeout(() => {
-                toggleFavoriteFoodItem({
-                  ...foodItem,
-                  categoryName: category,
-                  locationName: location,
-                  menuName: menu,
-                });
-              }, 200);
             }
           }}>
           <Heart

@@ -30,7 +30,8 @@ const Favorites = () => {
                   />
                 </View>
                 <Text className="font-medium text-ut-grey">
-                  To add a favorite, swipe left on a food item!
+                  Swipe left on a food item to add it to your favorites. Swipe left again to remove
+                  it.
                 </Text>
               </View>
 

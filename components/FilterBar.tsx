@@ -29,6 +29,8 @@ const FilterBar = ({
 
       if (defaultFilter && items.some((item) => item.title.includes(defaultFilter))) {
         setSelectedItem(defaultFilter);
+      } else {
+        setSelectedItem(items[0].id);
       }
     }
   }, []);
