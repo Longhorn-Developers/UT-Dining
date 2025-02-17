@@ -49,20 +49,15 @@ export default function Home() {
   const { data, fetchData, forceFetchData, setLastUpdated, lastUpdated } = useDataStore();
 
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  useEffect(() => {
     async function prepare() {
       try {
+        console.log('Preparing app...');
         // Pre-load fonts, make any API calls you need to do here
-        fetchData();
-        // Artificially delay for two seconds to simulate a slow loading
-        // experience. Remove this if you copy and paste the code!
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await fetchData();
       } catch (e) {
         console.warn(e);
       } finally {
+        console.log('App is ready!');
         // Tell the application to render
         setAppIsReady(true);
       }
@@ -86,7 +81,7 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
-    }, 30000); // update every 30 seconds
+    }, 10000); // update every 10 seconds
     return () => clearInterval(interval);
   }, []);
 

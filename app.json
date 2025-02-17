@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "ut-dining-hall",
-    "slug": "ut-dining-hall",
+    "name": "UT Dining",
+    "slug": "ut-dining",
     "version": "1.0.0",
-    "scheme": "client",
+    "scheme": "ut-dining",
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -12,13 +12,12 @@
     "plugins": [
       "expo-router",
       [
-        "expo-font",
+        "expo-splash-screen",
         {
-          "fonts": [
-            {
-              "RobotoFlex": "./assets/fonts/RobotoFlex-VariableFont.ttf"
-            }
-          ]
+          "image": "./assets/icons/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
         }
       ]
     ],
@@ -27,23 +26,50 @@
       "tsconfigPaths": true
     },
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/icons/ios-light.png",
+    "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/icons/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "icon": {
+        "dark": "./assets/icons/ios-dark.png",
+        "light": "./assets/icons/ios-light.png",
+        "tinted": "./assets/icons/ios-tinted.png"
+      },
+      "bundleIdentifier": "com.ethanl06.ut-dining",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/icons/adaptive-icon.png",
+        "backgroundColor": "#BF5700"
+      },
+      "package": "com.ethanl06.utdining"
+    },
+    "newArchEnabled": true,
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "005ee5ea-5ec3-4d96-af00-5d6203694b74"
       }
     },
-    "newArchEnabled": true
+    "owner": "ethanl06",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/005ee5ea-5ec3-4d96-af00-5d6203694b74"
+    }
   }
 }
