@@ -1,328 +1,120 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import {
-  BicepsFlexed,
+  HeartIcon,
   ChefHatIcon,
   ChevronRight,
-  CircleX,
-  Droplet,
   Flame,
-  HeartIcon,
+  BicepsFlexed,
+  Wheat,
 } from 'lucide-react-native';
-import { Text, TouchableOpacity, View, ViewStyle, Image } from 'react-native';
-import ReanimatedSwipeable, {
-  SwipeableMethods,
-} from 'react-native-gesture-handler/ReanimatedSwipeable';
+import React from 'react';
+import { Text, TouchableOpacity, View, Image } from 'react-native';
+import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Notifier } from 'react-native-notifier';
-import Reanimated, {
-  Easing,
-  Extrapolation,
-  interpolate,
-  interpolateColor,
-  SharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
 
 import Alert from './Alert';
+import { FavoriteAction, RemoveAction, AddMealPlanAction } from './AnimatedActions';
 
 import { ALLERGEN_ICONS } from '~/data/AllergenInfo';
 import { FoodItem, useDataStore } from '~/store/useDataStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
 
-const Favorite = (
-  progressAnimatedValue: SharedValue<number>,
-  dragAnimatedValue: SharedValue<number>,
-  swipeable: SwipeableMethods
-) => {
-  const heartAnimation = useAnimatedStyle<ViewStyle>(() => {
-    const translateXValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 1],
-      [50, -20],
-      Extrapolation.CLAMP
-    );
-
-    const scaleValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 1],
-      [0.4, 1.2],
-      Extrapolation.CLAMP
-    );
-
-    const opacityValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 0.2, 1],
-      [0, 1, 1],
-      Extrapolation.CLAMP
-    );
-
-    return {
-      transform: [
-        {
-          scale: withTiming(scaleValue, { duration: 300, easing: Easing.out(Easing.exp) }),
-        },
-        {
-          translateX: withTiming(translateXValue, {
-            duration: 300,
-            easing: Easing.out(Easing.exp),
-          }),
-        },
-      ],
-      opacity: withTiming(opacityValue, { duration: 300 }),
-    };
-  });
-
-  const backgroundAnimation = useAnimatedStyle<ViewStyle>(() => {
-    return {
-      backgroundColor: interpolateColor(
-        progressAnimatedValue.value,
-        [0, 0.8, 1],
-        ['white', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
-      ),
-    };
-  });
-
-  return (
-    <Reanimated.View
-      style={backgroundAnimation}
-      className="min-w-[6.5rem] flex-row items-center justify-end pr-4">
-      <Reanimated.View style={heartAnimation}>
-        <HeartIcon fill="#fff" stroke="#fff" />
-      </Reanimated.View>
-    </Reanimated.View>
-  );
-};
-
-const Remove = (
-  progressAnimatedValue: SharedValue<number>,
-  dragAnimatedValue: SharedValue<number>,
-  swipeable: SwipeableMethods
-) => {
-  const heartAnimation = useAnimatedStyle<ViewStyle>(() => {
-    const translateXValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 1],
-      [50, -20],
-      Extrapolation.CLAMP
-    );
-
-    const scaleValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 1],
-      [0.4, 1.2],
-      Extrapolation.CLAMP
-    );
-
-    const opacityValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 0.2, 1],
-      [0, 1, 1],
-      Extrapolation.CLAMP
-    );
-
-    return {
-      transform: [
-        {
-          scale: withTiming(scaleValue, { duration: 300, easing: Easing.out(Easing.exp) }),
-        },
-        {
-          translateX: withTiming(translateXValue, {
-            duration: 300,
-            easing: Easing.out(Easing.exp),
-          }),
-        },
-      ],
-      opacity: withTiming(opacityValue, { duration: 300 }),
-    };
-  });
-
-  const backgroundAnimation = useAnimatedStyle<ViewStyle>(() => {
-    return {
-      backgroundColor: interpolateColor(
-        progressAnimatedValue.value,
-        [0, 0.8, 1],
-        ['white', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
-      ),
-    };
-  });
-
-  return (
-    <Reanimated.View
-      style={backgroundAnimation}
-      className="min-w-[6.5rem] flex-row items-center justify-end pr-4">
-      <Reanimated.View style={heartAnimation}>
-        <CircleX stroke="#fff" />
-      </Reanimated.View>
-    </Reanimated.View>
-  );
-};
-
-const AddMealPlan = (
-  progressAnimatedValue: SharedValue<number>,
-  dragAnimatedValue: SharedValue<number>,
-  swipeable: SwipeableMethods
-) => {
-  const heartAnimation = useAnimatedStyle<ViewStyle>(() => {
-    const translateXValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 1],
-      [-110, -20],
-      Extrapolation.CLAMP
-    );
-
-    const scaleValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 1],
-      [0.4, 1.2],
-      Extrapolation.CLAMP
-    );
-
-    const opacityValue = interpolate(
-      progressAnimatedValue.value,
-      [0, 0.2, 1],
-      [0, 1, 1],
-      Extrapolation.CLAMP
-    );
-
-    return {
-      transform: [
-        {
-          scale: withTiming(scaleValue, { duration: 300, easing: Easing.out(Easing.exp) }),
-        },
-        {
-          translateX: withTiming(translateXValue, {
-            duration: 300,
-            easing: Easing.out(Easing.exp),
-          }),
-        },
-      ],
-      opacity: withTiming(opacityValue, { duration: 300 }),
-    };
-  });
-
-  const backgroundAnimation = useAnimatedStyle<ViewStyle>(() => {
-    return {
-      backgroundColor: interpolateColor(
-        progressAnimatedValue.value,
-        [0, 0.8, 1],
-        ['white', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
-      ),
-    };
-  });
-
-  return (
-    <Reanimated.View
-      style={backgroundAnimation}
-      className="min-w-[6.5rem] flex-row items-center justify-end pr-4">
-      <Reanimated.View style={heartAnimation}>
-        <ChefHatIcon fill="#fff" stroke="#fff" />
-      </Reanimated.View>
-    </Reanimated.View>
-  );
-};
-
 const FoodComponent = ({
   food,
   selectedMenu,
   categoryName,
   location,
+  showFood = true,
 }: {
   food: FoodItem;
   selectedMenu: string;
   categoryName: string;
   location: string;
+  showFood?: boolean;
 }) => {
-  const { toggleFavoriteFoodItem, isFavoriteFoodItem, isMealPlanItem, toggleMealPlanItem } =
-    useDataStore();
-  const allergenData = Object.entries(food.allergens || {});
-  const isFavorite = isFavoriteFoodItem(food.name as string);
-  const isMealPlan = isMealPlanItem(food.name as string);
+  const toggleFavoriteFoodItem = useDataStore((state) => state.toggleFavoriteFoodItem);
+  const isFavorite = useDataStore((state) => state.isFavoriteFoodItem(food.name as string));
+  const isMealPlan = useDataStore((state) => state.isMealPlanItem(food.name as string));
+  const toggleMealPlanItem = useDataStore((state) => state.toggleMealPlanItem);
 
   return (
     <ReanimatedSwipeable
+      enabled={showFood}
       containerStyle={{
         borderRadius: 4,
         overflow: 'hidden',
         marginBottom: 8,
         backgroundColor: COLORS['ut-burnt-orange'],
+        display: showFood ? 'flex' : 'none',
+        pointerEvents: showFood ? 'auto' : 'none',
       }}
-      onSwipeableOpen={(direction, swipable) => {
-        swipable.close();
+      shouldCancelWhenOutside
+      onSwipeableOpen={(direction, swipeable) => {
+        console.log('swipeable open');
+        swipeable.close();
 
         if (direction === 'left') {
-          if (isMealPlan) {
-            Notifier.showNotification({
-              title: `${food.name} removed from today's meal plan!`,
-              description: 'You removed this item from your meal plan.',
-              swipeEnabled: true,
-              Component: Alert,
-              duration: 3000,
-              queueMode: 'immediate',
-            });
-          } else {
-            Notifier.showNotification({
-              title: `${food.name} added to today's meal plan!`,
-              description: 'Tap the chef hat (top right) to view your\nmeal plan for today.',
-              swipeEnabled: true,
-              Component: Alert,
-              duration: 3000,
-              queueMode: 'immediate',
-            });
-          }
+          toggleMealPlanItem({
+            ...food,
+            categoryName,
+            locationName: location,
+            menuName: selectedMenu,
+          });
 
-          setTimeout(() => {
-            toggleMealPlanItem({
-              ...food,
-              categoryName,
-              locationName: location,
-              menuName: selectedMenu,
-            });
-          }, 200);
+          Notifier.showNotification({
+            title: isMealPlan
+              ? `${food.name} removed from today's meal plan!`
+              : `${food.name} added to today's meal plan!`,
+            description: isMealPlan
+              ? 'You removed this item from your meal plan.'
+              : 'Tap the chef hat (top right) to view your\nmeal plan for today.',
+            swipeEnabled: true,
+            Component: Alert,
+            duration: 3000,
+            queueMode: 'immediate',
+          });
         } else {
-          if (isFavorite) {
-            Notifier.showNotification({
-              title: `${food.name} removed from Favorites!`,
-              description: 'You removed this item from your favorites.',
-              swipeEnabled: true,
-              Component: Alert,
-              duration: 3000,
-              queueMode: 'immediate',
-            });
-          } else {
-            Notifier.showNotification({
-              title: `${food.name} added to Favorites!`,
-              description: 'Tap the heart (top right) to view your saved favorites.',
-              swipeEnabled: true,
-              Component: Alert,
-              duration: 3000,
-              queueMode: 'immediate',
-            });
-          }
+          toggleFavoriteFoodItem({
+            ...food,
+            categoryName,
+            locationName: location,
+            menuName: selectedMenu,
+          });
 
-          // To ensure the animation is complete before updating the state
-          setTimeout(() => {
-            toggleFavoriteFoodItem({
-              ...food,
-              categoryName,
-              locationName: location,
-              menuName: selectedMenu,
-            });
-          }, 200);
+          Notifier.showNotification({
+            title: isFavorite
+              ? `${food.name} removed from Favorites!`
+              : `${food.name} added to Favorites!`,
+            description: isFavorite
+              ? 'You removed this item from your favorites.'
+              : 'Tap the heart (top right) to view your saved favorites.',
+            swipeEnabled: true,
+            Component: Alert,
+            duration: 3000,
+            queueMode: 'immediate',
+          });
         }
       }}
       overshootLeft={false}
       overshootRight={false}
       leftThreshold={50}
       rightThreshold={50}
-      renderRightActions={isFavorite ? Remove : Favorite}
-      renderLeftActions={isMealPlan ? Remove : AddMealPlan}>
+      renderRightActions={(progress) =>
+        isFavorite ? <RemoveAction progress={progress} /> : <FavoriteAction progress={progress} />
+      }
+      renderLeftActions={(progress) =>
+        isMealPlan ? (
+          <RemoveAction progress={progress} />
+        ) : (
+          <AddMealPlanAction progress={progress} />
+        )
+      }>
       <TouchableOpacity
         activeOpacity={1}
         onPress={async () => {
           await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
           router.push({
             pathname: `/location/food/[food]`,
             params: {
@@ -349,13 +141,12 @@ const FoodComponent = ({
                 color={COLORS['ut-burnt-orange']}
               />
             )}
-
             {isMealPlan && <ChefHatIcon size={12} color={COLORS['ut-burnt-orange']} />}
           </View>
-          <View className="flex flex-row gap-2 ">
+          <View className="flex flex-row gap-2">
             <View className="flex-row items-center gap-x-0.5">
               <Flame fill={COLORS['ut-burnt-orange']} size={10} color={COLORS['ut-burnt-orange']} />
-              <Text className="text-xs font-medium">{food.nutrition?.calories} kCal</Text>
+              <Text className="text-xs font-medium">{food.nutrition?.calories} kcal</Text>
             </View>
             <View className="flex-row items-center gap-x-0.5">
               <BicepsFlexed
@@ -366,17 +157,14 @@ const FoodComponent = ({
               <Text className="text-xs font-medium">{food.nutrition?.protein} Protein</Text>
             </View>
             <View className="flex-row items-center gap-x-0.5">
-              <Droplet
-                fill={COLORS['ut-burnt-orange']}
-                size={10}
-                color={COLORS['ut-burnt-orange']}
-              />
-              <Text className="text-xs font-medium">{food.nutrition?.total_fat} Fat</Text>
+              <Wheat fill={COLORS['ut-burnt-orange']} size={10} color={COLORS['ut-burnt-orange']} />
+              <Text className="text-xs font-medium">
+                {food.nutrition?.total_carbohydrates} Carbs
+              </Text>
             </View>
           </View>
-
           <View className="flex-row flex-wrap gap-1">
-            {allergenData.map(
+            {Object.entries(food.allergens || {}).map(
               ([key, value]) =>
                 value && (
                   <Image
@@ -389,7 +177,6 @@ const FoodComponent = ({
             )}
           </View>
         </View>
-
         <View className="flex-row items-center gap-x-1">
           <ChevronRight size={20} color={COLORS['ut-burnt-orange']} />
         </View>

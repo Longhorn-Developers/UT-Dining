@@ -1,9 +1,8 @@
 import { FlashList } from '@shopify/flash-list';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { ChevronDown, Clock, Filter } from 'lucide-react-native';
+import { ChevronDown, Clock } from 'lucide-react-native';
 import React, { useState, useCallback, useMemo } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 import { Container } from '~/components/Container';
 import FilterBar from '~/components/FilterBar';
@@ -45,20 +44,21 @@ const MenuCategoryItem = React.memo(
             <ChevronDown size={20} color={COLORS['ut-grey']} />
           </View>
         </TouchableOpacity>
-        {showFood && (
-          <FlashList
-            data={foodItems}
-            estimatedItemSize={20}
-            renderItem={({ item: food }) => (
-              <FoodComponent
-                food={food}
-                selectedMenu={selectedMenu}
-                categoryName={categoryName}
-                location={location as string}
-              />
-            )}
-          />
-        )}
+
+        <FlashList
+          data={foodItems}
+          estimatedItemSize={20}
+          renderItem={({ item: food }) => (
+            <FoodComponent
+              food={food}
+              selectedMenu={selectedMenu}
+              categoryName={categoryName}
+              location={location as string}
+              showFood={showFood}
+            />
+          )}
+          extraData={showFood}
+        />
       </View>
     );
   }
@@ -91,7 +91,7 @@ const Location = () => {
   }: {
     location: string;
   } = useLocalSearchParams();
-  const { getLocationData } = useDataStore();
+  const getLocationData = useDataStore((state) => state.getLocationData);
   const data = getLocationData(location);
 
   const [selectedMenu, setSelectedMenu] = useState(
@@ -120,94 +120,87 @@ const Location = () => {
   return (
     <>
       <Stack.Screen options={{ title: 'Location' }} />
-      <Container className="mx-0">
-        <GestureHandlerRootView>
-          <FlashList
-            data={filteredData}
-            estimatedItemSize={5}
-            removeClippedSubviews
-            ListHeaderComponent={
-              <View className="mx-6 mt-6 flex gap-y-5">
-                <TopBar variant="location" />
-                <View className="gap-y-4">
-                  <View>
-                    <View className="w-full flex-row items-center justify-between">
-                      <Text className="font-sans text-3xl font-extrabold">{location}</Text>
-                    </View>
-                    <Text className="text-lg font-semibold text-ut-burnt-orange">
-                      {isLocationOpen(location) ? 'Open' : 'Closed'}
-                    </Text>
+      <Container className="mx-0 flex-1">
+        <FlashList
+          data={filteredData}
+          estimatedItemSize={20}
+          removeClippedSubviews
+          ListHeaderComponent={
+            <View className="mx-6 mt-6 flex gap-y-5">
+              <TopBar variant="location" />
+              <View className="gap-y-4">
+                <View>
+                  <View className="w-full flex-row items-center justify-between">
+                    <Text className="font-sans text-3xl font-extrabold">{location}</Text>
+                  </View>
+                  <Text className="text-lg font-semibold text-ut-burnt-orange">
+                    {isLocationOpen(location) ? 'Open' : 'Closed'}
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    setTimeDropdownOpen(!timeDropdownOpen);
+                  }}
+                  className="flex flex-row items-start gap-4">
+                  {/* Left Column: Day Ranges */}
+                  <View className="flex flex-col gap-1.5">
+                    {(timeDropdownOpen ? schedule : schedule.slice(0, 1)).map((item, index) => (
+                      <View key={item.dayRange} className="flex flex-row gap-2">
+                        {/* Show Clock icon only for the first item */}
+                        <View className={index === 0 ? 'flex' : 'invisible'}>
+                          <Clock size={12} color={COLORS['ut-grey']} />
+                        </View>
+                        <Text className="text-sm leading-none text-ut-grey">{item.dayRange}:</Text>
+                      </View>
+                    ))}
                   </View>
 
-                  <TouchableOpacity
-                    onPress={() => {
-                      setTimeDropdownOpen(!timeDropdownOpen);
-                    }}
-                    className="flex flex-row items-start gap-4">
-                    {/* Left Column: Day Ranges */}
-                    <View className="flex flex-col gap-1.5">
-                      {(timeDropdownOpen ? schedule : schedule.slice(0, 1)).map((item, index) => (
-                        <View key={item.dayRange} className="flex flex-row gap-2">
-                          {/* Show Clock icon only for the first item */}
-                          <View className={index === 0 ? 'flex' : 'invisible'}>
-                            <Clock size={12} color={COLORS['ut-grey']} />
+                  {/* Right Column: Times */}
+                  <View className="flex flex-col gap-1.5">
+                    {(timeDropdownOpen ? schedule : schedule.slice(0, 1)).map((item, index) => (
+                      <View key={item.dayRange} className="flex flex-row gap-2">
+                        <Text key={index} className={cn('text-sm leading-none text-ut-grey')}>
+                          {item.time}
+                        </Text>
+
+                        {index === 0 && (
+                          <View
+                            className={cn(
+                              'transition-transform duration-200 ease-in-out',
+                              timeDropdownOpen ? 'rotate-180 transform' : 'rotate-0'
+                            )}>
+                            <ChevronDown size={12} color={COLORS['ut-grey']} />
                           </View>
-                          <Text className="text-sm leading-none text-ut-grey">
-                            {item.dayRange}:
-                          </Text>
-                        </View>
-                      ))}
-                    </View>
+                        )}
+                      </View>
+                    ))}
+                  </View>
+                </TouchableOpacity>
 
-                    {/* Right Column: Times */}
-                    <View className="flex flex-col gap-1.5">
-                      {(timeDropdownOpen ? schedule : schedule.slice(0, 1)).map((item, index) => (
-                        <View key={item.dayRange} className="flex flex-row gap-2">
-                          <Text key={index} className={cn('text-sm leading-none text-ut-grey')}>
-                            {item.time}
-                          </Text>
+                <View className="my-1 w-full border-b border-b-ut-grey/15" />
 
-                          {index === 0 && (
-                            <View
-                              className={cn(
-                                'transition-transform duration-200 ease-in-out',
-                                timeDropdownOpen ? 'rotate-180 transform' : 'rotate-0'
-                              )}>
-                              <ChevronDown size={12} color={COLORS['ut-grey']} />
-                            </View>
-                          )}
-                        </View>
-                      ))}
-                    </View>
-                  </TouchableOpacity>
-
-                  <View className="my-1 w-full border-b border-b-ut-grey/15" />
-
-                  <FilterBar
-                    selectedItem={selectedMenu as string}
-                    setSelectedItem={setSelectedMenu}
-                    useTimeOfDayDefault={filters.length > 1}
-                    items={filters}
-                  />
-                </View>
-              </View>
-            }
-            ListEmptyComponent={
-              <View className="mt-12 flex-1 items-center justify-center">
-                <Text className="text-xl font-bold text-ut-burnt-orange">No items found.</Text>
-                <Text className="text-sm">Please try again later.</Text>
-              </View>
-            }
-            renderItem={({ item: menu }) => {
-              return (
-                <MenuItem
-                  selectedMenu={selectedMenu as string}
-                  menuCategories={menu.menu_category}
+                <FilterBar
+                  selectedItem={selectedMenu as string}
+                  setSelectedItem={setSelectedMenu}
+                  useTimeOfDayDefault={filters.length > 1}
+                  items={filters}
                 />
-              );
-            }}
-          />
-        </GestureHandlerRootView>
+              </View>
+            </View>
+          }
+          ListEmptyComponent={
+            <View className="mt-12 flex-1 items-center justify-center">
+              <Text className="text-xl font-bold text-ut-burnt-orange">No items found.</Text>
+              <Text className="text-sm">Please try again later.</Text>
+            </View>
+          }
+          renderItem={({ item: menu }) => {
+            return (
+              <MenuItem selectedMenu={selectedMenu as string} menuCategories={menu.menu_category} />
+            );
+          }}
+        />
       </Container>
     </>
   );

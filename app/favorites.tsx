@@ -1,3 +1,4 @@
+import { FlashList } from '@shopify/flash-list';
 import { Stack } from 'expo-router';
 import { HeartIcon } from 'lucide-react-native';
 import React from 'react';
@@ -10,13 +11,14 @@ import { useDataStore } from '~/store/useDataStore';
 import { COLORS } from '~/utils/colors';
 
 const Favorites = () => {
-  const { favoriteFoodItems } = useDataStore();
+  const favoriteFoodItems = useDataStore((state) => state.favoriteFoodItems);
 
   return (
     <>
       <Stack.Screen options={{ title: 'Favorites' }} />
       <Container>
-        <FlatList
+        <FlashList
+          keyExtractor={(item) => `${item.name}-${item.categoryName}-${item.menuName}`}
           ListHeaderComponent={
             <View className="my-6 flex gap-y-5">
               <TopBar variant="back" />
@@ -30,7 +32,8 @@ const Favorites = () => {
                   />
                 </View>
                 <Text className="font-medium text-ut-grey">
-                  To add a favorite, swipe left on a food item!
+                  Swipe left on a food item to add it to your favorites. Swipe left again to remove
+                  it.
                 </Text>
               </View>
 

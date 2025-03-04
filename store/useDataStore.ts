@@ -7,8 +7,8 @@ import { shouldRequery } from '~/utils/time';
 
 const STORAGE_KEY_DATA = 'localData';
 const STORAGE_KEY_TIMESTAMP = 'lastQueryTime';
-const STORAGE_KEY_FAVORITES = 'favoriteFoodItems';
-const STORAGE_KEY_MEALPLAN = 'mealPlanItems';
+export const STORAGE_KEY_FAVORITES = 'favoriteFoodItems';
+export const STORAGE_KEY_MEALPLAN = 'mealPlanItems';
 
 // Supabase query
 const dataQuery = supabase.from('location').select(`
@@ -34,7 +34,8 @@ const dataQuery = supabase.from('location').select(`
               sesame_seeds,
               vegan,
               vegetarian,
-              halal
+              halal,
+              milk
             ),
             nutrition: nutrition_id (
               calories,
@@ -70,6 +71,7 @@ export type StoredFoodItem = FoodItem & {
   categoryName: string;
   locationName: string;
   menuName: string;
+  quantity?: number; // added quantity (default can be 1 when adding)
 };
 
 type DataLookup = {
@@ -111,168 +113,192 @@ interface DataStore extends DataLookup {
   getLastUpdated: () => Promise<string | null>;
   setLastUpdated: () => void;
   favoriteFoodItems: StoredFoodItem[];
-  addFavoriteFoodItem: (item: StoredFoodItem) => void;
-  toggleFavoriteFoodItem: (item: StoredFoodItem) => boolean;
+  toggleFavoriteFoodItem: (item: StoredFoodItem) => void;
   isFavoriteFoodItem: (item: string) => boolean;
   mealPlanItems: StoredFoodItem[];
-  addMealPlanItem: (item: StoredFoodItem) => void;
-  toggleMealPlanItem: (item: StoredFoodItem) => boolean;
+  removeMealPlanItem: (name: string) => void;
+  getMealPlanItem: (name: string) => StoredFoodItem | null;
+  toggleMealPlanItem: (item: StoredFoodItem) => void;
   isMealPlanItem: (item: string) => boolean;
+  updateMealPlanItemQuantity: (item: StoredFoodItem, quantity: number) => void;
 }
 
-export const useDataStore = create<DataStore>((set, get) => ({
-  data: null,
-  locations: new Map(),
-  foodItems: new Map(),
-
-  fetchData: async () => {
+export const useDataStore = create<DataStore>((set, get) => {
+  // Initialize persisted arrays from AsyncStorage.
+  (async () => {
     try {
-      // Batch storage reads
-      const [storedData, lastQueryTime] = await AsyncStorage.multiGet([
-        STORAGE_KEY_DATA,
-        STORAGE_KEY_TIMESTAMP,
+      const [favoritesResult, mealPlanResult] = await AsyncStorage.multiGet([
+        STORAGE_KEY_FAVORITES,
+        STORAGE_KEY_MEALPLAN,
       ]);
-
-      if (storedData[1] && lastQueryTime[1] && !shouldRequery(lastQueryTime[1])) {
-        const parsedData = JSON.parse(storedData[1]);
-        set({
-          data: parsedData,
-          ...createLookupMaps(parsedData),
-        });
-        return;
-      }
-
-      const { data: fetchedData, error } = await dataQuery;
-      if (error) throw error;
-
-      // Clear the meal plan AsyncStorage
-      await AsyncStorage.removeItem(STORAGE_KEY_MEALPLAN);
-
-      // Batch storage writes
-      await AsyncStorage.multiSet([
-        [STORAGE_KEY_DATA, JSON.stringify(fetchedData)],
-        [STORAGE_KEY_TIMESTAMP, new Date().toISOString()],
-      ]);
-
+      const storedFavorites = favoritesResult[1] ? JSON.parse(favoritesResult[1]) : [];
+      const storedMealPlan = mealPlanResult[1] ? JSON.parse(mealPlanResult[1]) : [];
       set({
-        data: fetchedData,
-        ...createLookupMaps(fetchedData),
-        lastUpdated: new Date(),
+        favoriteFoodItems: storedFavorites,
+        mealPlanItems: storedMealPlan,
       });
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error loading persisted data:', error);
     }
-  },
+  })();
 
-  forceFetchData: async () => {
-    try {
-      const { data: fetchedData, error } = await dataQuery;
+  return {
+    data: null,
+    locations: new Map(),
+    foodItems: new Map(),
 
-      if (error) throw error;
+    fetchData: async () => {
+      try {
+        // Batch storage reads
+        const [storedData, lastQueryTime] = await AsyncStorage.multiGet([
+          STORAGE_KEY_DATA,
+          STORAGE_KEY_TIMESTAMP,
+        ]);
 
-      await AsyncStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(fetchedData));
-      await AsyncStorage.setItem(STORAGE_KEY_TIMESTAMP, new Date().toISOString());
+        if (storedData[1] && lastQueryTime[1] && !shouldRequery(lastQueryTime[1])) {
+          const parsedData = JSON.parse(storedData[1]);
+          set({
+            data: parsedData,
+            ...createLookupMaps(parsedData),
+          });
+          return;
+        }
 
-      set({ data: fetchedData });
-      console.log('fetching new data');
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  },
+        const { data: fetchedData, error } = await dataQuery;
+        if (error) throw error;
 
-  getLocationData: (name) => {
-    return get().locations.get(name) || null;
-  },
+        // Clear the meal plan AsyncStorage
+        await AsyncStorage.removeItem(STORAGE_KEY_MEALPLAN);
 
-  getFoodItem: (locationName, menuName, categoryName, itemName) => {
-    return get().foodItems.get(`${locationName}-${menuName}-${categoryName}-${itemName}`) || null;
-  },
+        // Batch storage writes
+        await AsyncStorage.multiSet([
+          [STORAGE_KEY_DATA, JSON.stringify(fetchedData)],
+          [STORAGE_KEY_TIMESTAMP, new Date().toISOString()],
+        ]);
 
-  getLastUpdated: async () => {
-    const storedData = await AsyncStorage.getItem(STORAGE_KEY_DATA);
-    set({ data: storedData ? JSON.parse(storedData) : null });
-    return AsyncStorage.getItem(STORAGE_KEY_TIMESTAMP);
-  },
-
-  setLastUpdated: () => {
-    AsyncStorage.setItem(STORAGE_KEY_TIMESTAMP, new Date().toISOString());
-    set({ lastUpdated: new Date() });
-  },
-
-  lastUpdated: null,
-
-  favoriteFoodItems: [],
-
-  addFavoriteFoodItem: (item) => {
-    set((state) => {
-      const alreadyExists = state.favoriteFoodItems.some(
-        (favItem) => favItem.name === item.name && favItem.categoryName === item.categoryName
-      );
-      if (alreadyExists) return state;
-      const newFavorites = [...state.favoriteFoodItems, item];
-      AsyncStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(newFavorites));
-      return { favoriteFoodItems: newFavorites };
-    });
-  },
-
-  toggleFavoriteFoodItem: (item) => {
-    set((state) => {
-      const alreadyExists = state.favoriteFoodItems.some(
-        (favItem) => favItem.name === item.name && favItem.categoryName === item.categoryName
-      );
-      let newFavorites;
-      if (alreadyExists) {
-        newFavorites = state.favoriteFoodItems.filter(
-          (i) => !(i.name === item.name && i.categoryName === item.categoryName)
-        );
-      } else {
-        newFavorites = [...state.favoriteFoodItems, item];
+        set({
+          data: fetchedData,
+          ...createLookupMaps(fetchedData),
+          lastUpdated: new Date(),
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-      AsyncStorage.setItem(STORAGE_KEY_FAVORITES, JSON.stringify(newFavorites));
-      return { favoriteFoodItems: newFavorites };
-    });
-    // Since set() runs synchronously in Zustand, we can now check the updated state.
-    return get().favoriteFoodItems.some(
-      (i) => i.name === item.name && i.categoryName === item.categoryName
-    );
-  },
+    },
 
-  isFavoriteFoodItem: (item) => {
-    return get().favoriteFoodItems.some((i) => i.name === item);
-  },
+    forceFetchData: async () => {
+      try {
+        const { data: fetchedData, error } = await dataQuery;
 
-  mealPlanItems: [],
+        if (error) throw error;
 
-  addMealPlanItem: (item) => {
-    set((state) => {
-      const newMealPlanItems = [...state.mealPlanItems, item];
-      AsyncStorage.setItem(STORAGE_KEY_MEALPLAN, JSON.stringify(newMealPlanItems));
-      return { mealPlanItems: newMealPlanItems };
-    });
-  },
+        await AsyncStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(fetchedData));
+        await AsyncStorage.setItem(STORAGE_KEY_TIMESTAMP, new Date().toISOString());
 
-  toggleMealPlanItem: (item) => {
-    set((state) => {
-      const alreadyExists = state.mealPlanItems.some(
-        (mealItem) => mealItem.name === item.name && mealItem.categoryName === item.categoryName
-      );
-      let newMealPlanItems;
-      if (alreadyExists) {
-        newMealPlanItems = state.mealPlanItems.filter(
-          (i) => !(i.name === item.name && i.categoryName === item.categoryName)
-        );
-      } else {
-        newMealPlanItems = [...state.mealPlanItems, item];
+        set({ data: fetchedData });
+        console.log('fetching new data');
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-      AsyncStorage.setItem(STORAGE_KEY_MEALPLAN, JSON.stringify(newMealPlanItems));
-      return { mealPlanItems: newMealPlanItems };
-    });
-    return get().mealPlanItems.some(
-      (i) => i.name === item.name && i.categoryName === item.categoryName
-    );
-  },
+    },
 
-  isMealPlanItem: (item) => {
-    return get().mealPlanItems.some((i) => i.name === item);
-  },
-}));
+    getLocationData: (name) => {
+      return get().locations.get(name) || null;
+    },
+
+    getFoodItem: (locationName, menuName, categoryName, itemName) => {
+      return get().foodItems.get(`${locationName}-${menuName}-${categoryName}-${itemName}`) || null;
+    },
+
+    getLastUpdated: async () => {
+      const storedData = await AsyncStorage.getItem(STORAGE_KEY_DATA);
+      set({ data: storedData ? JSON.parse(storedData) : null });
+      return AsyncStorage.getItem(STORAGE_KEY_TIMESTAMP);
+    },
+
+    setLastUpdated: () => {
+      AsyncStorage.setItem(STORAGE_KEY_TIMESTAMP, new Date().toISOString());
+      set({ lastUpdated: new Date() });
+    },
+
+    lastUpdated: null,
+
+    favoriteFoodItems: [],
+
+    toggleFavoriteFoodItem: (item) => {
+      set((state) => {
+        const alreadyExists = state.favoriteFoodItems.some(
+          (favItem) => favItem.name === item.name && favItem.categoryName === item.categoryName
+        );
+        let newFavorites;
+        if (alreadyExists) {
+          newFavorites = state.favoriteFoodItems.filter(
+            (i) => !(i.name === item.name && i.categoryName === item.categoryName)
+          );
+        } else {
+          newFavorites = [...state.favoriteFoodItems, item];
+        }
+        return { favoriteFoodItems: newFavorites };
+      });
+      return Promise.resolve(
+        get().favoriteFoodItems.some(
+          (i) => i.name === item.name && i.categoryName === item.categoryName
+        )
+      );
+    },
+
+    isFavoriteFoodItem: (item) => {
+      return get().favoriteFoodItems.some((i) => i.name === item);
+    },
+
+    mealPlanItems: [],
+
+    removeMealPlanItem: (name) => {
+      set((state) => {
+        const newMealPlanItems = state.mealPlanItems.filter((i) => i.name !== name);
+        return { mealPlanItems: newMealPlanItems };
+      });
+    },
+
+    getMealPlanItem: (name) => {
+      return get().mealPlanItems.find((i) => i.name === name) || null;
+    },
+
+    toggleMealPlanItem: (item) => {
+      set((state) => {
+        const alreadyExists = state.mealPlanItems.some(
+          (mealItem) => mealItem.name === item.name && mealItem.categoryName === item.categoryName
+        );
+        let newMealPlanItems;
+        if (alreadyExists) {
+          newMealPlanItems = state.mealPlanItems.filter(
+            (i) => !(i.name === item.name && i.categoryName === item.categoryName)
+          );
+        } else {
+          newMealPlanItems = [...state.mealPlanItems, { ...item, quantity: item.quantity ?? 1 }];
+        }
+        return { mealPlanItems: newMealPlanItems };
+      });
+      return Promise.resolve(
+        get().mealPlanItems.some(
+          (i) => i.name === item.name && i.categoryName === item.categoryName
+        )
+      );
+    },
+
+    updateMealPlanItemQuantity: (item, quantity) => {
+      set((state) => {
+        const newMealPlanItems = state.mealPlanItems.map((mealItem) =>
+          mealItem.name === item.name && mealItem.categoryName === item.categoryName
+            ? { ...mealItem, quantity }
+            : mealItem
+        );
+        return { mealPlanItems: newMealPlanItems };
+      });
+    },
+
+    isMealPlanItem: (item) => {
+      return get().mealPlanItems.some((i) => i.name === item);
+    },
+  };
+});

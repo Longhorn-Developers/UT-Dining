@@ -1,6 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { BicepsFlexed, Droplet, Flame } from 'lucide-react-native';
+import { BicepsFlexed, Droplet, Flame, Wheat } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, Image } from 'react-native';
 
@@ -36,7 +36,7 @@ const getPercentage = (value: number, key: string) =>
 const FoodScreen = () => {
   const params = useLocalSearchParams<SearchParams>();
   const { food, menu, category, location } = params;
-  const { getFoodItem } = useDataStore();
+  const getFoodItem = useDataStore((state) => state.getFoodItem);
 
   // Early exit for missing params
   if (!location || !menu || !category || !food) {
@@ -99,7 +99,7 @@ const FoodScreen = () => {
                 {item.key}
               </Text>
             )}
-            <Text>{item.key === 'Calories' ? ` ${item.value} kCal` : ` ${item.value}`}</Text>
+            <Text>{item.key === 'Calories' ? ` ${item.value} kcal` : ` ${item.value}`}</Text>
           </View>
           <View>{DAILY_VALUES[item.key] && <Text className="font-bold">{percentage}%</Text>}</View>
         </View>
@@ -123,7 +123,7 @@ const FoodScreen = () => {
               <View>
                 <Text className="font-sans text-3xl font-extrabold">{foodItem.name}</Text>
 
-                <View className="flex-row gap-x-4">
+                <View className="flex-row gap-x-2">
                   <NutritionInfo
                     icon={
                       <Flame
@@ -132,7 +132,7 @@ const FoodScreen = () => {
                         size={16}
                       />
                     }
-                    value={`${foodItem.nutrition?.calories} kCal`}
+                    value={`${foodItem.nutrition?.calories} kcal`}
                   />
                   <NutritionInfo
                     icon={
@@ -144,15 +144,16 @@ const FoodScreen = () => {
                     }
                     value={`${foodItem.nutrition?.protein} Protein`}
                   />
+
                   <NutritionInfo
                     icon={
-                      <Droplet
+                      <Wheat
                         fill={COLORS['ut-burnt-orange']}
                         color={COLORS['ut-burnt-orange']}
                         size={16}
                       />
                     }
-                    value={`${foodItem.nutrition?.total_fat} Fat`}
+                    value={`${foodItem.nutrition?.total_carbohydrates} Carbs`}
                   />
                 </View>
 

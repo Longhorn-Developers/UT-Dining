@@ -1,15 +1,21 @@
-import { SafeAreaView } from 'react-native';
+import { LayoutChangeEvent, SafeAreaView } from 'react-native';
 
 import { cn } from '~/utils/utils';
 
 export const Container = ({
+  onLayout,
   className,
   children,
 }: {
+  onLayout?: (event: LayoutChangeEvent) => void;
   className?: string;
   children: React.ReactNode;
 }) => {
-  return <SafeAreaView className={cn(styles.container, className)}>{children}</SafeAreaView>;
+  return (
+    <SafeAreaView onLayout={onLayout} className={cn(styles.container, className)}>
+      {children}
+    </SafeAreaView>
+  );
 };
 
 const styles = {

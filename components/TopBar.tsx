@@ -2,7 +2,7 @@ import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Bell, ChefHat, ChevronLeft, Cog, Heart, Info, Map } from 'lucide-react-native';
 import React from 'react';
-import { View, Image, TouchableOpacity, Alert as NativeAlert } from 'react-native';
+import { View, Image, TouchableOpacity, Alert as NativeAlert, Text } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { Notifier } from 'react-native-notifier';
 
@@ -67,8 +67,10 @@ const LocationTopBar = () => {
 
   return (
     <View className="flex w-full flex-row items-center justify-between ">
-      <TouchableOpacity className="flex items-center" onPress={() => router.back()}>
+      <TouchableOpacity className="flex flex-row items-center" onPress={() => router.back()}>
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
+
+        <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>
       </TouchableOpacity>
 
       <View className="flex flex-row gap-x-5">
@@ -81,11 +83,6 @@ const LocationTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
-            // NativeAlert.alert(
-            //   'Coming Soon!',
-            //   'The meal planner feature will be available in an upcoming update.'
-            // );
-
             router.push(`/meal-plan`);
           }}>
           <ChefHat size={20} color={COLORS['ut-grey']} />
@@ -121,27 +118,42 @@ const FoodTopBar = () => {
     menu: string;
   }>();
 
-  const {
-    toggleFavoriteFoodItem,
-    toggleMealPlanItem,
-    getFoodItem,
-    isFavoriteFoodItem,
-    isMealPlanItem,
-  } = useDataStore();
+  const toggleFavoriteFoodItem = useDataStore((state) => state.toggleFavoriteFoodItem);
+  const toggleMealPlanItem = useDataStore((state) => state.toggleMealPlanItem);
+  const getFoodItem = useDataStore((state) => state.getFoodItem);
+  const favoriteFoodItems = useDataStore((state) => state.favoriteFoodItems);
+  const mealPlanItems = useDataStore((state) => state.mealPlanItems);
+
+  const isFavoriteFoodItem = () => {
+    return favoriteFoodItems.some((item) => item.name === food);
+  };
+
+  const isMealPlanItem = () => {
+    return mealPlanItems.some((item) => item.name === food);
+  };
 
   const foodItem = getFoodItem(location, menu, category, food);
 
   return (
     <View className="flex w-full flex-row items-center justify-between ">
-      <TouchableOpacity className="flex items-center" onPress={() => router.back()}>
+      <TouchableOpacity className="flex flex-row items-center" onPress={() => router.back()}>
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
+
+        <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>
       </TouchableOpacity>
 
       <View className="flex-row gap-x-5">
         <TouchableOpacity
           onPress={() => {
             if (foodItem) {
-              if (isMealPlanItem(food)) {
+              toggleMealPlanItem({
+                ...foodItem,
+                categoryName: category,
+                locationName: location,
+                menuName: menu,
+              });
+
+              if (!isMealPlanItem(food)) {
                 Notifier.showNotification({
                   title: `${foodItem.name} removed from today's meal plan!`,
                   description: 'You removed this item from your meal plan.',
@@ -160,15 +172,6 @@ const FoodTopBar = () => {
                   queueMode: 'immediate',
                 });
               }
-
-              setTimeout(() => {
-                toggleMealPlanItem({
-                  ...foodItem,
-                  categoryName: category,
-                  locationName: location,
-                  menuName: menu,
-                });
-              }, 200);
             }
           }}>
           <ChefHat
@@ -181,7 +184,14 @@ const FoodTopBar = () => {
         <TouchableOpacity
           onPress={() => {
             if (foodItem) {
-              if (isFavoriteFoodItem(food)) {
+              toggleFavoriteFoodItem({
+                ...foodItem,
+                categoryName: category,
+                locationName: location,
+                menuName: menu,
+              });
+
+              if (!isFavoriteFoodItem(food)) {
                 Notifier.showNotification({
                   title: `${foodItem.name} removed from Favorites!`,
                   description: 'You removed this item from your favorites.',
@@ -200,15 +210,6 @@ const FoodTopBar = () => {
                   queueMode: 'immediate',
                 });
               }
-
-              setTimeout(() => {
-                toggleFavoriteFoodItem({
-                  ...foodItem,
-                  categoryName: category,
-                  locationName: location,
-                  menuName: menu,
-                });
-              }, 200);
             }
           }}>
           <Heart
@@ -231,8 +232,10 @@ const FoodTopBar = () => {
 const BackTopBar = () => {
   return (
     <View className="flex w-full flex-row items-center justify-between ">
-      <TouchableOpacity className="flex items-center" onPress={() => router.back()}>
+      <TouchableOpacity className="flex flex-row items-center" onPress={() => router.back()}>
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
+
+        <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>
       </TouchableOpacity>
     </View>
   );
