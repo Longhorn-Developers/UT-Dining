@@ -50,7 +50,7 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
    service_role key: eyJh......
    ```
 
-   The `DB URL` and `anon key` are the environment variables you need to configure in the next step.
+   The `API URL` and `anon key` are the environment variables you need to configure in the next step.
 
 4. **Configure Environment Variables**
 
@@ -61,7 +61,7 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
     EXPO_PUBLIC_SUPABASE_ANON_KEY=<supabase-anon-key>
    ```
 
-   Replace `<supabase-url>` and `<supabase-anon-key>` with the values `DB URL` and `anon key` from the previous step.
+   Replace `<supabase-url>` and `<supabase-anon-key>` with the values `API URL` and `anon key` from the previous step.
 
 5. **Start the Development Server**
 
