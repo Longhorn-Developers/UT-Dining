@@ -6,6 +6,7 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
 
 - **Framework:** Expo, React Native
 - **State Management:** Zustand
+- **Database:** Supabase
 - **Styling:** NativeWind and Tailwind CSS
 - **Build Tools:** pnpm, Metro bundler
 
@@ -24,18 +25,45 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
     pnpm install
    ```
 
-3. **Configure Environment Variables**
+3. **Run Local Supabase Instance**
 
-   Create a `.env` file in the root directory and add the following environment variables:
+   For this step, you need [Docker Desktop](https://docs.docker.com/desktop/) installed on your machine. Follow the guide to install it on your system.
+
+   Next, install the Supabase CLI. Follow the guide [here](https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=macos#installing-the-supabase-cli).
+
+   After installing the Supabase CLI, run the following command to start a local Supabase instance:
+
+   ```sh
+   supabase start
+   ```
+
+   Once it's up and running, you should see a message like this in the terminal:
+
+   ```sh
+   Started supabase local development setup.
+
+         API URL: http://localhost:54321
+          DB URL: postgresql://postgres:postgres@localhost:54322/postgres
+      Studio URL: http://localhost:54323
+    Inbucket URL: http://localhost:54324
+        anon key: eyJh......
+   service_role key: eyJh......
+   ```
+
+   The `DB URL` and `anon key` are the environment variables you need to configure in the next step.
+
+4. **Configure Environment Variables**
+
+   Use the `.env-example` file to create a `.env` file in the root directory and add the following environment variables:
 
    ```sh
     EXPO_PUBLIC_SUPABASE_URL=<supabase-url>
     EXPO_PUBLIC_SUPABASE_ANON_KEY=<supabase-anon-key>
    ```
 
-   Contact @EthanL06 for environment variables, or create a Supabase account and create a new project to get your own [here](https://database.new).
+   Replace `<supabase-url>` and `<supabase-anon-key>` with the values `DB URL` and `anon key` from the previous step.
 
-4. **Start the Development Server**
+5. **Start the Development Server**
 
    For iOS:
 
