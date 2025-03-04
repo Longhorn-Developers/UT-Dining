@@ -83,3 +83,5 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
    pnpm run ios --tunnel
    pnpm run android --tunnel
    ```
+
+   > NOTE: This may not work with connecting to the Supabase instance. You may need to use an iOS or Android emulator on your computer instead.
