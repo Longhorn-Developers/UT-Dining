@@ -7,7 +7,7 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
 - **Framework:** Expo, React Native
 - **State Management:** Zustand
 - **Database:** Supabase
-- **Styling:** NativeWind and Tailwind CSS
+- **Styling:** NativeWind
 - **Build Tools:** pnpm, Metro bundler
 
 ## Setup
@@ -84,4 +84,4 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
    pnpm run android --tunnel
    ```
 
-   > NOTE: This may not work with connecting to the Supabase instance. You may need to use an iOS or Android emulator on your computer instead.
+   > NOTE: This may not work with connecting to the Supabase instance. You may need to use an [iOS](https://docs.expo.dev/workflow/ios-simulator/) or [Android](https://docs.expo.dev/workflow/android-studio-emulator/) emulator on your computer instead.
