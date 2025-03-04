@@ -91,7 +91,7 @@ const Location = () => {
   }: {
     location: string;
   } = useLocalSearchParams();
-  const { getLocationData } = useDataStore();
+  const getLocationData = useDataStore((state) => state.getLocationData);
   const data = getLocationData(location);
 
   const [selectedMenu, setSelectedMenu] = useState(
@@ -120,10 +120,10 @@ const Location = () => {
   return (
     <>
       <Stack.Screen options={{ title: 'Location' }} />
-      <Container className="mx-0">
+      <Container className="mx-0 flex-1">
         <FlashList
           data={filteredData}
-          estimatedItemSize={5}
+          estimatedItemSize={20}
           removeClippedSubviews
           ListHeaderComponent={
             <View className="mx-6 mt-6 flex gap-y-5">

@@ -10,7 +10,7 @@ import { RemoveAction } from '~/components/AnimatedActions';
 import { Container } from '~/components/Container';
 import TopBar from '~/components/TopBar';
 import { ALLERGEN_ICONS } from '~/data/AllergenInfo';
-import { FoodItem, useDataStore } from '~/store/useDataStore';
+import { FoodItem, StoredFoodItem, useDataStore } from '~/store/useDataStore';
 import { COLORS } from '~/utils/colors';
 
 const MealPlanComponent = ({
@@ -18,21 +18,20 @@ const MealPlanComponent = ({
   selectedMenu,
   categoryName,
   location,
+  quantity,
 }: {
   food: FoodItem;
   selectedMenu: string;
   categoryName: string;
   location: string;
+  quantity: number;
 }) => {
-  const { updateMealPlanItemQuantity, getMealPlanItem, removeMealPlanItem } = useDataStore();
-  const mealPlanItem = getMealPlanItem(food.name || '');
+  const updateMealPlanItemQuantity = useDataStore((state) => state.updateMealPlanItemQuantity);
+  const removeMealPlanItem = useDataStore((state) => state.removeMealPlanItem);
 
   // Local state to hold TextInput value.
-  const [quantityInput, setQuantityInput] = useState(mealPlanItem?.quantity?.toString() || '1');
-
-  if (!mealPlanItem) {
-    return null;
-  }
+  const [quantityInput, setQuantityInput] = useState(`${quantity}` || '1');
+  console.log('quantityInput', quantityInput);
 
   const description = `${categoryName} - ${location} (${selectedMenu})`;
   const allergenData = Object.entries(food.allergens || {});
@@ -51,10 +50,10 @@ const MealPlanComponent = ({
       rightThreshold={0}
       renderRightActions={() => null}
       renderLeftActions={(progress) => <RemoveAction progress={progress} />}
-      onSwipeableOpen={async (direction, swipeable) => {
+      onSwipeableOpen={(direction, swipeable) => {
         swipeable.close();
 
-        await removeMealPlanItem(food.name || '');
+        removeMealPlanItem(food.name || '');
 
         Notifier.showNotification({
           title: `${food.name} removed from today's meal plan!`,
@@ -108,13 +107,13 @@ const MealPlanComponent = ({
             keyboardType="numeric"
             value={quantityInput}
             onChangeText={setQuantityInput}
-            onEndEditing={async () => {
+            onEndEditing={() => {
               let quantity = parseInt(quantityInput, 10);
               if (isNaN(quantity)) {
                 quantity = 1;
               }
               if (quantity < 1) {
-                await removeMealPlanItem(food.name || '');
+                removeMealPlanItem(food.name || '');
 
                 Notifier.showNotification({
                   title: `${food.name} removed from today's meal plan!`,
@@ -126,7 +125,7 @@ const MealPlanComponent = ({
                 quantity = 99;
               }
               setQuantityInput(quantity.toString());
-              updateMealPlanItemQuantity(mealPlanItem, quantity);
+              updateMealPlanItemQuantity(food as StoredFoodItem, quantity);
             }}
           />
           <Text className="text-xs font-medium text-ut-grey">Quantity</Text>
@@ -137,7 +136,7 @@ const MealPlanComponent = ({
 };
 
 const MealPlan = () => {
-  const { mealPlanItems } = useDataStore();
+  const mealPlanItems = useDataStore((state) => state.mealPlanItems);
 
   const totalCalories = mealPlanItems.reduce(
     (sum, item) => sum + parseFloat(String(item.nutrition?.calories || 0)) * (item?.quantity || 1),
@@ -162,6 +161,7 @@ const MealPlan = () => {
       />
       <Container className="m-0">
         <FlatList
+          keyExtractor={(item) => `${item.name}-${item.categoryName}-${item.menuName}`}
           ListHeaderComponent={
             <View className="flex gap-y-5 bg-white py-6">
               <TopBar variant="back" />
@@ -211,6 +211,7 @@ const MealPlan = () => {
               food={item}
               location={item.locationName}
               selectedMenu={item.menuName}
+              quantity={item.quantity || 1}
             />
           )}
           ListEmptyComponent={

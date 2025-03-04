@@ -34,25 +34,29 @@ const FoodComponent = ({
   location: string;
   showFood?: boolean;
 }) => {
-  const { toggleFavoriteFoodItem, isFavoriteFoodItem, isMealPlanItem, toggleMealPlanItem } =
-    useDataStore();
-  const isFavorite = isFavoriteFoodItem(food.name as string);
-  const isMealPlan = isMealPlanItem(food.name as string);
+  const toggleFavoriteFoodItem = useDataStore((state) => state.toggleFavoriteFoodItem);
+  const isFavorite = useDataStore((state) => state.isFavoriteFoodItem(food.name as string));
+  const isMealPlan = useDataStore((state) => state.isMealPlanItem(food.name as string));
+  const toggleMealPlanItem = useDataStore((state) => state.toggleMealPlanItem);
 
   return (
     <ReanimatedSwipeable
+      enabled={showFood}
       containerStyle={{
         borderRadius: 4,
         overflow: 'hidden',
         marginBottom: 8,
         backgroundColor: COLORS['ut-burnt-orange'],
         display: showFood ? 'flex' : 'none',
+        pointerEvents: showFood ? 'auto' : 'none',
       }}
-      onSwipeableOpen={async (direction, swipeable) => {
+      shouldCancelWhenOutside
+      onSwipeableOpen={(direction, swipeable) => {
+        console.log('swipeable open');
         swipeable.close();
 
         if (direction === 'left') {
-          await toggleMealPlanItem({
+          toggleMealPlanItem({
             ...food,
             categoryName,
             locationName: location,
@@ -72,7 +76,7 @@ const FoodComponent = ({
             queueMode: 'immediate',
           });
         } else {
-          await toggleFavoriteFoodItem({
+          toggleFavoriteFoodItem({
             ...food,
             categoryName,
             locationName: location,

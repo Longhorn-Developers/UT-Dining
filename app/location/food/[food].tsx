@@ -36,7 +36,7 @@ const getPercentage = (value: number, key: string) =>
 const FoodScreen = () => {
   const params = useLocalSearchParams<SearchParams>();
   const { food, menu, category, location } = params;
-  const { getFoodItem } = useDataStore();
+  const getFoodItem = useDataStore((state) => state.getFoodItem);
 
   // Early exit for missing params
   if (!location || !menu || !category || !food) {

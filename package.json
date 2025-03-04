@@ -23,6 +23,7 @@
     "date-fns-tz": "^3.2.0",
     "expo": "^52.0.35",
     "expo-constants": "~17.0.6",
+    "expo-dev-client": "~5.0.12",
     "expo-font": "~13.0.3",
     "expo-haptics": "~14.0.1",
     "expo-image": "~2.0.5",
@@ -31,6 +32,7 @@
     "expo-splash-screen": "~0.29.22",
     "expo-status-bar": "~2.0.1",
     "expo-system-ui": "~4.0.8",
+    "expo-updates": "~0.26.18",
     "expo-web-browser": "~14.0.2",
     "lucide-react-native": "^0.474.0",
     "nativewind": "latest",
@@ -47,9 +49,7 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.13",
     "tailwind-merge": "^3.0.1",
-    "zustand": "^4.5.6",
-    "expo-dev-client": "~5.0.12",
-    "expo-updates": "~0.26.18"
+    "zustand": "^4.5.6"
   },
   "devDependencies": {
     "@babel/core": "^7.26.9",

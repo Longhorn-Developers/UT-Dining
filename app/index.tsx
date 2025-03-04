@@ -46,13 +46,17 @@ export default function Home() {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
   const [appIsReady, setAppIsReady] = useState(false);
-  const { data, fetchData, forceFetchData, setLastUpdated, lastUpdated } = useDataStore();
+
+  const data = useDataStore((state) => state.data);
+  const fetchData = useDataStore((state) => state.fetchData);
+  const forceFetchData = useDataStore((state) => state.forceFetchData);
+  const setLastUpdated = useDataStore((state) => state.setLastUpdated);
+  const lastUpdated = useDataStore((state) => state.lastUpdated);
 
   useEffect(() => {
     async function prepare() {
       try {
         console.log('Preparing app...');
-        // Pre-load fonts, make any API calls you need to do here
         await fetchData();
       } catch (e) {
         console.warn(e);
