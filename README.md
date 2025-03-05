@@ -66,8 +66,7 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
     EXPO_PUBLIC_SUPABASE_ANON_KEY=<supabase-anon-key>
    ```
 
-   If not running Supabase locally, ask [@EthanL06](https://github.com/EthanL06) for environment variables.
-
+   > If not running Supabase locally, ask [@EthanL06](https://github.com/EthanL06) for environment variables.
 
 5. Create an expo account at [expo.dev](https://expo.dev). Once you create the account, you can log in with:
 
@@ -75,14 +74,14 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
    npx expo login
    ```
 
-
 6. **Start the Development Server**
 
    ```sh
-     pnpm run start
-     ```
+   pnpm run start
+   ```
 
    - **For Android:**
+
      - Scan the QR code displayed in the terminal on your Android phone or IPhone to view the app.
 
      - To run the app on an Android emulator (requires Android SDK):
@@ -90,7 +89,6 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
        - After installation, configure the **SDK path** variable in the system environment.
        - In Android Studio, open the **Virtual Devices** manager and launch a virtual Android device.
        - Once the emulator is running, go back to the UT Dining repository, open the Android project, and you're all set!
-
 
 7. **Tunneling for Physical Devices**
 
