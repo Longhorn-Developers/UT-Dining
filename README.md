@@ -57,7 +57,7 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
 
    The `API URL` and `anon key` are the environment variables you need to configure in the next step.
 
-3. **Configure Environment Variables**
+4. **Configure Environment Variables**
 
    Use the `.env-example` file to create a `.env` file in the root directory and add the following environment variables:
 
@@ -69,14 +69,14 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
    If not running Supabase locally, ask [@EthanL06](https://github.com/EthanL06) for environment variables.
 
 
-4. Create an expo account at [expo.dev](https://expo.dev). Once you create the account, you can log in with:
+5. Create an expo account at [expo.dev](https://expo.dev). Once you create the account, you can log in with:
 
    ```sh
    npx expo login
    ```
 
 
-5. **Start the Development Server**
+6. **Start the Development Server**
 
    ```sh
      pnpm run start
@@ -92,7 +92,7 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
        - Once the emulator is running, go back to the UT Dining repository, open the Android project, and you're all set!
 
 
-6. **Tunneling for Physical Devices**
+7. **Tunneling for Physical Devices**
 
    If you're using a physical device on a public Wi-Fi network, use the following commands to tunnel the server to your device:
 
