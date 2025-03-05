@@ -12,10 +12,14 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
 
 ## Setup
 
-1. **Clone the Repository**
+1. **Fork the Repository**
+
+   Go to the [UT Dining Hall repository](https://github.com/EthanL06/ut-dining-hall.git) and click the [Fork](https://github.com/EthanL06/ut-dining-hall/fork) button in the top-right corner of the page.
+
+   After forking, clone the repository to your local machine:
 
    ```sh
-   git clone https://github.com/EthanL06/ut-dining-hall.git
+   git clone https://github.com/<your-username>/ut-dining-hall.git
    cd ut-dining-hall
    ```
 
@@ -23,9 +27,10 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
 
    ```sh
     pnpm install
+
    ```
 
-3. **Run Local Supabase Instance**
+3. **Run Local Supabase Instance (OPTIONAL)**
 
    For this step, you need [Docker Desktop](https://docs.docker.com/desktop/) installed on your machine. Follow the guide to install it on your system.
 
@@ -61,27 +66,36 @@ UT Dining Hall is a mobile application that provides comprehensive dining hall i
     EXPO_PUBLIC_SUPABASE_ANON_KEY=<supabase-anon-key>
    ```
 
-   Replace `<supabase-url>` and `<supabase-anon-key>` with the values `API URL` and `anon key` from the previous step.
+   > If not running Supabase locally, ask [@EthanL06](https://github.com/EthanL06) for environment variables.
 
-5. **Start the Development Server**
-
-   For iOS:
+5. Create an expo account at [expo.dev](https://expo.dev). Once you create the account, you can log in with:
 
    ```sh
-    pnpm run ios
+   npx expo login
    ```
 
-   For Android:
+6. **Start the Development Server**
 
    ```sh
-   pnpm run android
+   pnpm run start
    ```
 
-   To tunnel the server to your phone (if you're using a physical device on public wifi):
+   - **For Android:**
+
+     - Scan the QR code displayed in the terminal on your Android phone or IPhone to view the app.
+
+     - To run the app on an Android emulator (requires Android SDK):
+       - Download and install **Android Studio** from [here](https://developer.android.com/studio).
+       - After installation, configure the **SDK path** variable in the system environment.
+       - In Android Studio, open the **Virtual Devices** manager and launch a virtual Android device.
+       - Once the emulator is running, go back to the UT Dining repository, open the Android project, and you're all set!
+
+7. **Tunneling for Physical Devices**
+
+   If you're using a physical device on a public Wi-Fi network, use the following commands to tunnel the server to your device:
 
    ```sh
-   pnpm run ios --tunnel
-   pnpm run android --tunnel
+   pnpm run start --tunnel
    ```
 
-   > NOTE: This may not work with connecting to the Supabase instance. You may need to use an [iOS](https://docs.expo.dev/workflow/ios-simulator/) or [Android](https://docs.expo.dev/workflow/android-studio-emulator/) emulator on your computer instead.
+   > **NOTE:** This may not work with connecting to the Supabase instance. You may need to use an [iOS](https://docs.expo.dev/workflow/ios-simulator/) or [Android](https://docs.expo.dev/workflow/android-studio-emulator/) emulator instead.
