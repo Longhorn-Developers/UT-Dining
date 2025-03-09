@@ -64,7 +64,7 @@ Every 24 hours, the **Expo** mobile application fetches the latest menu data fro
 
 1. **Fork the Repository**
 
-   Go to the [UT Dining repository](https://github.com/EthanL06/ut-dining.git) and click the [Fork](https://github.com/EthanL06/ut-dining/fork) button in the top-right corner of the page.
+   Go to the [UT Dining repository](https://github.com/Longhorn-Developers/UT-Dining.git) and click the [Fork](https://github.com/Longhorn-Developers/UT-Dining.git) button in the top-right corner of the page.
 
    After forking, clone the repository to your local machine:
 
