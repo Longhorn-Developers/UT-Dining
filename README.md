@@ -148,7 +148,7 @@ Every 24 hours, the **Expo** mobile application fetches the latest menu data fro
 
    > Note: Tunneling may have limitations with Supabase connections. Using an emulator is recommended for full functionality.
 
-   **Debugging Drizzle with Drizzle Studio**
+   **Debugging Drizzle with Drizzle Studio**<br>
    While the development server is running, press `Shift + M` in the terminal and select `expo-drizzle-studio-plugin` to open Drizzle Studio in your browser. You can use this tool to inspect the SQLite database and troubleshoot any issues related to the local cache with SQLite and Drizzle ORM. Read more about Drizzle Studio [here](https://orm.drizzle.team/drizzle-studio/overview).
 
 7. **Launch on your device**
