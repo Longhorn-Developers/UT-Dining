@@ -27,12 +27,10 @@ export function useLocationData(location: string) {
           throw new Error('No data found for location ' + location);
         }
 
-        setSelectedMenu(menuNames[0] as string);
         setFilters(menuNames.map((menuName) => ({ title: menuName || '', id: menuName || '' })));
         setData(fetchedData);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
-        setSelectedMenu(null);
         setData(null);
         setFilters([]);
         console.log(e);
