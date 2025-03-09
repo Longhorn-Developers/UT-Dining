@@ -1,11 +1,10 @@
-
-<img src="https://github.com/user-attachments/assets/21c5d1d5-e0c2-41d6-b171-79f8364bd050" />
+![UT Dining Logo](https://github.com/user-attachments/assets/21c5d1d5-e0c2-41d6-b171-79f8364bd050)
 
 # UT Dining
 
 UT Dining is a mobile application that provides comprehensive information about dining options at the University of Texas at Austin, including menus, nutrition data, allergens, and more.
 
-<img src="https://github.com/user-attachments/assets/f095381b-b850-4c99-9748-8b4864226af4" />
+![UT Dining App Screenshot](https://github.com/user-attachments/assets/f095381b-b850-4c99-9748-8b4864226af4)
 
 ## Table of Contents
 
@@ -39,11 +38,12 @@ UT Dining is a mobile application that provides comprehensive information about 
 - **Icons**: [Lucide React Native](https://lucide.dev/guide/packages/lucide-react-native)
 
 ## How it Works
+
 <img src="https://github.com/user-attachments/assets/f1264b22-d0ad-44e8-9342-ec53ec94d37b"><br>
 
-At the core of the system is a remote Render instance, which is scheduled to run every 24 hours at 7:00 AM UTC *(or 1:00 AM CST)*. This instance is responsible for scraping the dining menus from UT Austin, sourced from [this page](https://hf-foodpro.austin.utexas.edu/foodpro/location.aspx). Once the menus are scraped, the data is stored in a Supabase database.
+At the core of the system is a remote Render instance, which is scheduled to run every 24 hours at 7:00 AM UTC _(or 1:00 AM CST)_. This instance is responsible for scraping the dining menus from UT Austin, sourced from [this page](https://hf-foodpro.austin.utexas.edu/foodpro/location.aspx). Once the menus are scraped, the data is stored in a Supabase database.
 
-Every 24 hours, the Expo mobile application fetches the latest menu data from the Supabase database, keeping the application up-to-date. To optimize performance and reduce latency, the data is cached locally in an SQLite database using Drizzle ORM. This local cache allows the app to quickly retrieve the necessary information, ensuring a smooth, offline-first user experience.
+Every 24 hours, the Expo mobile application fetches the latest menu data from the Supabase database, keeping the application up-to-date. To optimize performance and reduce loading times, the data is cached locally in an SQLite database using Drizzle ORM. This local cache allows the app to quickly retrieve the necessary information, ensuring a smooth, offline-first user experience.
 
 ## Getting Started
 
@@ -52,7 +52,8 @@ Every 24 hours, the Expo mobile application fetches the latest menu data from th
 - [Node.js](https://nodejs.org/) (LTS version recommended)
 - [pnpm](https://pnpm.io/installation)
 - [Expo CLI](https://docs.expo.dev/get-started/installation/)
-- A physical mobile device with [Expo Go](https://expo.dev/client) installed or an emulator
+- A physical mobile device with [Expo Go](https://expo.dev/client) installed or an emulator. Follow the guide [here](https://docs.expo.dev/workflow/android-studio-emulator/) to set up an Android emulator or [here](https://docs.expo.dev/workflow/ios-simulator/) for an iOS simulator.
+- [Tailwind CSS Intellisense Extension](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss) for Visual Studio Code (optional, but highly recommended)
 
 ### Installation
 
@@ -142,16 +143,19 @@ Every 24 hours, the Expo mobile application fetches the latest menu data from th
 
    > Note: Tunneling may have limitations with Supabase connections. Using an emulator is recommended for full functionality.
 
+   **Debugging Drizzle with Drizzle Studio**
+   While the development server is running, press `Shift + M` in the terminal and select `expo-drizzle-studio-plugin` to open Drizzle Studio in your browser. You can use this tool to inspect the SQLite database and troubleshoot any issues related to the local cache with SQLite and Drizzle ORM. Read more about Drizzle Studio [here](https://orm.drizzle.team/drizzle-studio/overview).
+
 7. **Launch on your device**
 
    Scan the QR code with your mobile device's camera or Expo Go app, or press:
-   
+
    - `a` to open on Android emulator
    - `i` to open on iOS simulator
 
 ## Project Structure
 
-```
+```txt
 ut-dining/
 ├── app/               # Expo Router screens and local UI components
 ├── assets/            # Images and static assets
@@ -176,9 +180,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 5. Open a Pull Request
 
 ## Related Repositories
-Here are the repositories related to the UT Dining project:
-1.	**[UT Dining Scraper](https://github.com/EthanL06/ut-dining-scraper)**<br>
-This repository contains the code for scraping dining menus from UT Austin and storing them in the Supabase database.
 
-2.	**[UT Dining Website](https://github.com/Longhorn-Developers/ut-dining-website)**<br>
-This repository hosts the code for the UT Dining website.
+Here are the repositories related to the UT Dining project:
+
+1. **[UT Dining Scraper](https://github.com/EthanL06/ut-dining-scraper)**<br>
+   This repository contains the code for scraping dining menus from UT Austin and storing them in the Supabase database.
+
+2. **[UT Dining Website](https://github.com/Longhorn-Developers/ut-dining-website)**<br>
+   This repository hosts the code for the UT Dining website.
