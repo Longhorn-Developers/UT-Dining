@@ -41,9 +41,9 @@ UT Dining is a mobile application that provides comprehensive information about 
 
 <img src="https://github.com/user-attachments/assets/f1264b22-d0ad-44e8-9342-ec53ec94d37b"><br>
 
-At the core of the system is a remote Render instance, which is scheduled to run every 24 hours at 7:00 AM UTC _(or 1:00 AM CST)_. This instance is responsible for scraping the dining menus from UT Austin, sourced from [this page](https://hf-foodpro.austin.utexas.edu/foodpro/location.aspx). Once the menus are scraped, the data is stored in a Supabase database.
+At the core of the system is a remote **Render** instance, which is scheduled to run every 24 hours at 7:00 AM UTC _(or 1:00 AM CST)_. This instance is responsible for scraping the dining menus from UT Austin, sourced from [this page](https://hf-foodpro.austin.utexas.edu/foodpro/location.aspx). Once the menus are scraped, the data is stored in a **Supabase** database.
 
-Every 24 hours, the Expo mobile application fetches the latest menu data from the Supabase database, keeping the application up-to-date. To optimize performance and reduce loading times, the data is cached locally in an SQLite database using Drizzle ORM. This local cache allows the app to quickly retrieve the necessary information, ensuring a smooth, offline-first user experience.
+Every 24 hours, the **Expo** mobile application fetches the latest menu data from the database, keeping the application up-to-date. To optimize performance and reduce loading times, the data is cached locally in an **SQLite** database using **Drizzle ORM**. This local cache allows the app to quickly retrieve the necessary information, ensuring a smooth, **offline-first** user experience.
 
 ## Getting Started
 
