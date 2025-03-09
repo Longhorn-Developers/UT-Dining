@@ -175,7 +175,18 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+3. Commit your changes using [conventional commit messages](https://www.conventionalcommits.org/):
+
+```sh
+feat: add new feature
+fix: resolve issue with X
+docs: update documentation
+style: format code (no functional changes)
+refactor: restructure code without changing behavior
+test: add or update tests
+chore: update dependencies or configuration
+```
+
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
