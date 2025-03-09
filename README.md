@@ -115,7 +115,7 @@ Every 24 hours, the **Expo** mobile application fetches the latest menu data fro
    cp .env-example .env
    ```
 
-   Update with your Supabase credentials:
+   Update with your Supabase `API URL` and `anon key` credentials:
 
    ```sh
     EXPO_PUBLIC_SUPABASE_URL=<supabase-url>
