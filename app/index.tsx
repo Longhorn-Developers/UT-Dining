@@ -1,6 +1,10 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import * as Haptics from 'expo-haptics';
 import { router, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import { useSQLiteContext } from 'expo-sqlite';
 import { ChevronRight } from 'lucide-react-native';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
@@ -13,12 +17,14 @@ import {
 } from 'react-native';
 import { Notifier } from 'react-native-notifier';
 
+import * as schema from '../db/schema';
+
 import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
 import { LOCATION_INFO } from '~/data/LocationInfo';
-import { DataQuery, useDataStore } from '~/store/useDataStore';
+import { insertDataIntoSQLiteDB } from '~/db/database';
 import { COLORS } from '~/utils/colors';
 import { getLocationTimeMessage, isLocationOpen, timeOfDay } from '~/utils/time';
 import { cn } from '~/utils/utils';
@@ -32,7 +38,7 @@ SplashScreen.setOptions({
   fade: true,
 });
 
-const sortLocations = (data: DataQuery) => {
+const sortLocations = (data: schema.Location[]) => {
   // Make a copy of data and sort based on the index in LOCATION_INFO.
   return [...data].sort((a, b) => {
     const indexA = LOCATION_INFO.findIndex((info) => info.name === a.name);
@@ -47,17 +53,26 @@ export default function Home() {
   const [refreshing, setRefreshing] = useState(false);
   const [appIsReady, setAppIsReady] = useState(false);
 
-  const data = useDataStore((state) => state.data);
-  const fetchData = useDataStore((state) => state.fetchData);
-  const forceFetchData = useDataStore((state) => state.forceFetchData);
-  const setLastUpdated = useDataStore((state) => state.setLastUpdated);
-  const lastUpdated = useDataStore((state) => state.lastUpdated);
+  const [locations, setLocations] = useState<schema.Location[] | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const db = useSQLiteContext();
+  const drizzleDb = drizzle(db, { schema });
+  useDrizzleStudio(db);
 
   useEffect(() => {
     async function prepare() {
       try {
         console.log('Preparing app...');
-        await fetchData();
+        await insertDataIntoSQLiteDB(drizzleDb);
+        const data = await drizzleDb.select().from(schema.location);
+        setLocations(data);
+
+        const lastUpdated = await AsyncStorage.getItem('lastQueryTime');
+        if (lastUpdated) {
+          setLastUpdated(new Date(lastUpdated));
+        }
+        console.log('Data initialized!');
       } catch (e) {
         console.warn(e);
       } finally {
@@ -91,9 +106,9 @@ export default function Home() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await forceFetchData();
+    await insertDataIntoSQLiteDB(drizzleDb, true);
     setCurrentTime(new Date());
-    setLastUpdated();
+    setLastUpdated(new Date());
     setRefreshing(false);
 
     Notifier.showNotification({
@@ -104,14 +119,14 @@ export default function Home() {
     });
   };
 
-  if (!data)
+  if (!locations)
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" color={COLORS['ut-burnt-orange']} />
       </View>
     );
 
-  const sortedData = sortLocations(data);
+  const sortedData = sortLocations(locations);
 
   const filteredData =
     selectedFilter === 'all'
@@ -154,7 +169,9 @@ export default function Home() {
   return (
     <>
       <Stack.Screen options={{ title: 'Home' }} />
+
       <Container onLayout={onLayoutRootView}>
+        {/* <Link href={'/test'}>Click me!</Link> */}
         <FlatList
           extraData={[currentTime, selectedFilter]}
           data={filteredData}
@@ -175,7 +192,7 @@ export default function Home() {
 
             return (
               <TouchableOpacity
-                key={item.id}
+                key={item.name}
                 onPress={async () => {
                   router.push(`/location/${item.name}`);
                   await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -185,7 +202,7 @@ export default function Home() {
                   <View className="relative size-3">
                     <View
                       className={cn(
-                        `size-full rounded-full shadow`,
+                        `size-full rounded-full shadow transition-all`,
                         open
                           ? appIsReady
                             ? 'animate-status-blink bg-green-500 shadow-green-500'

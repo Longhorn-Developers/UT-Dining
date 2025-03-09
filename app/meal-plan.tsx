@@ -10,7 +10,7 @@ import { RemoveAction } from '~/components/AnimatedActions';
 import { Container } from '~/components/Container';
 import TopBar from '~/components/TopBar';
 import { ALLERGEN_ICONS } from '~/data/AllergenInfo';
-import { FoodItem, StoredFoodItem, useDataStore } from '~/store/useDataStore';
+import { useMealPlanStore, MealPlanItem } from '~/store/useMealPlanStore';
 import { COLORS } from '~/utils/colors';
 
 const MealPlanComponent = ({
@@ -20,18 +20,17 @@ const MealPlanComponent = ({
   location,
   quantity,
 }: {
-  food: FoodItem;
+  food: MealPlanItem;
   selectedMenu: string;
   categoryName: string;
   location: string;
   quantity: number;
 }) => {
-  const updateMealPlanItemQuantity = useDataStore((state) => state.updateMealPlanItemQuantity);
-  const removeMealPlanItem = useDataStore((state) => state.removeMealPlanItem);
+  const updateMealPlanItemQuantity = useMealPlanStore((state) => state.updateMealPlanItemQuantity);
+  const removeMealPlanItem = useMealPlanStore((state) => state.removeMealPlanItem);
 
   // Local state to hold TextInput value.
   const [quantityInput, setQuantityInput] = useState(`${quantity}` || '1');
-  console.log('quantityInput', quantityInput);
 
   const description = `${categoryName} - ${location} (${selectedMenu})`;
   const allergenData = Object.entries(food.allergens || {});
@@ -125,7 +124,7 @@ const MealPlanComponent = ({
                 quantity = 99;
               }
               setQuantityInput(quantity.toString());
-              updateMealPlanItemQuantity(food as StoredFoodItem, quantity);
+              updateMealPlanItemQuantity(food.name || '', quantity);
             }}
           />
           <Text className="text-xs font-medium text-ut-grey">Quantity</Text>
@@ -136,7 +135,7 @@ const MealPlanComponent = ({
 };
 
 const MealPlan = () => {
-  const mealPlanItems = useDataStore((state) => state.mealPlanItems);
+  const mealPlanItems = useMealPlanStore((state) => state.mealPlanItems);
 
   const totalCalories = mealPlanItems.reduce(
     (sum, item) => sum + parseFloat(String(item.nutrition?.calories || 0)) * (item?.quantity || 1),

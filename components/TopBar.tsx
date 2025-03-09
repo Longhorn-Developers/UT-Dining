@@ -1,7 +1,7 @@
 import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Bell, ChefHat, ChevronLeft, Cog, Heart, Info, Map } from 'lucide-react-native';
-import React from 'react';
+import { Bell, ChefHat, ChevronLeft, Heart, Info, Map } from 'lucide-react-native';
+import React, { useEffect } from 'react';
 import { View, Image, TouchableOpacity, Alert as NativeAlert, Text } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { Notifier } from 'react-native-notifier';
@@ -9,7 +9,9 @@ import { Notifier } from 'react-native-notifier';
 import Alert from './Alert';
 
 import { LOCATION_INFO } from '~/data/LocationInfo';
-import { useDataStore } from '~/store/useDataStore';
+import { useFoodData } from '~/hooks/useFoodData';
+import { useFavoritesStore } from '~/store/useFavoritesStore';
+import { useMealPlanStore } from '~/store/useMealPlanStore';
 import { COLORS } from '~/utils/colors';
 
 const icon = require('../assets/image.png');
@@ -32,10 +34,6 @@ const HomeTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
-            // NativeAlert.alert(
-            //   'Coming Soon!',
-            //   'The meal planner feature will be available in an upcoming update.'
-            // );
             router.push(`/meal-plan`);
           }}>
           <ChefHat size={20} color={COLORS['ut-grey']} />
@@ -118,21 +116,16 @@ const FoodTopBar = () => {
     menu: string;
   }>();
 
-  const toggleFavoriteFoodItem = useDataStore((state) => state.toggleFavoriteFoodItem);
-  const toggleMealPlanItem = useDataStore((state) => state.toggleMealPlanItem);
-  const getFoodItem = useDataStore((state) => state.getFoodItem);
-  const favoriteFoodItems = useDataStore((state) => state.favoriteFoodItems);
-  const mealPlanItems = useDataStore((state) => state.mealPlanItems);
+  const { foodItem } = useFoodData(location, menu, category, food);
+  const toggleMealPlanItem = useMealPlanStore((state) => state.toggleMealPlanItem);
+  const isMealPlanItem = useMealPlanStore((state) => state.isMealPlanItem(food));
 
-  const isFavoriteFoodItem = () => {
-    return favoriteFoodItems.some((item) => item.name === food);
-  };
+  const isFavorite = useFavoritesStore((state) => state.isFavorite(food));
+  const toggleFavoriteFoodItem = useFavoritesStore((state) => state.toggleFavoriteItem);
 
-  const isMealPlanItem = () => {
-    return mealPlanItems.some((item) => item.name === food);
-  };
-
-  const foodItem = getFoodItem(location, menu, category, food);
+  if (!foodItem) {
+    return null;
+  }
 
   return (
     <View className="flex w-full flex-row items-center justify-between ">
@@ -147,13 +140,21 @@ const FoodTopBar = () => {
           onPress={() => {
             if (foodItem) {
               toggleMealPlanItem({
-                ...foodItem,
-                categoryName: category,
+                name: foodItem.name as string,
                 locationName: location,
+                categoryName: category,
                 menuName: menu,
+                allergens: Object.fromEntries(
+                  Object.entries(foodItem.allergens).filter(([key]) => key !== 'id')
+                ) as Record<string, boolean>,
+                nutrition: {
+                  calories: foodItem.nutrition?.calories || '0',
+                  protein: foodItem.nutrition?.protein || '0',
+                  total_carbohydrates: foodItem.nutrition?.total_carbohydrates || '0',
+                },
               });
 
-              if (!isMealPlanItem(food)) {
+              if (isMealPlanItem) {
                 Notifier.showNotification({
                   title: `${foodItem.name} removed from today's meal plan!`,
                   description: 'You removed this item from your meal plan.',
@@ -176,8 +177,8 @@ const FoodTopBar = () => {
           }}>
           <ChefHat
             size={20}
-            color={isMealPlanItem(food) ? COLORS['ut-burnt-orange'] : COLORS['ut-grey']}
-            fill={isMealPlanItem(food) ? COLORS['ut-burnt-orange'] : 'white'}
+            color={isMealPlanItem ? COLORS['ut-burnt-orange'] : COLORS['ut-grey']}
+            fill={isMealPlanItem ? COLORS['ut-burnt-orange'] : 'white'}
           />
         </TouchableOpacity>
 
@@ -185,13 +186,13 @@ const FoodTopBar = () => {
           onPress={() => {
             if (foodItem) {
               toggleFavoriteFoodItem({
-                ...foodItem,
-                categoryName: category,
+                name: foodItem.name as string,
                 locationName: location,
+                categoryName: category,
                 menuName: menu,
               });
 
-              if (!isFavoriteFoodItem(food)) {
+              if (isFavorite) {
                 Notifier.showNotification({
                   title: `${foodItem.name} removed from Favorites!`,
                   description: 'You removed this item from your favorites.',
@@ -214,8 +215,8 @@ const FoodTopBar = () => {
           }}>
           <Heart
             size={20}
-            color={isFavoriteFoodItem(food) ? COLORS['ut-burnt-orange'] : COLORS['ut-grey']}
-            fill={isFavoriteFoodItem(food) ? COLORS['ut-burnt-orange'] : 'white'}
+            color={isFavorite ? COLORS['ut-burnt-orange'] : COLORS['ut-grey']}
+            fill={isFavorite ? COLORS['ut-burnt-orange'] : 'white'}
           />
         </TouchableOpacity>
         <TouchableOpacity
