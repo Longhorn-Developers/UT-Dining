@@ -5,6 +5,7 @@ import { LOCATION_INFO, WeekDay } from '~/data/LocationInfo';
 
 const CENTRAL_TIME_ZONE = 'America/Chicago';
 
+// Helper to determine if a requery is needed based on the last query time.
 export const shouldRequery = (lastQueryTime: string | null): boolean => {
   if (!lastQueryTime) return true;
   const lastQueryDate = parseISO(lastQueryTime);
@@ -131,7 +132,7 @@ const dayAbbreviations: Record<WeekDay, string> = {
   Tuesday: 'T',
   Wednesday: 'W',
   Thursday: 'TH',
-  Friday: 'F',
+  Friday: 'Fri',
   Saturday: 'Sat',
   Sunday: 'Sun',
 };

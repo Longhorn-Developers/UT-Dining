@@ -1,48 +1,64 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { Stack } from 'expo-router';
-import { useEffect } from 'react';
-import { AppState } from 'react-native';
+import { openDatabaseSync, SQLiteProvider } from 'expo-sqlite';
+import { Suspense, useEffect } from 'react';
+import { ActivityIndicator } from 'react-native';
 import { SheetProvider } from 'react-native-actions-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NotifierWrapper } from 'react-native-notifier';
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+
+import * as schema from '../db/schema';
+import migrations from '../drizzle/migrations';
 
 import '../components/sheets/Sheets';
 import '../global.css';
-import { STORAGE_KEY_FAVORITES, STORAGE_KEY_MEALPLAN, useDataStore } from '~/store/useDataStore';
+import { insertDataIntoSQLiteDB } from '~/db/database';
+
+export const DATABASE_NAME = 'database.db';
+
+// This is the default configuration
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Reanimated runs in strict mode by default
+});
 
 export default function Layout() {
-  const favoriteFoodItems = useDataStore((state) => state.favoriteFoodItems);
-  const mealPlanItems = useDataStore((state) => state.mealPlanItems);
+  const expoDb = openDatabaseSync(DATABASE_NAME);
+  const db = drizzle<typeof schema>(expoDb);
+  const { success, error } = useMigrations(db, migrations);
 
   useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (nextAppState === 'background') {
-        console.log('Closing app...');
-        // Batch write without blocking the event loop
-        AsyncStorage.multiSet([
-          [STORAGE_KEY_FAVORITES, JSON.stringify(favoriteFoodItems)],
-          [STORAGE_KEY_MEALPLAN, JSON.stringify(mealPlanItems)],
-        ]).catch((error) => console.error('Error saving state in background:', error));
-      }
-    });
-    return () => subscription.remove();
-  }, [favoriteFoodItems, mealPlanItems]);
+    if (success) {
+      console.log('Database migrated successfully');
+    } else if (error) {
+      console.error('Error migrating database:', error);
+    }
+  }, [success]);
 
   return (
-    <GestureHandlerRootView>
-      <NotifierWrapper>
-        <SheetProvider>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: {
-                backgroundColor: 'white',
-              },
-              gestureEnabled: true,
-            }}
-          />
-        </SheetProvider>
-      </NotifierWrapper>
-    </GestureHandlerRootView>
+    <Suspense fallback={<ActivityIndicator size="large" />}>
+      <SQLiteProvider
+        databaseName={DATABASE_NAME}
+        options={{ enableChangeListener: true }}
+        useSuspense>
+        <GestureHandlerRootView>
+          <NotifierWrapper>
+            <SheetProvider>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: {
+                    backgroundColor: 'white',
+                  },
+                  gestureEnabled: true,
+                }}
+              />
+            </SheetProvider>
+          </NotifierWrapper>
+        </GestureHandlerRootView>
+      </SQLiteProvider>
+    </Suspense>
   );
 }

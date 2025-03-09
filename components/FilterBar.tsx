@@ -1,5 +1,5 @@
 import * as Haptics from 'expo-haptics';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { timeOfDay } from '~/utils/time';
@@ -12,28 +12,49 @@ type FilterBarProps = {
   useTimeOfDayDefault?: boolean;
 };
 
+// Define the proper meal order
+const MEAL_ORDER = {
+  Breakfast: 1,
+  Lunch: 2,
+  Dinner: 3,
+};
+
 const FilterBar = ({
   selectedItem,
   setSelectedItem,
   items,
   useTimeOfDayDefault = false,
 }: FilterBarProps) => {
+  // Sort items based on meal order
+  const sortedItems = useMemo(() => {
+    return [...items].sort((a, b) => {
+      const orderA = MEAL_ORDER[a.title as keyof typeof MEAL_ORDER] || 999;
+      const orderB = MEAL_ORDER[b.title as keyof typeof MEAL_ORDER] || 999;
+      return orderA - orderB;
+    });
+  }, [items]);
+
   // When enabled, set default filter based on timeOfDay if none is selected.
   useEffect(() => {
-    if (useTimeOfDayDefault) {
+    if (useTimeOfDayDefault && !selectedItem) {
       const tod = timeOfDay(new Date()); // 'morning', 'afternoon', or 'evening'
       let defaultFilter = '';
+
       if (tod === 'morning') defaultFilter = 'Breakfast';
       else if (tod === 'afternoon') defaultFilter = 'Lunch';
       else if (tod === 'evening') defaultFilter = 'Dinner';
 
-      if (defaultFilter && items.some((item) => item.title.includes(defaultFilter))) {
-        setSelectedItem(defaultFilter);
+      // Find item with matching title
+      const matchingItem = items.find((item) => item.title === defaultFilter);
+
+      if (matchingItem) {
+        setSelectedItem(matchingItem.id);
       } else {
-        setSelectedItem(items[0].id);
+        // Fallback to first item if no match
+        setSelectedItem(items[0]?.id || '');
       }
     }
-  }, []);
+  }, [items, selectedItem, useTimeOfDayDefault, setSelectedItem]);
 
   const onPressItem = async (id: string) => {
     setSelectedItem(id);
@@ -47,7 +68,7 @@ const FilterBar = ({
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerClassName="gap-x-2">
-          {items.map((item) => (
+          {sortedItems.map((item) => (
             <TouchableOpacity
               key={item.id}
               onPress={() => onPressItem(item.id)}
@@ -66,12 +87,6 @@ const FilterBar = ({
           ))}
         </ScrollView>
       </View>
-      {/* Uncomment if needed */}
-      {/* <View className="pl-2">
-          <TouchableOpacity>
-            <Filter size={20} color={COLORS['ut-grey']} />
-          </TouchableOpacity>
-        </View> */}
     </View>
   );
 };
