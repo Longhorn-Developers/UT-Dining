@@ -1,5 +1,5 @@
 import { ArrowUp } from 'lucide-react-native';
-import React, { useRef } from 'react';
+import React from 'react';
 import { TouchableOpacity, Animated } from 'react-native';
 
 interface ScrollToTopButtonProps {

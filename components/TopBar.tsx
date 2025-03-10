@@ -1,7 +1,7 @@
 import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Bell, ChefHat, ChevronLeft, Heart, Info, Map } from 'lucide-react-native';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Image, TouchableOpacity, Alert as NativeAlert, Text } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { Notifier } from 'react-native-notifier';

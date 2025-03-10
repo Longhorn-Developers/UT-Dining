@@ -14,7 +14,6 @@ import migrations from '../drizzle/migrations';
 
 import '../components/sheets/Sheets';
 import '../global.css';
-import { insertDataIntoSQLiteDB } from '~/db/database';
 
 export const DATABASE_NAME = 'database.db';
 
