@@ -12,16 +12,54 @@ import { useLocationData } from '../../hooks/useLocationData';
 
 import { Container } from '~/components/Container';
 import FoodComponent from '~/components/FoodComponent';
+import { useDebounce } from '~/hooks/useDebounce';
 
 const Location = () => {
   const { location } = useLocalSearchParams<{ location: string }>();
   const { data, loading, selectedMenu, setSelectedMenu, filters } = useLocationData(location);
   const { toggleCategory, flattenedItems, resetExpandedCategories } = useCategoryExpansion(data);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300); // 300ms debounce delay
+
   const listRef = useRef<FlashList<any>>(null);
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   // Animation value for fade and scale effect
   const scrollButtonAnimation = useRef(new Animated.Value(0)).current;
+
+  // Filter items based on search query
+  const filteredItems = React.useMemo(() => {
+    if (!searchQuery.trim()) {
+      return flattenedItems;
+    }
+
+    const query = searchQuery.toLowerCase();
+    const result = [];
+    let currentCategory = null;
+    let hasMatch = false;
+
+    for (const item of flattenedItems) {
+      if (item.type === 'category_header') {
+        currentCategory = { ...item, isExpanded: true };
+        hasMatch = false;
+        // Don't add category yet, wait to see if it has matching items
+      } else if (item.type === 'food_item') {
+        const foodName = item.data.name ? item.data.name.toLowerCase() : '';
+
+        if (foodName.includes(query)) {
+          // If this is the first match in this category, add the category header first
+          if (!hasMatch && currentCategory) {
+            result.push(currentCategory);
+            hasMatch = true;
+          }
+          // Then add the matching food item
+          result.push(item);
+        }
+      }
+    }
+
+    return result;
+  }, [flattenedItems, debouncedSearchQuery]);
 
   // Handle scroll events to show/hide button with animation
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -53,6 +91,11 @@ const Location = () => {
     listRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
 
+  // Reset search when menu changes
+  useEffect(() => {
+    setSearchQuery('');
+  }, [selectedMenu]);
+
   // Create skeletons for loading state
   const skeletonItems = React.useMemo(() => {
     const items = [];
@@ -69,6 +112,11 @@ const Location = () => {
     }
     return items;
   }, []);
+
+  // Reset expanded categories when selectedMenu changes
+  useEffect(() => {
+    resetExpandedCategories();
+  }, [selectedMenu, resetExpandedCategories]);
 
   // Render individual list item
   const renderItem = React.useCallback(
@@ -106,10 +154,14 @@ const Location = () => {
     [selectedMenu, location, toggleCategory]
   );
 
-  // Reset expanded categories when selectedMenu changes
-  useEffect(() => {
-    resetExpandedCategories();
-  }, [selectedMenu, resetExpandedCategories]);
+  // Helper function to determine which data to display
+  const getDisplayedItems = () => {
+    if (loading) {
+      return skeletonItems;
+    }
+
+    return debouncedSearchQuery ? filteredItems : flattenedItems;
+  };
 
   return (
     <>
@@ -121,20 +173,28 @@ const Location = () => {
           scrollEventThrottle={16}
           showsVerticalScrollIndicator
           estimatedItemSize={80}
-          data={loading ? skeletonItems : flattenedItems}
+          data={getDisplayedItems()}
           ListHeaderComponent={
-            <LocationHeader
-              location={location}
-              selectedMenu={selectedMenu}
-              setSelectedMenu={setSelectedMenu}
-              filters={filters}
-            />
+            <>
+              <LocationHeader
+                location={location}
+                selectedMenu={selectedMenu}
+                setSelectedMenu={setSelectedMenu}
+                filters={filters}
+                query={searchQuery}
+                setQuery={setSearchQuery}
+              />
+            </>
           }
           ListEmptyComponent={
             loading ? null : (
               <View className="mt-12 flex-1 items-center justify-center">
                 <Text className="text-xl font-bold text-ut-burnt-orange">No items found.</Text>
-                <Text className="text-sm">Please try again later.</Text>
+                <Text className="text-sm">
+                  {debouncedSearchQuery
+                    ? 'Try a different search term.'
+                    : 'Please try again later.'}
+                </Text>
               </View>
             )
           }
