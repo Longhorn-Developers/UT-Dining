@@ -118,11 +118,8 @@ export const useMealPlanStore = create<MealPlanState>()(
       // Check if data is stale and clear meal plan if needed
       checkAndClearIfStale: async () => {
         try {
-          // Get last query time
-          const lastQueryTime = await AsyncStorage.getItem(STORAGE_KEY_TIMESTAMP);
-
           // If data should be requeried (e.g., it's a new day), clear the meal plan
-          if (shouldRequery(lastQueryTime)) {
+          if (await shouldRequery()) {
             console.log('Menu data is stale, clearing meal plan');
             get().clearMealPlan();
           }
