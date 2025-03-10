@@ -22,6 +22,7 @@ Join the Beta Test here *(iOS only)*: [TestFlight - UT Dining](https://testfligh
 5. [Project Structure](#project-structure)
 6. [Contributing](#contributing)
 7. [Related Repositories](#related-repositories)
+8. [License](#license)
 
 ## Features
 
@@ -203,3 +204,8 @@ Here are the repositories related to the UT Dining project:
 
 2. **[UT Dining Website](https://github.com/Longhorn-Developers/ut-dining-website)**<br>
    This repository hosts the code for the UT Dining website.
+
+## License
+This project is licensed under the MIT License.
+
+You are free to use, modify, and distribute this software under the terms of the MIT License. See the [LICENSE](https://github.com/Longhorn-Developers/UT-Dining/blob/main/LICENSE) file for more details.
