@@ -29,30 +29,28 @@ const Location = () => {
 
   // Filter items based on search query
   const filteredItems = React.useMemo(() => {
-    if (!searchQuery.trim()) {
+    if (!debouncedSearchQuery.trim()) {
       return flattenedItems;
     }
 
-    const query = searchQuery.toLowerCase();
+    // Handling search query
+    const query = debouncedSearchQuery.toLowerCase();
     const result = [];
+    const processedCategoryIds = new Set(); // Track which categories we've added
     let currentCategory = null;
-    let hasMatch = false;
 
     for (const item of flattenedItems) {
       if (item.type === 'category_header') {
         currentCategory = { ...item, isExpanded: true };
-        hasMatch = false;
-        // Don't add category yet, wait to see if it has matching items
       } else if (item.type === 'food_item') {
         const foodName = item.data.name ? item.data.name.toLowerCase() : '';
 
         if (foodName.includes(query)) {
-          // If this is the first match in this category, add the category header first
-          if (!hasMatch && currentCategory) {
+          if (currentCategory && !processedCategoryIds.has(currentCategory.id)) {
             result.push(currentCategory);
-            hasMatch = true;
+            processedCategoryIds.add(currentCategory.id);
           }
-          // Then add the matching food item
+
           result.push(item);
         }
       }
