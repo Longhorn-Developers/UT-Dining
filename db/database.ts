@@ -80,8 +80,7 @@ export const insertDataIntoSQLiteDB = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   force = false
 ) => {
-  const lastQueried = await AsyncStorage.getItem('lastQueryTime');
-  const shouldRefresh = shouldRequery(lastQueried);
+  const shouldRefresh = await shouldRequery();
   console.log('Should refresh data:', shouldRefresh);
 
   if (!shouldRefresh) {

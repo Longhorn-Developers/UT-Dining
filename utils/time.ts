@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { parseISO, format, addDays } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 
@@ -6,15 +7,16 @@ import { LOCATION_INFO, WeekDay } from '~/data/LocationInfo';
 const CENTRAL_TIME_ZONE = 'America/Chicago';
 
 // Helper to determine if a requery is needed based on the last query time.
-export const shouldRequery = (lastQueryTime: string | null): boolean => {
+export const shouldRequery = async (): Promise<boolean> => {
+  const lastQueryTime = await AsyncStorage.getItem('lastQueryTime');
   if (!lastQueryTime) return true;
   const lastQueryDate = parseISO(lastQueryTime);
   const now = new Date();
   const nowCentral = toZonedTime(now, CENTRAL_TIME_ZONE);
   const lastQueryCentral = toZonedTime(lastQueryDate, CENTRAL_TIME_ZONE);
 
-  // Prevent requerying before 1:10 AM CST
-  if (nowCentral.getHours() === 1 && nowCentral.getMinutes() < 10) {
+  // Prevent requerying before 3:00 AM CST
+  if (nowCentral.getHours() < 3) {
     return false;
   }
 
