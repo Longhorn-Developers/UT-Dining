@@ -80,12 +80,14 @@ export const insertDataIntoSQLiteDB = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   force = false
 ) => {
-  const shouldRefresh = await shouldRequery();
-  console.log('Should refresh data:', shouldRefresh);
+  if (!force) {
+    const shouldRefresh = await shouldRequery();
+    console.log('Should refresh data:', shouldRefresh);
 
-  if (!shouldRefresh) {
-    console.log('Data already added to database');
-    return;
+    if (!shouldRefresh) {
+      console.log('Data already added to database');
+      return;
+    }
   }
 
   console.log('Fetching fresh data from Supabase...');
