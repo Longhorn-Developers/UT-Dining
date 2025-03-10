@@ -36,6 +36,12 @@ const FilterBar = ({
 
   // When enabled, set default filter based on timeOfDay if none is selected.
   useEffect(() => {
+    // If there's only one item, automatically select it
+    if (items.length === 1 && !selectedItem) {
+      setSelectedItem(items[0].id);
+      return;
+    }
+
     if (useTimeOfDayDefault && !selectedItem) {
       const tod = timeOfDay(new Date()); // 'morning', 'afternoon', or 'evening'
       let defaultFilter = '';
