@@ -1,10 +1,11 @@
 import { FlashList } from '@shopify/flash-list';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, Animated, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 
 import CategoryHeader from './components/CategoryHeader';
 import LocationHeader from './components/LocationHeader';
+import ScrollToTopButton from './components/ScrollToTopButton';
 import SkeletonItem from './components/SkeletonItem';
 import { useCategoryExpansion } from '../../hooks/useCategoryExpansion';
 import { useLocationData } from '../../hooks/useLocationData';
@@ -14,16 +15,43 @@ import FoodComponent from '~/components/FoodComponent';
 
 const Location = () => {
   const { location } = useLocalSearchParams<{ location: string }>();
-
-  // Custom hooks for data and state management
   const { data, loading, selectedMenu, setSelectedMenu, filters } = useLocationData(location);
-
   const { toggleCategory, flattenedItems, resetExpandedCategories } = useCategoryExpansion(data);
 
-  // Reset expanded categories when selectedMenu changes
-  useEffect(() => {
-    resetExpandedCategories();
-  }, [selectedMenu, resetExpandedCategories]);
+  const listRef = useRef<FlashList<any>>(null);
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
+  // Animation value for fade and scale effect
+  const scrollButtonAnimation = useRef(new Animated.Value(0)).current;
+
+  // Handle scroll events to show/hide button with animation
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const scrollPosition = event.nativeEvent.contentOffset.y;
+    // Show button when scrolled down at least 400 pixels
+    if (scrollPosition > 500 && !showScrollToTop) {
+      setShowScrollToTop(true);
+      Animated.spring(scrollButtonAnimation, {
+        toValue: 1,
+        useNativeDriver: true,
+        // Add spring configuration for a bouncy effect
+        friction: 7,
+        tension: 40,
+      }).start();
+    } else if (scrollPosition <= 500 && showScrollToTop) {
+      Animated.spring(scrollButtonAnimation, {
+        toValue: 0,
+        useNativeDriver: true,
+        friction: 7,
+      }).start(() => {
+        // Only hide the button after animation completes
+        setShowScrollToTop(false);
+      });
+    }
+  };
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+  };
 
   // Create skeletons for loading state
   const skeletonItems = React.useMemo(() => {
@@ -78,11 +106,19 @@ const Location = () => {
     [selectedMenu, location, toggleCategory]
   );
 
+  // Reset expanded categories when selectedMenu changes
+  useEffect(() => {
+    resetExpandedCategories();
+  }, [selectedMenu, resetExpandedCategories]);
+
   return (
     <>
       <Stack.Screen options={{ title: 'Location' }} />
-      <Container className="mx-0 flex-1">
+      <Container className="relative mx-0 w-full flex-1">
         <FlashList
+          ref={listRef}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
           showsVerticalScrollIndicator
           estimatedItemSize={80}
           data={loading ? skeletonItems : flattenedItems}
@@ -104,6 +140,12 @@ const Location = () => {
           }
           renderItem={renderItem}
           getItemType={(item) => ('type' in item ? item.type : 'unknown')}
+        />
+
+        <ScrollToTopButton
+          visible={showScrollToTop}
+          animationValue={scrollButtonAnimation}
+          onPress={scrollToTop}
         />
       </Container>
     </>
