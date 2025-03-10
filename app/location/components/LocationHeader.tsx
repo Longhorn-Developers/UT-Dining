@@ -52,7 +52,7 @@ const LocationHeader = React.memo(
               items={filters}
             />
 
-            <SearchBar query={query} setQuery={setQuery} />
+            {filters && filters.length > 1 && <SearchBar query={query} setQuery={setQuery} />}
           </View>
         </View>
       </View>
