@@ -156,7 +156,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
           </View>
 
           <View className="mt-4">
-            <Text className="text-center text-xs text-ut-grey">
+            <Text className="text-xs text-ut-grey">
               Note: Allergen and dietary data comes directly from University Housing and Dining and
               may not always be accurate. Use discretion when making dietary choices.
             </Text>
