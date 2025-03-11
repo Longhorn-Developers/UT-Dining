@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react-native';
+import { Search, X } from 'lucide-react-native';
 import React from 'react';
 import { View, TextInput } from 'react-native';
 
@@ -16,8 +16,8 @@ const SearchBar = ({ query, setQuery }: Props) => {
         placeholder="Search for food name..."
         value={query}
         onChangeText={setQuery}
-        clearButtonMode="while-editing"
       />
+      {query.length > 0 && <X size={18} color="#888888" onPress={() => setQuery('')} />}
     </View>
   );
 };
