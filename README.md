@@ -18,6 +18,7 @@ Join the Beta Test here _(iOS only)_: [TestFlight - UT Dining](https://testfligh
 3. [How it Works](#how-it-works)
 4. [Getting Started](#getting-started)
    - [Prerequisites](#prerequisites)
+   - [VSCode Extensions](#vscode-extensions)
    - [Installation](#installation)
 5. [Project Structure](#project-structure)
 6. [Contributing](#contributing)
