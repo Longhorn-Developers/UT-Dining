@@ -1,6 +1,6 @@
-import { Filter, Heart, ChefHat, X } from 'lucide-react-native';
+import { Filter, Heart, ChefHat, RotateCwIcon } from 'lucide-react-native';
 import { Text, View, TouchableOpacity, Image } from 'react-native';
-import ActionSheet, { SheetProps } from 'react-native-actions-sheet';
+import ActionSheet, { ScrollView, SheetProps } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ALLERGEN_ICONS, ALLERGEN_EXCEPTIONS } from '~/data/AllergenInfo';
@@ -45,121 +45,124 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
       gestureEnabled
       safeAreaInsets={insets}
       useBottomSafeAreaPadding>
-      <View className="p-6">
-        {/* Header */}
-        <View className="mb-4 flex-row items-center justify-between">
-          <View className="flex-row items-center gap-x-2">
-            <Filter color={COLORS['ut-burnt-orange']} size={20} />
-            <Text className="text-2xl font-bold">Filters</Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View className="p-6">
+          {/* Header */}
+          <View className="mb-4 flex-row items-center justify-between">
+            <View className="flex-row items-center gap-x-2">
+              <Filter color={COLORS['ut-burnt-orange']} size={20} />
+              <Text className="text-3xl font-bold">Filters</Text>
+            </View>
+
+            <TouchableOpacity
+              onPress={resetFilters}
+              className="flex-row items-center gap-x-1 rounded-full border border-ut-grey/50 px-3 py-1">
+              <RotateCwIcon size={16} color={COLORS['ut-grey']} />
+              <Text className="text-sm font-medium text-ut-grey">Reset</Text>
+            </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            onPress={resetFilters}
-            className="flex-row items-center gap-x-1 rounded-full border border-ut-grey/50 px-3 py-1">
-            <X size={16} color={COLORS['ut-grey']} />
-            <Text className="text-sm font-medium text-ut-grey">Reset</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Special Filters */}
-        <Text className="mb-2 text-lg font-semibold">My Items</Text>
-        <View className="mb-6 flex-row gap-x-2">
-          <TouchableOpacity
-            onPress={toggleFavoriteFilter}
-            className={cn(
-              'flex-1 flex-row items-center justify-center gap-x-2 rounded-lg border py-3',
-              filters.favorites
-                ? 'border-ut-burnt-orange bg-ut-burnt-orange'
-                : 'border-ut-grey/15 bg-white'
-            )}>
-            <Heart
-              size={18}
-              color={filters.favorites ? 'white' : COLORS['ut-grey']}
-              fill={filters.favorites ? 'white' : 'transparent'}
-            />
-            <Text className={cn('font-medium', filters.favorites ? 'text-white' : 'text-ut-grey')}>
-              Favorites
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={toggleMealPlanFilter}
-            className={cn(
-              'flex-1 flex-row items-center justify-center gap-x-2 rounded-lg border py-3',
-              filters.mealPlan
-                ? 'border-ut-burnt-orange bg-ut-burnt-orange'
-                : 'border-ut-grey/15 bg-white'
-            )}>
-            <ChefHat size={18} color={filters.mealPlan ? 'white' : COLORS['ut-grey']} />
-            <Text className={cn('font-medium', filters.mealPlan ? 'text-white' : 'text-ut-grey')}>
-              Meal Plan
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Allergens */}
-        <Text className="text-lg font-semibold">Allergen Free</Text>
-        <Text className="mb-2 text-sm text-ut-grey">
-          Show only items that do not contain these allergens
-        </Text>
-        <View className="mb-6 flex-row flex-wrap gap-2">
-          {allergens.map(([key, iconSource]) => (
+          {/* Special Filters */}
+          <Text className="mb-2 text-xl font-semibold">My Items</Text>
+          <View className="mb-6 flex-row gap-x-2">
             <TouchableOpacity
-              key={key}
-              onPress={() => toggleAllergenFilter(key)}
+              onPress={toggleFavoriteFilter}
               className={cn(
-                'flex-row items-center gap-x-2 rounded-lg border px-3 py-2',
-                filters.allergens[key]
+                'flex-1 flex-row items-center justify-center gap-x-2 rounded-lg border py-3',
+                filters.favorites
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange'
                   : 'border-ut-grey/15 bg-white'
               )}>
-              <Image source={iconSource} className="size-4" resizeMode="contain" />
+              <Heart
+                size={18}
+                color={filters.favorites ? 'white' : COLORS['ut-grey']}
+                fill={filters.favorites ? 'white' : 'transparent'}
+              />
               <Text
-                className={cn(
-                  'text-sm font-medium',
-                  filters.allergens[key] ? 'text-white' : 'text-ut-grey'
-                )}>
-                {formatKey(key)}
+                className={cn('font-medium', filters.favorites ? 'text-white' : 'text-ut-grey')}>
+                Favorites
               </Text>
             </TouchableOpacity>
-          ))}
-        </View>
 
-        {/* Dietary Preferences */}
-        <Text className="text-lg font-semibold">Dietary Preferences</Text>
-        <Text className="mb-2 text-sm text-ut-grey">
-          Show only items that match these dietary preferences
-        </Text>
-        <View className="mb-4 flex-row flex-wrap gap-2">
-          {dietaryOptions.map(([key, iconSource]) => (
             <TouchableOpacity
-              key={key}
-              onPress={() => toggleDietaryFilter(key)}
+              onPress={toggleMealPlanFilter}
               className={cn(
-                'flex-row items-center gap-x-2 rounded-lg border px-3 py-2',
-                filters.dietary[key]
+                'flex-1 flex-row items-center justify-center gap-x-2 rounded-lg border py-3',
+                filters.mealPlan
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange'
                   : 'border-ut-grey/15 bg-white'
               )}>
-              <Image source={iconSource} className="size-4" resizeMode="contain" />
-              <Text
-                className={cn(
-                  'text-sm font-medium',
-                  filters.dietary[key] ? 'text-white' : 'text-ut-grey'
-                )}>
-                {formatKey(key)}
+              <ChefHat size={18} color={filters.mealPlan ? 'white' : COLORS['ut-grey']} />
+              <Text className={cn('font-medium', filters.mealPlan ? 'text-white' : 'text-ut-grey')}>
+                Meal Plan
               </Text>
             </TouchableOpacity>
-          ))}
-        </View>
+          </View>
 
-        <View className="mb-2 mt-4">
-          <Text className="text-center text-xs text-ut-grey">
-            Note: Allergen and dietary data comes directly from University Housing and Dining and
-            may not always be accurate. Use discretion when making dietary choices.
+          {/* Allergens */}
+          <Text className="text-xl font-semibold">Allergen Free</Text>
+          <Text className="mb-2 text-sm text-ut-grey">
+            Show only items that do not contain these allergens
           </Text>
+          <View className="mb-6 flex-row flex-wrap gap-2">
+            {allergens.map(([key, iconSource]) => (
+              <TouchableOpacity
+                key={key}
+                onPress={() => toggleAllergenFilter(key)}
+                className={cn(
+                  'flex-row items-center gap-x-2 rounded-lg border px-3 py-2',
+                  filters.allergens[key]
+                    ? 'border-ut-burnt-orange bg-ut-burnt-orange'
+                    : 'border-ut-grey/15 bg-white'
+                )}>
+                <Image source={iconSource} className="size-4 rounded-full" resizeMode="contain" />
+                <Text
+                  className={cn(
+                    'text-sm font-medium',
+                    filters.allergens[key] ? 'text-white' : 'text-ut-grey'
+                  )}>
+                  {formatKey(key)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Dietary Preferences */}
+          <Text className="text-xl font-semibold">Dietary Preferences</Text>
+          <Text className="mb-2 text-sm text-ut-grey">
+            Show only items that match these dietary preferences
+          </Text>
+          <View className="mb-4 flex-row flex-wrap gap-2">
+            {dietaryOptions.map(([key, iconSource]) => (
+              <TouchableOpacity
+                key={key}
+                onPress={() => toggleDietaryFilter(key)}
+                className={cn(
+                  'flex-row items-center gap-x-2 rounded-lg border px-3 py-2',
+                  filters.dietary[key]
+                    ? 'border-ut-burnt-orange bg-ut-burnt-orange'
+                    : 'border-ut-grey/15 bg-white'
+                )}>
+                <Image source={iconSource} className="size-4" resizeMode="contain" />
+                <Text
+                  className={cn(
+                    'text-sm font-medium',
+                    filters.dietary[key] ? 'text-white' : 'text-ut-grey'
+                  )}>
+                  {formatKey(key)}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View className="mt-4">
+            <Text className="text-center text-xs text-ut-grey">
+              Note: Allergen and dietary data comes directly from University Housing and Dining and
+              may not always be accurate. Use discretion when making dietary choices.
+            </Text>
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </ActionSheet>
   );
 };

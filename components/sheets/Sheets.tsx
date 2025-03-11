@@ -1,4 +1,4 @@
-// https://rnas.vercel.app/guides/
+// https://rnas.vercel.app/
 
 import { registerSheet, SheetDefinition } from 'react-native-actions-sheet';
 
