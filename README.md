@@ -58,8 +58,15 @@ Every 24 hours, the **Expo** mobile application fetches the latest menu data fro
 - [Node.js](https://nodejs.org/) (LTS version recommended)
 - [pnpm](https://pnpm.io/installation)
 - [Expo CLI](https://docs.expo.dev/get-started/installation/)
-- A physical mobile device with [Expo Go](https://expo.dev/client) installed or an emulator. Follow the guide [here](https://docs.expo.dev/workflow/android-studio-emulator/) to set up an Android emulator or [here](https://docs.expo.dev/workflow/ios-simulator/) for an iOS simulator.
-- [Tailwind CSS Intellisense Extension](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss) for Visual Studio Code (optional, but highly recommended)
+- An iOS or Android emulator. Follow the guide [here](https://docs.expo.dev/workflow/android-studio-emulator/) to set up an Android emulator or [here](https://docs.expo.dev/workflow/ios-simulator/) for an iOS simulator.
+
+### VSCode Extensions
+
+We recommend using the following VSCode extensions to improve your development experience:
+
+- **[ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)**: For identifying and fixing linting issues.
+- **[Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)**: For automatic code formatting.
+- **[Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)**: For Tailwind CSS class autocomplete and IntelliSense.
 
 ### Installation
 
@@ -135,26 +142,26 @@ Every 24 hours, the **Expo** mobile application fetches the latest menu data fro
 
 6. **Setup the Development Build**
 
-   Since the app uses [react-native-mmkv](https://github.com/mrousavy/react-native-mmkv?tab=readme-ov-file) instead of `AsyncStorage`, you must run it with a development build rather       than Expo Go.  
+   Since the app uses [react-native-mmkv](https://github.com/mrousavy/react-native-mmkv?tab=readme-ov-file) instead of `AsyncStorage`, you must run it with a development build rather than Expo Go.
 
-   Run the following commands to build the development version:  
+   Run the following commands to build the development version:
 
-   - **For iOS:**  
+   - **For iOS:**
      ```sh
      pnpm run ios
      ```
-     
-    - **For Android:**
-     ```sh
-     pnpm run android
-     ```
-    
-     If you’re developing for both platforms, run both commands.
-      
-     > **Note**: The build process may take some time. Please wait until it completes.
-   
+   - **For Android:**
 
-6. **Start the Development Server**
+   ```sh
+   pnpm run android
+   ```
+
+   If you’re developing for both platforms, run both commands.
+
+   > **Note**: The build process may take some time. Please wait until it completes.
+
+7. **Start the Development Server**
+
    ```sh
    pnpm run start
    ```
