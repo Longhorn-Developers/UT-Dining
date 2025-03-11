@@ -14,40 +14,82 @@ import { useScrollToTop } from '../../hooks/useScrollToTop';
 import { Container } from '~/components/Container';
 import FoodComponent from '~/components/FoodComponent';
 import { useDebounce } from '~/hooks/useDebounce';
+import { useFiltersStore } from '~/store/useFiltersStore';
+import { filterFoodItems } from '~/utils/filter';
 
 /**
- * Filter items based on search query
+ * Filter items based on search query and user-selected filters
  */
-const useFilteredItems = (flattenedItems: any[], debouncedSearchQuery: string) => {
+const useFilteredItems = (flattenedItems: any[], debouncedSearchQuery: string, filters: any) => {
   return React.useMemo(() => {
-    if (!debouncedSearchQuery.trim()) {
-      return flattenedItems;
-    }
+    // First, filter by search query
+    let result = flattenedItems;
 
-    const query = debouncedSearchQuery.toLowerCase();
-    const result = [];
-    const processedCategoryIds = new Set();
-    let currentCategory = null;
+    if (debouncedSearchQuery.trim()) {
+      const query = debouncedSearchQuery.toLowerCase();
+      result = [];
+      const processedCategoryIds = new Set();
+      let currentCategory = null;
 
-    for (const item of flattenedItems) {
-      if (item.type === 'category_header') {
-        currentCategory = { ...item, isExpanded: true };
-      } else if (item.type === 'food_item') {
-        const foodName = item.data.name ? item.data.name.toLowerCase() : '';
-        const description = item.data.description ? item.data.description.toLowerCase() : '';
+      for (const item of flattenedItems) {
+        if (item.type === 'category_header') {
+          currentCategory = { ...item, isExpanded: true };
+        } else if (item.type === 'food_item') {
+          const foodName = item.data.name ? item.data.name.toLowerCase() : '';
+          const description = item.data.description ? item.data.description.toLowerCase() : '';
 
-        if (foodName.includes(query) || description.includes(query)) {
-          if (currentCategory && !processedCategoryIds.has(currentCategory.id)) {
-            result.push(currentCategory);
-            processedCategoryIds.add(currentCategory.id);
+          if (foodName.includes(query) || description.includes(query)) {
+            if (currentCategory && !processedCategoryIds.has(currentCategory.id)) {
+              result.push(currentCategory);
+              processedCategoryIds.add(currentCategory.id);
+            }
+            result.push(item);
           }
-          result.push(item);
         }
       }
     }
 
+    // Then, apply additional filters (favorites, allergens, dietary)
+    if (
+      Object.values(filters).some(
+        (val) =>
+          val === true ||
+          (typeof val === 'object' && val !== null && Object.values(val).some((v) => v))
+      )
+    ) {
+      const filteredCategories = new Set();
+      const filteredResult = [];
+      let currentCategory = null;
+
+      for (const item of result) {
+        if (item.type === 'category_header') {
+          // Don't add category headers yet, we'll add them if they have matching items
+          currentCategory = item;
+        } else if (item.type === 'food_item') {
+          // Apply additional filters to food items
+          const foodItem = item.data;
+
+          // Use our utility function to check if this item passes all filters
+          if (filterFoodItems([foodItem], filters).length > 0) {
+            // Item passed all filters, so add its category header if not already added
+            if (currentCategory && !filteredCategories.has(currentCategory.id)) {
+              filteredResult.push(currentCategory);
+              filteredCategories.add(currentCategory.id);
+            }
+            // Then add the item itself
+            filteredResult.push(item);
+          }
+        } else {
+          // Pass through any other item types
+          filteredResult.push(item);
+        }
+      }
+
+      return filteredResult;
+    }
+
     return result;
-  }, [flattenedItems, debouncedSearchQuery]);
+  }, [flattenedItems, debouncedSearchQuery, filters]);
 };
 
 /**
@@ -70,15 +112,24 @@ const useSkeletonItems = () => {
 const Location = () => {
   // Core state and data
   const { location } = useLocalSearchParams<{ location: string }>();
-  const { data, loading, selectedMenu, setSelectedMenu, filters } = useLocationData(location);
+  const {
+    data,
+    loading,
+    selectedMenu,
+    setSelectedMenu,
+    filters: menuFilters,
+  } = useLocationData(location);
   const { toggleCategory, flattenedItems, resetExpandedCategories } = useCategoryExpansion(data);
+
+  // Get active filters from filters store
+  const activeFilters = useFiltersStore((state) => state.filters);
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   // Custom hooks for UI elements
-  const filteredItems = useFilteredItems(flattenedItems, debouncedSearchQuery);
+  const filteredItems = useFilteredItems(flattenedItems, debouncedSearchQuery, activeFilters);
   const skeletonItems = useSkeletonItems();
 
   // Scroll to top functionality
@@ -95,8 +146,13 @@ const Location = () => {
   // Determine which data to display
   const getDisplayedItems = useCallback(() => {
     if (loading) return skeletonItems;
-    return debouncedSearchQuery ? filteredItems : flattenedItems;
-  }, [loading, debouncedSearchQuery, filteredItems, flattenedItems, skeletonItems]);
+    return debouncedSearchQuery ||
+      Object.values(activeFilters).some(
+        (val) => val === true || (typeof val === 'object' && Object.values(val).some((v) => v))
+      )
+      ? filteredItems
+      : flattenedItems;
+  }, [loading, debouncedSearchQuery, filteredItems, flattenedItems, skeletonItems, activeFilters]);
 
   // Render list items based on their type
   const renderItem = useCallback(
@@ -142,15 +198,27 @@ const Location = () => {
   const EmptyState = useCallback(() => {
     if (loading) return null;
 
+    const subtitle = () => {
+      if (debouncedSearchQuery) {
+        return 'Try a different search term.';
+      } else if (
+        Object.values(activeFilters).some(
+          (val) => val === true || (typeof val === 'object' && Object.values(val).some((v) => v))
+        )
+      ) {
+        return 'Try adjusting your filters.';
+      }
+
+      return 'Please try again later.';
+    };
+
     return (
       <View className="mt-12 flex-1 items-center justify-center">
         <Text className="text-xl font-bold text-ut-burnt-orange">No items found.</Text>
-        <Text className="text-sm">
-          {debouncedSearchQuery ? 'Try a different search term.' : 'Please try again later.'}
-        </Text>
+        <Text className="text-sm">{subtitle()}</Text>
       </View>
     );
-  }, [loading, debouncedSearchQuery]);
+  }, [loading, debouncedSearchQuery, activeFilters]);
 
   // Header component with location details and search
   const Header = useCallback(
@@ -159,12 +227,12 @@ const Location = () => {
         location={location}
         selectedMenu={selectedMenu}
         setSelectedMenu={setSelectedMenu}
-        filters={filters}
+        filters={menuFilters}
         query={searchQuery}
         setQuery={setSearchQuery}
       />
     ),
-    [location, selectedMenu, setSelectedMenu, filters, searchQuery, setSearchQuery]
+    [location, selectedMenu, setSelectedMenu, menuFilters, searchQuery, setSearchQuery]
   );
 
   return (
