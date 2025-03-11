@@ -135,11 +135,19 @@ Every 24 hours, the **Expo** mobile application fetches the latest menu data fro
 
 6. **Start the Development Server**
 
+   Before running the development server, run the following to setup the development build:
+
+   ```sh
+   pnpm run prebuild
+   ```
+
+   Start the development server with:
+
    ```sh
    pnpm run start
    ```
 
-   Make sure that you are using `development build` instead of `Expo Go` when running the app. You can switch to the development build by pressing `s` in the terminal.
+   > Make sure that you are using `development build` instead of `Expo Go` when running the app. You can switch to the development build by pressing `s` in the terminal.
 
    **Tunneling for Physical Devices**
 
