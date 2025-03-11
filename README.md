@@ -133,21 +133,33 @@ Every 24 hours, the **Expo** mobile application fetches the latest menu data fro
    npx expo login
    ```
 
+6. **Setup the Development Build**
+
+   Since the app uses [react-native-mmkv](https://github.com/mrousavy/react-native-mmkv?tab=readme-ov-file) instead of `AsyncStorage`, you must run it with a development build rather       than Expo Go.  
+
+   Run the following commands to build the development version:  
+
+   - **For iOS:**  
+     ```sh
+     pnpm run ios
+     ```
+     
+    - **For Android:**
+     ```sh
+     pnpm run android
+     ```
+    
+     If you’re developing for both platforms, run both commands.
+      
+     > **Note**: The build process may take some time. Please wait until it completes.
+   
+
 6. **Start the Development Server**
-
-   Before running the development server, run the following to setup the development build:
-
-   ```sh
-   pnpm run prebuild
-   ```
-
-   Start the development server with:
-
    ```sh
    pnpm run start
    ```
 
-   > Make sure that you are using `development build` instead of `Expo Go` when running the app. You can switch to the development build by pressing `s` in the terminal.
+   Make sure that you are using `development build` instead of `Expo Go` when running the app. You can switch to the development build by pressing `s` in the terminal.
 
    **Tunneling for Physical Devices**
 
@@ -163,7 +175,7 @@ Every 24 hours, the **Expo** mobile application fetches the latest menu data fro
 
    While the development server is running, press `Shift + M` in the terminal and select `expo-drizzle-studio-plugin` to open Drizzle Studio in your browser. You can use this tool to inspect the SQLite database and troubleshoot any issues related to the local cache with SQLite and Drizzle ORM. Read more about Drizzle Studio [here](https://orm.drizzle.team/drizzle-studio/overview).
 
-7. **Launch Emulators**
+8. **Launch Emulators**
 
    To open the app on an emulator, press either of the following keys in the terminal:
 
