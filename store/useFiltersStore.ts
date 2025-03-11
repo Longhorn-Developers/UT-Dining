@@ -1,6 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+
+import { zustandStorage } from './rnmmkv-storage';
 
 interface AllergenFilters {
   [key: string]: boolean;
@@ -89,7 +90,7 @@ export const useFiltersStore = create<FiltersState>()(
     }),
     {
       name: 'filters-storage',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => zustandStorage),
     }
   )
 );

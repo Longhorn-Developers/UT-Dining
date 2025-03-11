@@ -1,6 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+
+import { zustandStorage } from './rnmmkv-storage';
 
 export interface FavoriteItem {
   name: string;
@@ -22,7 +23,7 @@ interface FavoritesState {
 
 /**
  * Zustand store for managing favorite food items.
- * Persists favorites in AsyncStorage.
+ * Persists favorites in RNMMKV storage.
  */
 export const useFavoritesStore = create<FavoritesState>()(
   persist(
@@ -86,7 +87,7 @@ export const useFavoritesStore = create<FavoritesState>()(
     }),
     {
       name: 'favorites',
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => zustandStorage),
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.initialized = true;

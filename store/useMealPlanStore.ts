@@ -1,6 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+
+import { zustandStorage } from './rnmmkv-storage';
 
 import { shouldRequery } from '~/utils/time';
 
@@ -38,7 +39,7 @@ interface MealPlanState {
 
 /**
  * Zustand store for managing meal plan items.
- * Persists meal plan in AsyncStorage.
+ * Persists meal plan in RNMMKV storage.
  */
 export const useMealPlanStore = create<MealPlanState>()(
   persist(
@@ -130,7 +131,7 @@ export const useMealPlanStore = create<MealPlanState>()(
     }),
     {
       name: STORAGE_KEY_MEALPLAN,
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => zustandStorage),
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.initialized = true;
