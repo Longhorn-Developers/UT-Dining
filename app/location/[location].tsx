@@ -40,10 +40,18 @@ const useFilteredItems = (flattenedItems: any[], debouncedSearchQuery: string, f
 
           if (foodName.includes(query) || description.includes(query)) {
             if (currentCategory && !processedCategoryIds.has(currentCategory.id)) {
-              result.push(currentCategory);
+              // Always expand categories in search results
+              result.push({
+                ...currentCategory,
+                isExpanded: true,
+              });
               processedCategoryIds.add(currentCategory.id);
             }
-            result.push(item);
+            // Don't mark items as hidden in search results
+            result.push({
+              ...item,
+              hidden: false,
+            });
           }
         }
       }
@@ -154,7 +162,7 @@ const Location = () => {
       : flattenedItems;
   }, [loading, debouncedSearchQuery, filteredItems, flattenedItems, skeletonItems, activeFilters]);
 
-  // Render list items based on their type
+  // In your renderItem function in [location].tsx
   const renderItem = useCallback(
     ({ item }: { item: any }) => {
       switch (item.type) {
@@ -170,6 +178,11 @@ const Location = () => {
           );
 
         case 'food_item':
+          // Don't render if marked as hidden
+          if (item.hidden) {
+            return null;
+          }
+
           return (
             <View className="px-6">
               <FoodComponent
@@ -220,21 +233,6 @@ const Location = () => {
     );
   }, [loading, debouncedSearchQuery, activeFilters]);
 
-  // Header component with location details and search
-  const Header = useCallback(
-    () => (
-      <LocationHeader
-        location={location}
-        selectedMenu={selectedMenu}
-        setSelectedMenu={setSelectedMenu}
-        filters={menuFilters}
-        query={searchQuery}
-        setQuery={setSearchQuery}
-      />
-    ),
-    [location, selectedMenu, setSelectedMenu, menuFilters, searchQuery, setSearchQuery]
-  );
-
   return (
     <>
       <Stack.Screen options={{ title: 'Location' }} />
@@ -246,10 +244,23 @@ const Location = () => {
           showsVerticalScrollIndicator
           estimatedItemSize={80}
           data={getDisplayedItems()}
-          ListHeaderComponent={<Header />}
+          ListHeaderComponent={
+            <LocationHeader
+              location={location}
+              selectedMenu={selectedMenu}
+              setSelectedMenu={setSelectedMenu}
+              filters={menuFilters}
+              query={searchQuery}
+              setQuery={(query) => {
+                resetExpandedCategories();
+                setSearchQuery(query);
+              }}
+            />
+          }
           ListEmptyComponent={<EmptyState />}
           renderItem={renderItem}
           getItemType={(item) => ('type' in item ? item.type : 'unknown')}
+          keyboardShouldPersistTaps="always"
         />
 
         <ScrollToTopButton
