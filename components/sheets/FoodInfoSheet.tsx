@@ -2,30 +2,42 @@ import { InfoIcon } from 'lucide-react-native';
 import React from 'react';
 import { Text, View, Image } from 'react-native';
 import ActionSheet, { SheetProps } from 'react-native-actions-sheet';
+import { ScrollView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ALLERGEN_ICONS, ALLERGEN_EXCEPTIONS } from '~/data/AllergenInfo';
 import { COLORS } from '~/utils/colors';
 
-// Helper function to chunk arrays into rows of exactly four items
-const chunkArray = (array: [string, any][], size: number) => {
-  const chunks: [string, any][][] = [];
-  for (let i = 0; i < array.length; i += size) {
-    const chunk = array.slice(i, i + size);
-    while (chunk.length < size) {
-      chunk.push(['placeholder', null]); // Fill row with placeholders
-    }
-    chunks.push(chunk);
-  }
-  return chunks;
+// Helper function to organize allergen data
+const categorizeAllergens = () => {
+  const allergens = Object.entries(ALLERGEN_ICONS)
+    .filter(([key]) => !ALLERGEN_EXCEPTIONS.has(key))
+    .map(([key, icon]) => ({
+      key,
+      icon,
+      displayName: key
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' '),
+    }));
+
+  const dietary = Object.entries(ALLERGEN_ICONS)
+    .filter(([key]) => ALLERGEN_EXCEPTIONS.has(key))
+    .map(([key, icon]) => ({
+      key,
+      icon,
+      displayName: key
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' '),
+    }));
+
+  return { allergens, dietary };
 };
 
 const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
   const insets = useSafeAreaInsets();
-
-  // Split allergens and dietary items
-  const allergens = Object.entries(ALLERGEN_ICONS).filter(([key]) => !ALLERGEN_EXCEPTIONS.has(key));
-  const dietary = Object.entries(ALLERGEN_ICONS).filter(([key]) => ALLERGEN_EXCEPTIONS.has(key));
+  const { allergens, dietary } = categorizeAllergens();
 
   return (
     <ActionSheet
@@ -35,72 +47,64 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
       gestureEnabled
       safeAreaInsets={insets}
       useBottomSafeAreaPadding>
-      <View className="flex-col gap-y-4 p-6">
-        {/* Header */}
-        <View>
-          <View className="flex-row items-center gap-x-2">
-            <InfoIcon color={COLORS['ut-burnt-orange']} />
-            <Text className="text-3xl font-bold">Allergen & Dietary Legend</Text>
+      <ScrollView showsVerticalScrollIndicator={false} className="max-h-[60vh]">
+        <View className="p-6">
+          {/* Header */}
+          <View>
+            <View className="mb-2 flex-row items-center gap-x-2">
+              <InfoIcon color={COLORS['ut-burnt-orange']} />
+              <Text className="text-3xl font-bold">Food Legend</Text>
+            </View>
           </View>
-          <Text className="mt-1 text-gray-700">
-            <Text className="font-bold text-ut-burnt-orange">Disclaimer:</Text> Allergen and dietary
-            data may be inaccurate. Use discretion when making dietary choices.
-          </Text>
-        </View>
 
-        {/* Divider */}
-        <View className="w-full border-b border-b-ut-grey/15" />
-
-        {/* Allergens Section */}
-        <View className="gap-y-1">
-          <Text className="text-2xl font-bold">Allergens</Text>
-          <View className="mt-2 gap-6">
-            {chunkArray(allergens, 4).map((row, rowIndex) => (
-              <View key={rowIndex} className="flex-row justify-between">
-                {row.map(([allergen, iconSource], colIndex) => (
-                  <View key={colIndex} className="flex w-1/4 items-center">
-                    {iconSource ? (
-                      <>
-                        <Image source={iconSource} className="size-8" resizeMode="contain" />
-                        <Text className="mt-2 text-center text-sm font-medium capitalize">
-                          {allergen.replace(/_/g, ' ')}
-                        </Text>
-                      </>
-                    ) : (
-                      <View className="h-10 w-10 opacity-0" /> // Invisible placeholder
-                    )}
+          {/* Allergens Section */}
+          <View>
+            <Text className="text-xl font-semibold">Allergens</Text>
+            <Text className="mb-3 text-sm text-ut-grey">
+              Foods containing these allergens are labeled
+            </Text>
+            <View className="flex-row flex-wrap gap-4">
+              {allergens.map((item) => (
+                <View key={item.key} className="mb-4 w-[21%] items-center">
+                  <View className="mb-1 rounded-full border border-gray-200 bg-gray-50 p-3">
+                    <Image
+                      source={item.icon}
+                      className="size-10 rounded-full"
+                      resizeMode="contain"
+                    />
                   </View>
-                ))}
-              </View>
-            ))}
+                  <Text className="text-center text-xs font-medium text-ut-grey">
+                    {item.displayName}
+                  </Text>
+                </View>
+              ))}
+            </View>
           </View>
-        </View>
 
-        {/* Dietary Section */}
-        <View className="gap-y-1">
-          <Text className="text-2xl font-bold">Dietary</Text>
-          <View className="mt-2 gap-6">
-            {chunkArray(dietary, 4).map((row, rowIndex) => (
-              <View key={rowIndex} className="flex-row justify-between">
-                {row.map(([allergen, iconSource], colIndex) => (
-                  <View key={colIndex} className="flex w-1/4 items-center">
-                    {iconSource ? (
-                      <>
-                        <Image source={iconSource} className="size-8" resizeMode="contain" />
-                        <Text className="mt-2 text-center text-sm font-medium capitalize">
-                          {allergen.replace(/_/g, ' ')}
-                        </Text>
-                      </>
-                    ) : (
-                      <View className="h-10 w-10 opacity-0" /> // Invisible placeholder
-                    )}
+          {/* Divider */}
+          <View className="mb-4 w-full border-b border-b-ut-grey/15" />
+
+          {/* Dietary Section */}
+          <View>
+            <Text className="text-xl font-semibold">Dietary Preferences</Text>
+            <Text className="mb-3 text-sm text-ut-grey">
+              Foods that meet these preferences are labeled
+            </Text>
+            <View className="flex-row flex-wrap gap-4">
+              {dietary.map((item) => (
+                <View key={item.key} className="mb-4 w-[21%] items-center">
+                  <View className="mb-1 rounded-full border border-gray-200 bg-gray-50 p-3">
+                    <Image source={item.icon} className="size-10" resizeMode="contain" />
                   </View>
-                ))}
-              </View>
-            ))}
+                  <Text className="text-center text-xs font-medium text-ut-grey">
+                    {item.displayName}
+                  </Text>
+                </View>
+              ))}
+            </View>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </ActionSheet>
   );
 };
