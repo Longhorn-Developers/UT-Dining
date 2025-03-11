@@ -1,14 +1,14 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { parseISO, format, addDays } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 
 import { LOCATION_INFO, WeekDay } from '~/data/LocationInfo';
+import { miscStorage } from '~/store/misc-storage';
 
 const CENTRAL_TIME_ZONE = 'America/Chicago';
 
 // Helper to determine if a requery is needed based on the last query time.
 export const shouldRequery = async (): Promise<boolean> => {
-  const lastQueryTime = await AsyncStorage.getItem('lastQueryTime');
+  const lastQueryTime = miscStorage.getString('lastQueryTime');
   if (!lastQueryTime) return true;
   const lastQueryDate = parseISO(lastQueryTime);
   const now = new Date();

@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import { Stack } from 'expo-router';
@@ -16,6 +15,7 @@ import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
 import { LOCATION_INFO } from '~/data/LocationInfo';
 import { insertDataIntoSQLiteDB } from '~/db/database';
+import { miscStorage } from '~/store/misc-storage';
 import { COLORS } from '~/utils/colors';
 import { shouldRequery } from '~/utils/time';
 
@@ -71,7 +71,8 @@ export default function Home() {
         const data = await drizzleDb.select().from(schema.location);
         setLocations(data);
 
-        const lastUpdated = await AsyncStorage.getItem('lastQueryTime');
+        const lastUpdated = miscStorage.getString('lastQueryTime');
+
         if (lastUpdated) {
           setLastUpdated(new Date(lastUpdated));
         }

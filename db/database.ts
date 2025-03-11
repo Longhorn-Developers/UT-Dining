@@ -1,10 +1,10 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { eq, sql } from 'drizzle-orm';
 import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 
 import { allergens, food_item, location, menu, menu_category, nutrition } from './schema';
 import * as schema from '../db/schema';
 
+import { miscStorage } from '~/store/misc-storage';
 import { supabase } from '~/utils/supabase';
 import { shouldRequery } from '~/utils/time';
 
@@ -136,7 +136,7 @@ export const insertDataIntoSQLiteDB = async (
 
     console.log('Data added to database');
 
-    await AsyncStorage.setItem('lastQueryTime', new Date().toISOString());
+    miscStorage.set('lastQueryTime', new Date().toISOString());
   } else {
     console.error('Error fetching data from Supabase');
   }
