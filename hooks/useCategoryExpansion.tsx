@@ -1,15 +1,15 @@
 import { useState, useCallback, useMemo } from 'react';
 
-import { StructuredFoodItem, StructuredLocation } from '~/db/database';
+import { FoodItem, Location } from '~/db/database';
 
 // Define item types for our flattened list
 export type ListItem =
   | { type: 'category_header'; id: string; title: string; isExpanded: boolean }
-  | { type: 'food_item'; id: string; categoryId: string; data: StructuredFoodItem }
+  | { type: 'food_item'; id: string; categoryId: string; data: FoodItem }
   | { type: 'skeleton_header'; id: string }
   | { type: 'skeleton_item'; id: string };
 
-export function useCategoryExpansion(data: StructuredLocation | null) {
+export function useCategoryExpansion(data: Location | null) {
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
 
   // Toggle category expansion

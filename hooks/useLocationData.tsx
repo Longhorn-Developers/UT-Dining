@@ -4,13 +4,13 @@ import { useState, useEffect, useMemo } from 'react';
 
 import * as schema from '../db/schema';
 
-import { getLocationMenuNames, getLocationMenuData, StructuredLocation } from '~/db/database';
+import { getLocationMenuNames, getLocationMenuData, Location } from '~/db/database';
 
 export function useLocationData(location: string) {
   const db = useSQLiteContext();
   const drizzleDb = useMemo(() => drizzle(db, { schema }), [db]);
 
-  const [data, setData] = useState<StructuredLocation | null>(null);
+  const [data, setData] = useState<Location | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState<string | null>(null);
   const [filters, setFilters] = useState<{ title: string; id: string }[]>([]);

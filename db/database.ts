@@ -8,6 +8,28 @@ import * as schema from '../db/schema';
 import { supabase } from '~/utils/supabase';
 import { shouldRequery } from '~/utils/time';
 
+export interface Location {
+  location_name: schema.Location['name'];
+  menus: Menu[];
+}
+
+export interface Menu {
+  menu_name: schema.Menu['name'];
+  menu_categories: MenuCategory[];
+}
+
+export interface MenuCategory {
+  category_title: schema.MenuCategory['title'];
+  food_items: FoodItem[];
+}
+
+export interface FoodItem {
+  name: schema.FoodItem['name'];
+  link: schema.FoodItem['link'];
+  allergens: schema.Allergens;
+  nutrition: schema.Nutrition;
+}
+
 const querySupabase = async () => {
   try {
     const [
@@ -120,29 +142,6 @@ export const insertDataIntoSQLiteDB = async (
   }
 };
 
-// Structuring data properly
-export interface StructuredLocation {
-  location_name: schema.Location['name'];
-  menus: StructuredMenu[];
-}
-
-export interface StructuredMenu {
-  menu_name: schema.Menu['name'];
-  menu_categories: StructuredMenuCategory[];
-}
-
-export interface StructuredMenuCategory {
-  category_title: schema.MenuCategory['title'];
-  food_items: StructuredFoodItem[];
-}
-
-export interface StructuredFoodItem {
-  name: schema.FoodItem['name'];
-  link: schema.FoodItem['link'];
-  allergens: schema.Allergens;
-  nutrition: schema.Nutrition;
-}
-
 export const getLocationMenuNames = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string
@@ -221,20 +220,20 @@ export const getLocationMenuData = async (
       .execute();
 
     // Create structured data from query result
-    const structuredData: StructuredLocation = {
+    const structuredData: Location = {
       location_name: locationName,
       menus: [],
     };
 
     // Create a menu entry for the selected menu
-    const menuEntry: StructuredMenu = {
+    const menuEntry: Menu = {
       menu_name: menuName,
       menu_categories: [],
     };
     structuredData.menus.push(menuEntry);
 
     // Group food items by category
-    const categoryMap = new Map<string, StructuredFoodItem[]>();
+    const categoryMap = new Map<string, FoodItem[]>();
 
     for (const row of data) {
       if (!row.category_title) continue;
@@ -282,7 +281,7 @@ export const getFoodItem = async (
   menuName: string,
   categoryName: string,
   itemName: string
-): Promise<StructuredFoodItem | null> => {
+): Promise<FoodItem | null> => {
   const data = await db
     .select({
       food_name: schema.food_item.name,
@@ -341,7 +340,7 @@ export const getFoodItem = async (
   }
 
   // Convert the result to a StructuredFoodItem
-  const foodItem: StructuredFoodItem = {
+  const foodItem: FoodItem = {
     name: data[0].food_name,
     link: data[0].food_link,
     allergens: data[0].allergens as unknown as schema.Allergens,

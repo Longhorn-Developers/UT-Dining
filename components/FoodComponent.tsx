@@ -17,7 +17,7 @@ import Alert from './Alert';
 import { FavoriteAction, RemoveAction, AddMealPlanAction } from './AnimatedActions';
 
 import { ALLERGEN_ICONS } from '~/data/AllergenInfo';
-import { StructuredFoodItem } from '~/db/database';
+import { FoodItem } from '~/db/database';
 import { useFavoritesStore } from '~/store/useFavoritesStore';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 import { COLORS } from '~/utils/colors';
@@ -32,7 +32,7 @@ const FoodComponent = ({
   canFavorite = true,
   canMealPlan = true,
 }: {
-  food: StructuredFoodItem;
+  food: FoodItem;
   selectedMenu: string;
   categoryName: string;
   location: string;
@@ -200,7 +200,7 @@ const FoodContent = ({
   isMealPlan,
   showExtraInfo,
 }: {
-  food: StructuredFoodItem;
+  food: FoodItem;
   isFavorite: boolean;
   isMealPlan: boolean;
   showExtraInfo: boolean;
