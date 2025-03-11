@@ -7,7 +7,7 @@ UT Dining is a mobile application that provides comprehensive information about 
 > This project has been adopted by [Longhorn Developers](https://github.com/Longhorn-Developers). Huge thanks to Ethan Lanting (@EthanL06) for creating it!
 
 **Currently in Beta ‼️‼️**<br/>
-Join the Beta Test here *(iOS only)*: [TestFlight - UT Dining](https://testflight.apple.com/join/y3FUJUqN)
+Join the Beta Test here _(iOS only)_: [TestFlight - UT Dining](https://testflight.apple.com/join/y3FUJUqN)
 
 ![UT Dining App Screenshot](https://github.com/user-attachments/assets/f095381b-b850-4c99-9748-8b4864226af4)
 
@@ -139,6 +139,8 @@ Every 24 hours, the **Expo** mobile application fetches the latest menu data fro
    pnpm run start
    ```
 
+   Make sure that you are using `development build` instead of `Expo Go` when running the app. You can switch to the development build by pressing `s` in the terminal.
+
    **Tunneling for Physical Devices**
 
    If you're using a physical device on a public Wi-Fi network, use the following commands to tunnel the server to your device:
@@ -150,10 +152,10 @@ Every 24 hours, the **Expo** mobile application fetches the latest menu data fro
    > Note: Tunneling may have limitations with Supabase connections. Using an emulator is recommended for full functionality.
 
    **Debugging Drizzle with Drizzle Studio**
-   
+
    While the development server is running, press `Shift + M` in the terminal and select `expo-drizzle-studio-plugin` to open Drizzle Studio in your browser. You can use this tool to inspect the SQLite database and troubleshoot any issues related to the local cache with SQLite and Drizzle ORM. Read more about Drizzle Studio [here](https://orm.drizzle.team/drizzle-studio/overview).
 
-8. **Launch on your device**
+7. **Launch on your device**
 
    Scan the QR code with your mobile device's camera or Expo Go app, or press:
 
@@ -206,6 +208,7 @@ Here are the repositories related to the UT Dining project:
    This repository hosts the code for the UT Dining website.
 
 ## License
+
 This project is licensed under the MIT License.
 
 You are free to use, modify, and distribute this software under the terms of the MIT License. See the [LICENSE](https://github.com/Longhorn-Developers/UT-Dining/blob/main/LICENSE) file for more details.
