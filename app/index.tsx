@@ -166,6 +166,9 @@ export default function Home() {
           }
           contentContainerClassName="flex gap-y-3"
           renderItem={({ item }) => {
+            const locationInfo = LOCATION_INFO.find((info) => info.name === item.name);
+            if (!locationInfo) return null;
+
             return <LocationItem location={item} currentTime={currentTime} />;
           }}
           keyExtractor={(item) => item.id.toString()}
