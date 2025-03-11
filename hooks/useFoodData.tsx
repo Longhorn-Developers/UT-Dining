@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import * as schema from '../db/schema';
 
 import { ALLERGEN_EXCEPTIONS, NUTRITION_ORDER } from '~/data/AllergenInfo';
-import { getFoodItem, StructuredFoodItem } from '~/db/database';
+import { getFoodItem, FoodItem } from '~/db/database';
 
 // Helper function to format nutrition keys
 const formatNutritionKey = (key: string) =>
@@ -25,7 +25,7 @@ export function useFoodData(
   // Use useMemo to prevent recreating drizzleDb on each render
   const drizzleDb = useMemo(() => drizzle(db, { schema }), [db]);
 
-  const [foodItem, setFoodItem] = useState<StructuredFoodItem | null>(null);
+  const [foodItem, setFoodItem] = useState<FoodItem | null>(null);
 
   // Use refs to track if this is the first render
   const isFirstRender = useRef(true);
