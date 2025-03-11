@@ -45,12 +45,15 @@ const LocationHeader = React.memo(
           <View className="my-1 w-full border-b border-b-ut-grey/15" />
 
           <View className="gap-y-3">
-            <FilterBar
-              selectedItem={selectedMenu as string}
-              setSelectedItem={setSelectedMenu}
-              useTimeOfDayDefault={filters.length > 1}
-              items={filters}
-            />
+            <View className="flex-row items-center justify-between">
+              <FilterBar
+                selectedItem={selectedMenu as string}
+                setSelectedItem={setSelectedMenu}
+                useTimeOfDayDefault={filters.length > 1}
+                items={filters}
+                showFilterButton
+              />
+            </View>
 
             {filters && filters.length > 1 && <SearchBar query={query} setQuery={setQuery} />}
           </View>

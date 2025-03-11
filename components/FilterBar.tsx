@@ -1,7 +1,10 @@
 import * as Haptics from 'expo-haptics';
+import { Filter } from 'lucide-react-native';
 import React, { useEffect, useMemo } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { SheetManager } from 'react-native-actions-sheet';
 
+import { COLORS } from '~/utils/colors';
 import { timeOfDay } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
@@ -9,6 +12,7 @@ type FilterBarProps = {
   selectedItem: string;
   setSelectedItem: (item: string) => void;
   items: { id: string; title: string }[]; // Accepts dynamic items array
+  showFilterButton?: boolean;
   useTimeOfDayDefault?: boolean;
 };
 
@@ -23,6 +27,7 @@ const FilterBar = ({
   selectedItem,
   setSelectedItem,
   items,
+  showFilterButton = false,
   useTimeOfDayDefault = false,
 }: FilterBarProps) => {
   // Sort items based on meal order
@@ -69,7 +74,7 @@ const FilterBar = ({
 
   return (
     <View className="flex-row items-center">
-      <View className="flex-1">
+      <View className="flex-1 flex-row items-center">
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -92,6 +97,15 @@ const FilterBar = ({
             </TouchableOpacity>
           ))}
         </ScrollView>
+
+        {showFilterButton && (
+          <TouchableOpacity
+            onPress={() => {
+              SheetManager.show('filters');
+            }}>
+            <Filter size={18} color={COLORS['ut-grey']} />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

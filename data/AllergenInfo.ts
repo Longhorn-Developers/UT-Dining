@@ -15,7 +15,25 @@ const VeganIcon = require('../assets/allergen-icons/Vegan.webp');
 const VegetarianIcon = require('../assets/allergen-icons/Veggie.webp');
 const WheatIcon = require('../assets/allergen-icons/Wheat.webp');
 
-const ALLERGEN_ICONS: Record<string, ImageSourcePropType> = {
+export type AllergenKey =
+  | 'beef'
+  | 'egg'
+  | 'fish'
+  | 'peanuts'
+  | 'pork'
+  | 'shellfish'
+  | 'soy'
+  | 'tree_nuts'
+  | 'wheat'
+  | 'sesame_seeds'
+  | 'gluten'
+  | 'sesame'
+  | 'vegetarian'
+  | 'vegan'
+  | 'halal'
+  | 'milk';
+
+const ALLERGEN_ICONS: Record<AllergenKey, ImageSourcePropType> = {
   beef: BeefIcon,
   egg: EggIcon,
   fish: FishIcon,
