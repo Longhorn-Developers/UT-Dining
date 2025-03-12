@@ -10,9 +10,13 @@
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "check-types": "tsc --noEmit",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "prepare": "husky"
   },
   "dependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "@commitlint/types": "^19.8.0",
     "@expo/cli": "^0.22.18",
     "@expo/server": "^0.5.2",
     "@expo/vector-icons": "^14.0.4",
@@ -40,6 +44,7 @@
     "expo-system-ui": "~4.0.8",
     "expo-updates": "~0.27.3",
     "expo-web-browser": "~14.0.2",
+    "husky": "^9.1.7",
     "lucide-react-native": "^0.474.0",
     "nativewind": "latest",
     "react": "18.3.1",
