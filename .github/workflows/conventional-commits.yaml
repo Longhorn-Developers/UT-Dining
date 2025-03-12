@@ -1,8 +1,6 @@
 name: Conventional Commits
 
-on:
-  pull_request:
-    branches: [master]
+on: [push, pull_request]
 
 jobs:
   build:
