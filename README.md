@@ -148,20 +148,43 @@ We recommend using the following VSCode extensions to improve your development e
    Run the following commands to build the development version:
 
    - **For iOS:**
+
      ```sh
      pnpm run ios
      ```
+
    - **For Android:**
 
-   ```sh
-   pnpm run android
-   ```
+     ```sh
+     pnpm run android
+     ```
 
    If you’re developing for both platforms, run both commands.
 
    > **Note**: The build process may take some time. Please wait until it completes.
 
-7. **Start the Development Server**
+7. **Download to physical device (OPTIONAL)**
+
+   If you want to test the app on a physical device, connect your device to your computer
+   with a USB cable and run the following command:
+
+   - **For iOS:**
+
+   ```sh
+   npx expo run:ios --device
+   ```
+
+   - **For Android:**
+
+   ```sh
+   npx expo run:android --device
+   ```
+
+   > **Note**: Make sure to enable USB debugging on your Android device. You can find the instructions [here](https://developer.android.com/studio/debug/dev-options).
+
+   This will install the development build onto your device.
+
+8. **Start the Development Server**
 
    ```sh
    pnpm run start
@@ -183,7 +206,7 @@ We recommend using the following VSCode extensions to improve your development e
 
    While the development server is running, press `Shift + M` in the terminal and select `expo-drizzle-studio-plugin` to open Drizzle Studio in your browser. You can use this tool to inspect the SQLite database and troubleshoot any issues related to the local cache with SQLite and Drizzle ORM. Read more about Drizzle Studio [here](https://orm.drizzle.team/drizzle-studio/overview).
 
-8. **Launch Emulators**
+9. **Launch Emulators**
 
    To open the app on an emulator, press either of the following keys in the terminal:
 
