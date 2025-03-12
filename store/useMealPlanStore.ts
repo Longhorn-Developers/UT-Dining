@@ -6,7 +6,6 @@ import { zustandStorage } from './rnmmkv-storage';
 import { shouldRequery } from '~/utils/time';
 
 const STORAGE_KEY_MEALPLAN = 'mealPlanItems';
-const STORAGE_KEY_TIMESTAMP = 'lastQueryTime';
 
 export interface MealPlanItem {
   name: string;
