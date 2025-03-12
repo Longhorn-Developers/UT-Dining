@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image } from 'react-native';
 
-import { ALLERGEN_ICONS } from '~/data/AllergenInfo';
+import { ALLERGEN_ICONS, AllergenKey } from '~/data/AllergenInfo';
 
 interface AllergenSectionProps {
   title: string;
@@ -16,7 +16,7 @@ const AllergenSection = React.memo(({ title, items, showTitle }: AllergenSection
       {items.map((key) => (
         <View key={key} className="items-center">
           <Image
-            source={ALLERGEN_ICONS[key.toLowerCase()]}
+            source={ALLERGEN_ICONS[key.toLowerCase() as AllergenKey]}
             className="size-4 rounded-full"
             resizeMode="contain"
           />

@@ -26,8 +26,6 @@ export type AllergenKey =
   | 'tree_nuts'
   | 'wheat'
   | 'sesame_seeds'
-  | 'gluten'
-  | 'sesame'
   | 'vegetarian'
   | 'vegan'
   | 'halal'

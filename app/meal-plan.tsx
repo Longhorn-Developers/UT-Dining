@@ -91,7 +91,7 @@ const MealPlanComponent = ({
                 value && (
                   <Image
                     key={key}
-                    source={ALLERGEN_ICONS[key]}
+                    source={ALLERGEN_ICONS[key as keyof typeof ALLERGEN_ICONS]}
                     className="size-3 rounded-full"
                     resizeMode="contain"
                   />
