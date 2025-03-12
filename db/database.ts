@@ -192,19 +192,8 @@ export const getLocationMenuData = async (
         nutrition: {
           calories: schema.nutrition.calories,
           total_fat: schema.nutrition.total_fat,
-          // saturated_fat: schema.nutrition.saturated_fat,
-          // trans_fat: schema.nutrition.trans_fat,
-          // cholesterol: schema.nutrition.cholesterol,
-          // sodium: schema.nutrition.sodium,
           total_carbohydrates: schema.nutrition.total_carbohydrates,
-          // dietary_fiber: schema.nutrition.dietary_fiber,
-          // total_sugars: schema.nutrition.total_sugars,
           protein: schema.nutrition.protein,
-          // vitamin_d: schema.nutrition.vitamin_d,
-          // calcium: schema.nutrition.calcium,
-          // iron: schema.nutrition.iron,
-          // potassium: schema.nutrition.potassium,
-          // ingredients: schema.nutrition.ingredients,
         },
       })
       .from(schema.location)
