@@ -2,6 +2,7 @@
   "name": "client",
   "version": "1.0.0",
   "main": "expo-router/entry",
+  "type": "module",
   "scripts": {
     "android": "expo run:android",
     "ios": "expo run:ios",
