@@ -3,11 +3,9 @@ import React from 'react';
 import { ViewStyle } from 'react-native';
 import Reanimated, {
   useAnimatedStyle,
-  withTiming,
   interpolate,
   interpolateColor,
   Extrapolation,
-  Easing,
   SharedValue,
 } from 'react-native-reanimated';
 
@@ -19,13 +17,8 @@ export const FavoriteAction = ({ progress }: { progress: SharedValue<number> }) 
     const scale = interpolate(progress.value, [0, 1], [0.4, 1.2], Extrapolation.CLAMP);
     const opacity = interpolate(progress.value, [0, 0.2, 1], [0, 1, 1], Extrapolation.CLAMP);
     return {
-      transform: [
-        { scale: withTiming(scale, { duration: 300, easing: Easing.out(Easing.exp) }) },
-        {
-          translateX: withTiming(translateX, { duration: 300, easing: Easing.out(Easing.exp) }),
-        },
-      ],
-      opacity: withTiming(opacity, { duration: 300 }),
+      transform: [{ scale }, { translateX }],
+      opacity,
     };
   });
 
@@ -34,7 +27,7 @@ export const FavoriteAction = ({ progress }: { progress: SharedValue<number> }) 
       backgroundColor: interpolateColor(
         progress.value,
         [0, 0.8, 1],
-        ['white', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
+        ['#ff7400', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
       ),
     };
   });
@@ -56,11 +49,8 @@ export const RemoveAction = ({ progress }: { progress: SharedValue<number> }) =>
     const scale = interpolate(progress.value, [0, 1], [0.4, 1.2], Extrapolation.CLAMP);
     const opacity = interpolate(progress.value, [0, 0.2, 1], [0, 1, 1], Extrapolation.CLAMP);
     return {
-      transform: [
-        { scale: withTiming(scale, { duration: 300, easing: Easing.out(Easing.exp) }) },
-        { translateX: withTiming(translateX, { duration: 300, easing: Easing.out(Easing.exp) }) },
-      ],
-      opacity: withTiming(opacity, { duration: 300 }),
+      transform: [{ scale }, { translateX }],
+      opacity,
     };
   });
 
@@ -69,7 +59,7 @@ export const RemoveAction = ({ progress }: { progress: SharedValue<number> }) =>
       backgroundColor: interpolateColor(
         progress.value,
         [0, 0.8, 1],
-        ['white', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
+        ['#ff7400', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
       ),
     };
   });
@@ -85,17 +75,14 @@ export const RemoveAction = ({ progress }: { progress: SharedValue<number> }) =>
   );
 };
 
-export const AddMealPlanAction = ({ progress }: { progress: Reanimated.SharedValue<number> }) => {
+export const AddMealPlanAction = ({ progress }: { progress: SharedValue<number> }) => {
   const animatedStyle = useAnimatedStyle<ViewStyle>(() => {
     const translateX = interpolate(progress.value, [0, 1], [-110, -20], Extrapolation.CLAMP);
     const scale = interpolate(progress.value, [0, 1], [0.4, 1.2], Extrapolation.CLAMP);
     const opacity = interpolate(progress.value, [0, 0.2, 1], [0, 1, 1], Extrapolation.CLAMP);
     return {
-      transform: [
-        { scale: withTiming(scale, { duration: 300, easing: Easing.out(Easing.exp) }) },
-        { translateX: withTiming(translateX, { duration: 300, easing: Easing.out(Easing.exp) }) },
-      ],
-      opacity: withTiming(opacity, { duration: 300 }),
+      transform: [{ scale }, { translateX }],
+      opacity,
     };
   });
 
@@ -104,7 +91,7 @@ export const AddMealPlanAction = ({ progress }: { progress: Reanimated.SharedVal
       backgroundColor: interpolateColor(
         progress.value,
         [0, 0.8, 1],
-        ['white', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
+        ['#ff7400', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
       ),
     };
   });

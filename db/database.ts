@@ -116,25 +116,30 @@ export const insertDataIntoSQLiteDB = async (
   const data = await querySupabase();
 
   if (data) {
-    await Promise.all([
-      db.delete(location).execute(),
-      db.delete(menu).execute(),
-      db.delete(menu_category).execute(),
-      db.delete(food_item).execute(),
-      db.delete(nutrition).execute(),
-      db.delete(allergens).execute(),
-    ]);
+    try {
+      await Promise.all([
+        db.delete(location).execute(),
+        db.delete(menu).execute(),
+        db.delete(menu_category).execute(),
+        db.delete(food_item).execute(),
+        db.delete(nutrition).execute(),
+        db.delete(allergens).execute(),
+      ]);
 
-    await Promise.all([
-      db.insert(location).values(data.location),
-      db.insert(menu).values(data.menu),
-      db.insert(menu_category).values(data.menu_category),
-      db.insert(food_item).values(data.food_item),
-      db.insert(nutrition).values(data.nutrition),
-      db.insert(allergens).values(data.allergens),
-    ]);
+      await Promise.all([
+        db.insert(location).values(data.location),
+        db.insert(menu).values(data.menu),
+        db.insert(menu_category).values(data.menu_category),
+        db.insert(food_item).values(data.food_item),
+        db.insert(nutrition).values(data.nutrition),
+        db.insert(allergens).values(data.allergens),
+      ]);
 
-    console.log('Data added to database');
+      console.log('Data added to database');
+    } catch (error) {
+      console.error('Error inserting data into SQLite:', error);
+      return;
+    }
 
     miscStorage.set('lastQueryTime', new Date().toISOString());
   } else {
@@ -174,6 +179,7 @@ export const getLocationMenuData = async (
         food_name: schema.food_item.name,
         food_link: schema.food_item.link,
         allergens: {
+          id: schema.allergens.id,
           beef: schema.allergens.beef,
           egg: schema.allergens.egg,
           fish: schema.allergens.fish,
@@ -190,21 +196,11 @@ export const getLocationMenuData = async (
           milk: schema.allergens.milk,
         },
         nutrition: {
+          id: schema.nutrition.id,
           calories: schema.nutrition.calories,
           total_fat: schema.nutrition.total_fat,
-          // saturated_fat: schema.nutrition.saturated_fat,
-          // trans_fat: schema.nutrition.trans_fat,
-          // cholesterol: schema.nutrition.cholesterol,
-          // sodium: schema.nutrition.sodium,
           total_carbohydrates: schema.nutrition.total_carbohydrates,
-          // dietary_fiber: schema.nutrition.dietary_fiber,
-          // total_sugars: schema.nutrition.total_sugars,
           protein: schema.nutrition.protein,
-          // vitamin_d: schema.nutrition.vitamin_d,
-          // calcium: schema.nutrition.calcium,
-          // iron: schema.nutrition.iron,
-          // potassium: schema.nutrition.potassium,
-          // ingredients: schema.nutrition.ingredients,
         },
       })
       .from(schema.location)
@@ -287,6 +283,7 @@ export const getFoodItem = async (
       food_name: schema.food_item.name,
       food_link: schema.food_item.link,
       allergens: {
+        id: schema.allergens.id,
         beef: schema.allergens.beef,
         egg: schema.allergens.egg,
         fish: schema.allergens.fish,
@@ -303,6 +300,7 @@ export const getFoodItem = async (
         milk: schema.allergens.milk,
       },
       nutrition: {
+        id: schema.nutrition.id,
         calories: schema.nutrition.calories,
         total_fat: schema.nutrition.total_fat,
         saturated_fat: schema.nutrition.saturated_fat,
@@ -348,4 +346,104 @@ export const getFoodItem = async (
   };
 
   return foodItem;
+};
+
+export const getFavorites = async (db: ExpoSQLiteDatabase<typeof schema>) => {
+  const data = await db.select().from(schema.favorites).execute();
+
+  return data;
+};
+
+export const isFavoriteItem = (db: ExpoSQLiteDatabase<typeof schema>, foodName: string) => {
+  const favorite = db
+    .select()
+    .from(schema.favorites)
+    .where(eq(schema.favorites.name, foodName))
+    .get();
+
+  return favorite !== null && favorite !== undefined;
+};
+
+export const getFavoriteItem = (db: ExpoSQLiteDatabase<typeof schema>, foodName: string) => {
+  return db.select().from(schema.favorites).where(eq(schema.favorites.name, foodName)).get();
+};
+
+// Function to add a food item to favorites
+export const toggleFavorites = async (
+  db: ExpoSQLiteDatabase<typeof schema>,
+  foodItem: FoodItem,
+  locationName: string,
+  menuName: string,
+  categoryName: string
+) => {
+  if (isFavoriteItem(db, foodItem.name as string)) {
+    // Remove the item from favorites
+    await db
+      .delete(schema.favorites)
+      .where(eq(schema.favorites.name, foodItem.name as string))
+      .execute();
+
+    return false;
+  }
+
+  // Get nutrition and allergens data
+  const nutrition = db
+    .select()
+    .from(schema.nutrition)
+    .where(eq(schema.nutrition.id, foodItem.nutrition.id))
+    .get();
+
+  const allergens = db
+    .select()
+    .from(schema.allergens)
+    .where(eq(schema.allergens.id, foodItem.allergens.id))
+    .get();
+
+  // Insert into favorites table
+  await db
+    .insert(schema.favorites)
+    .values({
+      name: foodItem.name as string,
+      location_name: locationName,
+      menu_name: menuName,
+      category_name: categoryName,
+      date_added: new Date().toISOString(),
+      link: foodItem.link,
+
+      // Copy nutrition data
+      calories: nutrition?.calories,
+      total_fat: nutrition?.total_fat,
+      saturated_fat: nutrition?.saturated_fat,
+      trans_fat: nutrition?.trans_fat,
+      cholesterol: nutrition?.cholesterol,
+      sodium: nutrition?.sodium,
+      total_carbohydrates: nutrition?.total_carbohydrates,
+      dietary_fiber: nutrition?.dietary_fiber,
+      total_sugars: nutrition?.total_sugars,
+      protein: nutrition?.protein,
+      vitamin_d: nutrition?.vitamin_d,
+      calcium: nutrition?.calcium,
+      iron: nutrition?.iron,
+      potassium: nutrition?.potassium,
+      ingredients: nutrition?.ingredients,
+
+      // Copy allergens data
+      beef: allergens?.beef,
+      egg: allergens?.egg,
+      fish: allergens?.fish,
+      peanuts: allergens?.peanuts,
+      pork: allergens?.pork,
+      shellfish: allergens?.shellfish,
+      soy: allergens?.soy,
+      tree_nuts: allergens?.tree_nuts,
+      wheat: allergens?.wheat,
+      sesame_seeds: allergens?.sesame_seeds,
+      vegan: allergens?.vegan,
+      vegetarian: allergens?.vegetarian,
+      halal: allergens?.halal,
+      milk: allergens?.milk,
+    })
+    .execute();
+
+  return true;
 };

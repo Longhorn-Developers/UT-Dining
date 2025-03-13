@@ -14,23 +14,22 @@ import { Container } from '~/components/Container';
 import TopBar from '~/components/TopBar';
 import { COLORS } from '~/utils/colors';
 
-type SearchParams = {
-  food: string;
-  menu: string;
-  category: string;
-  location: string;
-};
-
 const FoodScreen = () => {
-  const params = useLocalSearchParams<SearchParams>();
-  const { food, menu, category, location } = params;
+  const params = useLocalSearchParams<{
+    food: string;
+    menu: string;
+    category: string;
+    location: string;
+    favorite: string;
+  }>();
+  const { food, menu, category, location, favorite } = params;
 
-  // Use custom hook to handle data fetching and processing
   const { foodItem, nutritionData, hasAllergens, allergenList, dietaryList } = useFoodData(
     location,
     menu,
     category,
-    food
+    food,
+    favorite === 'true'
   );
 
   return (

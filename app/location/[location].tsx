@@ -1,9 +1,11 @@
 import { FlashList } from '@shopify/flash-list';
+import { ExpoSQLiteDatabase, useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { View, Text } from 'react-native';
 
 import CategoryHeader from './components/CategoryHeader';
+import FoodItemRow from './components/FoodItemRow';
 import LocationHeader from './components/LocationHeader';
 import ScrollToTopButton from './components/ScrollToTopButton';
 import SkeletonItem from './components/SkeletonItem';
@@ -12,7 +14,8 @@ import { useLocationData } from '../../hooks/useLocationData';
 import { useScrollToTop } from '../../hooks/useScrollToTop';
 
 import { Container } from '~/components/Container';
-import FoodComponent from '~/components/FoodComponent';
+import * as schema from '~/db/schema';
+import { useDatabase } from '~/hooks/useDatabase';
 import { useDebounce } from '~/hooks/useDebounce';
 import { useFiltersStore } from '~/store/useFiltersStore';
 import { filterFoodItems } from '~/utils/filter';
@@ -20,7 +23,12 @@ import { filterFoodItems } from '~/utils/filter';
 /**
  * Filter items based on search query and user-selected filters
  */
-const useFilteredItems = (flattenedItems: any[], debouncedSearchQuery: string, filters: any) => {
+const useFilteredItems = (
+  flattenedItems: any[],
+  debouncedSearchQuery: string,
+  filters: any,
+  favorites: any[]
+) => {
   return React.useMemo(() => {
     // First, filter by search query
     let result = flattenedItems;
@@ -78,7 +86,7 @@ const useFilteredItems = (flattenedItems: any[], debouncedSearchQuery: string, f
           const foodItem = item.data;
 
           // Use our utility function to check if this item passes all filters
-          if (filterFoodItems([foodItem], filters).length > 0) {
+          if (filterFoodItems([foodItem], filters, favorites).length > 0) {
             // Item passed all filters, so add its category header if not already added
             if (currentCategory && !filteredCategories.has(currentCategory.id)) {
               filteredResult.push(currentCategory);
@@ -97,7 +105,7 @@ const useFilteredItems = (flattenedItems: any[], debouncedSearchQuery: string, f
     }
 
     return result;
-  }, [flattenedItems, debouncedSearchQuery, filters]);
+  }, [flattenedItems, debouncedSearchQuery, filters, favorites]);
 };
 
 /**
@@ -128,6 +136,9 @@ const Location = () => {
     filters: menuFilters,
   } = useLocationData(location);
   const { toggleCategory, flattenedItems, resetExpandedCategories } = useCategoryExpansion(data);
+  const db = useDatabase();
+
+  const { data: favorites } = useLiveQuery(db.select().from(schema.favorites));
 
   // Get active filters from filters store
   const activeFilters = useFiltersStore((state) => state.filters);
@@ -137,7 +148,12 @@ const Location = () => {
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   // Custom hooks for UI elements
-  const filteredItems = useFilteredItems(flattenedItems, debouncedSearchQuery, activeFilters);
+  const filteredItems = useFilteredItems(
+    flattenedItems,
+    debouncedSearchQuery,
+    activeFilters,
+    favorites
+  );
   const skeletonItems = useSkeletonItems();
 
   // Scroll to top functionality
@@ -177,22 +193,22 @@ const Location = () => {
             </View>
           );
 
-        case 'food_item':
+        case 'food_item': {
           // Don't render if marked as hidden
           if (item.hidden) {
             return null;
           }
 
           return (
-            <View className="px-6">
-              <FoodComponent
-                food={item.data}
-                selectedMenu={selectedMenu as string}
-                categoryName={item.categoryId}
-                location={location as string}
-              />
-            </View>
+            <FoodItemRow
+              item={item}
+              selectedMenu={selectedMenu as string}
+              location={location as string}
+              db={db}
+              favorites={favorites}
+            />
           );
+        }
 
         case 'skeleton_header':
           return <SkeletonItem isHeader />;
@@ -204,7 +220,7 @@ const Location = () => {
           return null;
       }
     },
-    [selectedMenu, location, toggleCategory]
+    [selectedMenu, location, toggleCategory, favorites, db]
   );
 
   // Empty state component
@@ -238,6 +254,7 @@ const Location = () => {
       <Stack.Screen options={{ title: 'Location' }} />
       <Container className="relative mx-0 w-full flex-1">
         <FlashList
+          extraData={favorites}
           ref={listRef}
           onScroll={handleScroll}
           scrollEventThrottle={16}
