@@ -1,11 +1,10 @@
 import { FoodItem } from '~/db/database';
-import { useFavoritesStore } from '~/store/useFavoritesStore';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 
-export const filterFoodItems = (foodItems: FoodItem[], filters: any) => {
+export const filterFoodItems = (foodItems: FoodItem[], filters: any, favorites: any[]) => {
   return foodItems.filter((item) => {
     // Check favorites filter
-    if (filters.favorites && !useFavoritesStore.getState().isFavorite(item.name as string)) {
+    if (filters.favorites && !favorites?.some((fav) => fav.name === item.name)) {
       return false;
     }
 

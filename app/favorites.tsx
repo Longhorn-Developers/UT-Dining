@@ -1,22 +1,37 @@
 import { FlashList } from '@shopify/flash-list';
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { Stack, router } from 'expo-router';
 import { Heart } from 'lucide-react-native';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { Notifier } from 'react-native-notifier';
 
+import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
 import FoodComponent from '~/components/FoodComponent';
 import TopBar from '~/components/TopBar';
-import { useFavoritesStore } from '~/store/useFavoritesStore';
+import { toggleFavorites } from '~/db/database';
+import * as schema from '~/db/schema';
+import { useDatabase } from '~/hooks/useDatabase';
 import { COLORS } from '~/utils/colors';
 
 const Favorites = () => {
-  const { favorites, initialized } = useFavoritesStore();
+  const db = useDatabase();
+  const { data: favorites } = useLiveQuery(db.select().from(schema.favorites));
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (favorites) {
+      setTimeout(() => {
+        setLoading(false);
+      }, 100);
+    }
+  }, []);
 
   // Sort favorites by date added (newest first)
   const sortedFavorites = useMemo(() => {
     return [...favorites].sort(
-      (a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime()
+      (a, b) => new Date(b.date_added).getTime() - new Date(a.date_added).getTime()
     );
   }, [favorites]);
 
@@ -56,30 +71,56 @@ const Favorites = () => {
           renderItem={({ item }) => (
             <View>
               <FoodComponent
-                categoryName={item.categoryName}
+                categoryName={item.category_name}
                 food={{
                   name: item.name,
                   // These are empty because we don't have full nutrition data in favorites
                   // You could modify to store this if needed
                   nutrition: {} as any,
                   allergens: {} as any,
-                  link: 'https://example.com',
+                  link: '',
                 }}
-                location={item.locationName}
+                location={item.location_name}
                 // Check if item.menuName is a string, otherwise convert it
-                selectedMenu={item.menuName}
+                selectedMenu={item.menu_name}
                 showExtraInfo={false}
                 canMealPlan={false}
+                isFavorite
+                isFavoriteScreen
+                onFavorite={async (food) => {
+                  Notifier.showNotification({
+                    title: `${food.name} removed from Favorites!`,
+                    description: 'You removed this item from your favorites.',
+                    swipeEnabled: true,
+                    Component: Alert,
+                    duration: 3000,
+                    queueMode: 'immediate',
+                  });
+
+                  // Toggle in database
+                  await toggleFavorites(
+                    db,
+                    food,
+                    item.location_name,
+                    item.menu_name,
+                    item.category_name
+                  );
+                }}
               />
             </View>
           )}
           ListEmptyComponent={
             <View className="mt-12 flex items-center justify-center">
-              <Text className="text-lg font-bold text-ut-burnt-orange">
-                {initialized ? 'No Favorites Yet!' : 'Loading...'}
-              </Text>
-              {initialized && (
+              {loading ? (
+                <Text className="text-xl font-bold text-ut-burnt-orange">Loading...</Text>
+              ) : (
                 <>
+                  {favorites.length === 0 && (
+                    <Text className="text-lg font-bold text-ut-burnt-orange">
+                      No Favorites Yet!
+                    </Text>
+                  )}
+
                   <Text className="mb-6 max-w-64 text-center text-ut-grey">
                     Find your favorite dishes by browsing dining locations.
                   </Text>

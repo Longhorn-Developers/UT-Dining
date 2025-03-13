@@ -1,7 +1,7 @@
 import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Bell, ChefHat, ChevronLeft, Heart, Info, Map } from 'lucide-react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Image, TouchableOpacity, Alert as NativeAlert, Text } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { Notifier } from 'react-native-notifier';
@@ -9,8 +9,9 @@ import { Notifier } from 'react-native-notifier';
 import Alert from './Alert';
 
 import { LOCATION_INFO } from '~/data/LocationInfo';
+import { isFavoriteItem, toggleFavorites } from '~/db/database';
+import { useDatabase } from '~/hooks/useDatabase';
 import { useFoodData } from '~/hooks/useFoodData';
-import { useFavoritesStore } from '~/store/useFavoritesStore';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 import { COLORS } from '~/utils/colors';
 
@@ -109,19 +110,25 @@ const LocationTopBar = () => {
 };
 
 const FoodTopBar = () => {
-  const { category, food, location, menu } = useLocalSearchParams<{
+  const { category, food, location, menu, favorite } = useLocalSearchParams<{
     category: string;
     food: string;
     location: string;
     menu: string;
+    favorite: string;
   }>();
 
-  const { foodItem } = useFoodData(location, menu, category, food);
+  const { foodItem } = useFoodData(location, menu, category, food, favorite === 'true');
   const toggleMealPlanItem = useMealPlanStore((state) => state.toggleMealPlanItem);
   const isMealPlanItem = useMealPlanStore((state) => state.isMealPlanItem(food));
+  const db = useDatabase();
+  const [isFavorite, setIsFavorite] = useState(false);
 
-  const isFavorite = useFavoritesStore((state) => state.isFavorite(food));
-  const toggleFavoriteFoodItem = useFavoritesStore((state) => state.toggleFavoriteItem);
+  useEffect(() => {
+    const result = isFavoriteItem(db, foodItem?.name as string);
+
+    setIsFavorite(result);
+  }, [foodItem]);
 
   if (!foodItem) {
     return null;
@@ -183,15 +190,8 @@ const FoodTopBar = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => {
+          onPress={async () => {
             if (foodItem) {
-              toggleFavoriteFoodItem({
-                name: foodItem.name as string,
-                locationName: location,
-                categoryName: category,
-                menuName: menu,
-              });
-
               if (isFavorite) {
                 Notifier.showNotification({
                   title: `${foodItem.name} removed from Favorites!`,
@@ -211,6 +211,9 @@ const FoodTopBar = () => {
                   queueMode: 'immediate',
                 });
               }
+
+              const isFavorited = await toggleFavorites(db, foodItem, location, menu, category);
+              setIsFavorite(isFavorited);
             }
           }}>
           <Heart

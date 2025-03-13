@@ -18,7 +18,6 @@ import { FavoriteAction, RemoveAction, AddMealPlanAction } from './AnimatedActio
 
 import { ALLERGEN_ICONS } from '~/data/AllergenInfo';
 import { FoodItem } from '~/db/database';
-import { useFavoritesStore } from '~/store/useFavoritesStore';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
@@ -28,54 +27,24 @@ const FoodComponent = ({
   selectedMenu,
   categoryName,
   location,
+  onFavorite,
+  isFavorite,
+  isFavoriteScreen = false,
   showExtraInfo = true,
-  canFavorite = true,
   canMealPlan = true,
 }: {
   food: FoodItem;
   selectedMenu: string;
   categoryName: string;
   location: string;
+  onFavorite: (food: FoodItem) => Promise<void>;
+  isFavorite: boolean;
+  isFavoriteScreen?: boolean; // If the component is rendered on the favorites screen
   showExtraInfo?: boolean;
-  canFavorite?: boolean;
   canMealPlan?: boolean;
 }) => {
-  const isFavorite = useFavoritesStore((state) => state.isFavorite(food.name as string));
-  const toggleFavoriteFoodItem = useFavoritesStore((state) => state.toggleFavoriteItem);
-
   const isMealPlan = useMealPlanStore((state) => state.isMealPlanItem(food.name as string));
   const toggleMealPlanItem = useMealPlanStore((state) => state.toggleMealPlanItem);
-
-  // If neither swipe action is enabled, render a non-swipeable component
-  if (!canFavorite && !canMealPlan) {
-    return (
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={async () => {
-          await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          router.push({
-            pathname: `/location/food/[food]`,
-            params: {
-              food: food.name as string,
-              menu: selectedMenu,
-              category: categoryName,
-              location,
-            },
-          });
-        }}
-        className={cn(
-          'mb-2 flex-row items-center justify-between rounded border bg-white px-3 py-2',
-          isFavorite || isMealPlan ? 'border-ut-burnt-orange' : 'border-ut-grey/15'
-        )}>
-        <FoodContent
-          food={food}
-          isFavorite={isFavorite}
-          isMealPlan={isMealPlan}
-          showExtraInfo={showExtraInfo}
-        />
-      </TouchableOpacity>
-    );
-  }
 
   return (
     <ReanimatedSwipeable
@@ -87,7 +56,21 @@ const FoodComponent = ({
       }}
       shouldCancelWhenOutside
       enableTrackpadTwoFingerGesture
-      onSwipeableOpen={(direction, swipeable) => {
+      // Add these properties to fix the gliding issue
+      friction={2} // Higher friction reduces gliding
+      overshootFriction={200} // Higher value means less overshoot
+      animationOptions={{
+        damping: 1, // Higher damping means less oscillation
+        stiffness: 11, // Higher stiffness means faster snapping
+        mass: 0.1, // Lower mass means faster settling
+        restDisplacementThreshold: 0.005, // Small threshold for considering animation "done"
+        restSpeedThreshold: 0.005, // Small threshold for considering animation "done"
+      }}
+      onSwipeableWillClose={() => {
+        // Optional haptic feedback when closing
+        Haptics.selectionAsync();
+      }}
+      onSwipeableOpen={async (direction, swipeable) => {
         swipeable.close();
 
         if (direction === 'left' && canMealPlan) {
@@ -118,42 +101,17 @@ const FoodComponent = ({
             duration: 3000,
             queueMode: 'immediate',
           });
-        } else if (direction === 'right' && canFavorite) {
-          toggleFavoriteFoodItem({
-            name: food.name as string,
-            locationName: location,
-            categoryName,
-            menuName: selectedMenu,
-          });
-
-          Notifier.showNotification({
-            title: isFavorite
-              ? `${food.name} removed from Favorites!`
-              : `${food.name} added to Favorites!`,
-            description: isFavorite
-              ? 'You removed this item from your favorites.'
-              : 'Tap the heart (top right) to view your saved favorites.',
-            swipeEnabled: true,
-            Component: Alert,
-            duration: 3000,
-            queueMode: 'immediate',
-          });
+        } else if (direction === 'right') {
+          await onFavorite(food);
         }
       }}
+      // Add these threshold properties to better define when an action is triggered
       overshootLeft={!canMealPlan}
-      overshootRight={!canFavorite}
-      leftThreshold={canMealPlan ? 50 : Number.MAX_VALUE} // Disable left swipe if canMealPlan is false
-      rightThreshold={canFavorite ? 50 : Number.MAX_VALUE} // Disable right swipe if canFavorite is false
+      leftThreshold={canMealPlan ? 50 : Number.MAX_VALUE} // Higher threshold requires more decisive swipe
+      rightThreshold={100} // Higher threshold requires more decisive swipe
       dragOffsetFromLeftEdge={canMealPlan ? 50 : Number.MAX_VALUE}
-      dragOffsetFromRightEdge={canFavorite ? 50 : Number.MAX_VALUE}
       renderRightActions={(progress) =>
-        canFavorite ? (
-          isFavorite ? (
-            <RemoveAction progress={progress} />
-          ) : (
-            <FavoriteAction progress={progress} />
-          )
-        ) : null
+        isFavorite ? <RemoveAction progress={progress} /> : <FavoriteAction progress={progress} />
       }
       renderLeftActions={(progress) =>
         canMealPlan ? (
@@ -175,6 +133,7 @@ const FoodComponent = ({
               menu: selectedMenu,
               category: categoryName,
               location,
+              favorite: isFavoriteScreen ? 'true' : 'false',
             },
           });
         }}

@@ -1,14 +1,11 @@
-import { drizzle } from 'drizzle-orm/expo-sqlite';
-import { useSQLiteContext } from 'expo-sqlite';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 
-import * as schema from '../db/schema';
+import { useDatabase } from './useDatabase';
 
 import { getLocationMenuNames, getLocationMenuData, Location } from '~/db/database';
 
 export function useLocationData(location: string) {
-  const db = useSQLiteContext();
-  const drizzleDb = useMemo(() => drizzle(db, { schema }), [db]);
+  const db = useDatabase();
 
   const [data, setData] = useState<Location | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,8 +17,8 @@ export function useLocationData(location: string) {
     const initializeData = async () => {
       setLoading(true);
       try {
-        const menuNames = await getLocationMenuNames(drizzleDb, location);
-        const fetchedData = await getLocationMenuData(drizzleDb, location, menuNames[0] as string);
+        const menuNames = await getLocationMenuNames(db, location);
+        const fetchedData = await getLocationMenuData(db, location, menuNames[0] as string);
 
         if (fetchedData === null) {
           throw new Error('No data found for location ' + location);
@@ -40,7 +37,7 @@ export function useLocationData(location: string) {
     };
 
     initializeData();
-  }, [drizzleDb, location]);
+  }, [db, location]);
 
   // Handle menu changes
   useEffect(() => {
@@ -49,7 +46,7 @@ export function useLocationData(location: string) {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const data = await getLocationMenuData(drizzleDb, location, selectedMenu);
+        const data = await getLocationMenuData(db, location, selectedMenu);
         setData(data);
       } catch (error) {
         console.error(error);
@@ -59,7 +56,7 @@ export function useLocationData(location: string) {
     };
 
     fetchData();
-  }, [selectedMenu, drizzleDb, location]);
+  }, [selectedMenu, db, location]);
 
   return { data, loading, selectedMenu, setSelectedMenu, filters };
 }
