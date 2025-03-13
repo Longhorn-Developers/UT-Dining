@@ -152,8 +152,7 @@ const Location = () => {
     flattenedItems,
     debouncedSearchQuery,
     activeFilters,
-    favorites,
-    db
+    favorites
   );
   const skeletonItems = useSkeletonItems();
 
