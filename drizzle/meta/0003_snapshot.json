@@ -433,12 +433,8 @@
           "name": "food_item_menu_category_id_menu_category_id_fk",
           "tableFrom": "food_item",
           "tableTo": "menu_category",
-          "columnsFrom": [
-            "menu_category_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["menu_category_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -446,12 +442,8 @@
           "name": "food_item_nutrition_id_nutrition_id_fk",
           "tableFrom": "food_item",
           "tableTo": "nutrition",
-          "columnsFrom": [
-            "nutrition_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["nutrition_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -459,12 +451,8 @@
           "name": "food_item_allergens_id_allergens_id_fk",
           "tableFrom": "food_item",
           "tableTo": "allergens",
-          "columnsFrom": [
-            "allergens_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["allergens_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -535,12 +523,8 @@
           "name": "menu_location_id_location_id_fk",
           "tableFrom": "menu",
           "tableTo": "location",
-          "columnsFrom": [
-            "location_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["location_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -580,12 +564,8 @@
           "name": "menu_category_menu_id_menu_id_fk",
           "tableFrom": "menu_category",
           "tableTo": "menu",
-          "columnsFrom": [
-            "menu_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["menu_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
