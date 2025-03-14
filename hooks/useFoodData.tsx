@@ -151,6 +151,7 @@ const convertFavoriteItemToFoodItem = (favoriteItem: Favorite): FoodItem => {
     },
     nutrition: {
       id: 0,
+      serving_size: favoriteItem.serving_size,
       calories: favoriteItem.calories,
       protein: favoriteItem.protein,
       total_fat: favoriteItem.total_fat,

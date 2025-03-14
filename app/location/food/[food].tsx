@@ -32,13 +32,16 @@ const FoodScreen = () => {
     favorite === 'true'
   );
 
+  // Filter out serving size from nutrition data
+  const nutritionDataFiltered = nutritionData.filter((item) => item.key !== 'Serving Size');
+
   return (
     <>
       <Stack.Screen options={{ title: 'Food' }} />
       <Container className="mx-0">
         <FlashList
           estimatedItemSize={14}
-          data={nutritionData}
+          data={nutritionDataFiltered}
           renderItem={({ item }) => <NutritionRow item={item} />}
           ListHeaderComponent={
             <View className="mx-6 mt-6 flex gap-y-5">
@@ -103,7 +106,7 @@ const FoodScreen = () => {
                   <View className="mb-2">
                     <View className="mb-2 flex-row justify-between">
                       <Text className="font-bold">Serving Size</Text>
-                      <Text className="font-bold">1 each</Text>
+                      <Text className="font-bold">{foodItem.nutrition?.serving_size}</Text>
                     </View>
                     <View className="w-full border-b border-b-ut-grey/15" />
                   </View>
