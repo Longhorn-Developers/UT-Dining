@@ -21,6 +21,7 @@ export const menu_category = sqliteTable('menu_category', {
 export const nutrition = sqliteTable('nutrition', {
   id: integer('id').primaryKey(),
   // Doesn't have food_item_id key. Might be error here, watch out
+  serving_size: text('serving_size'),
   calories: text('calories'),
   total_fat: text('total_fat'),
   saturated_fat: text('saturated_fat'),
