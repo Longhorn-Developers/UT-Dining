@@ -105,6 +105,7 @@ export const favorites = sqliteTable('favorites', {
   link: text('link'),
 
   // Embedded nutrition data (denormalized for quick access)
+  serving_size: text('serving_size'),
   calories: text('calories'),
   total_fat: text('total_fat'),
   saturated_fat: text('saturated_fat'),

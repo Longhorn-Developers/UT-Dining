@@ -29,6 +29,13 @@
       "when": 1741920625497,
       "tag": "0003_cold_shard",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1741921379326,
+      "tag": "0004_nosy_sunset_bain",
+      "breakpoints": true
     }
   ]
 }

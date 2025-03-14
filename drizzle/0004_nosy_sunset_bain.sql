@@ -1,0 +1,1 @@
+ALTER TABLE `favorites` ADD `serving_size` text;
