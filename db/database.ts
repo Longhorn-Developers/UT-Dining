@@ -301,6 +301,7 @@ export const getFoodItem = async (
       },
       nutrition: {
         id: schema.nutrition.id,
+        serving_size: schema.nutrition.serving_size,
         calories: schema.nutrition.calories,
         total_fat: schema.nutrition.total_fat,
         saturated_fat: schema.nutrition.saturated_fat,
@@ -411,6 +412,7 @@ export const toggleFavorites = async (
       link: foodItem.link,
 
       // Copy nutrition data
+      serving_size: nutrition?.serving_size,
       calories: nutrition?.calories,
       total_fat: nutrition?.total_fat,
       saturated_fat: nutrition?.saturated_fat,

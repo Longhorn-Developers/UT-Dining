@@ -1,0 +1,1 @@
+ALTER TABLE `nutrition` ADD `serving_size` text;

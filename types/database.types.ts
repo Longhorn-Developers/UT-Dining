@@ -200,6 +200,7 @@ export type Database = {
           potassium: string | null;
           protein: string | null;
           saturated_fat: string | null;
+          serving_size: string | null;
           sodium: string | null;
           total_carbohydrates: string | null;
           total_fat: string | null;
@@ -219,6 +220,7 @@ export type Database = {
           potassium?: string | null;
           protein?: string | null;
           saturated_fat?: string | null;
+          serving_size?: string | null;
           sodium?: string | null;
           total_carbohydrates?: string | null;
           total_fat?: string | null;
@@ -238,6 +240,7 @@ export type Database = {
           potassium?: string | null;
           protein?: string | null;
           saturated_fat?: string | null;
+          serving_size?: string | null;
           sodium?: string | null;
           total_carbohydrates?: string | null;
           total_fat?: string | null;

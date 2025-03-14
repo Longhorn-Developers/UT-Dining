@@ -123,9 +123,10 @@ BEGIN
         END IF;
 
         -- Now insert into nutrition using new_food_item_id
-        INSERT INTO nutrition (food_item_id, calories, total_fat, saturated_fat, trans_fat, cholesterol, sodium, total_carbohydrates, dietary_fiber, total_sugars, protein, vitamin_d, calcium, iron, potassium, ingredients)
+        INSERT INTO nutrition (food_item_id, serving_size, calories, total_fat, saturated_fat, trans_fat, cholesterol, sodium, total_carbohydrates, dietary_fiber, total_sugars, protein, vitamin_d, calcium, iron, potassium, ingredients)
         VALUES (
-          new_food_item_id, 
+          new_food_item_id,
+          nutrition->>'servingSize', 
           nutrition->>'calories', 
           nutrition->>'totalFat', 
           nutrition->>'saturatedFat', 
@@ -361,7 +362,8 @@ CREATE TABLE IF NOT EXISTS "public"."nutrition" (
     "iron" "text",
     "potassium" "text",
     "ingredients" "text",
-    "trans_fat" "text"
+    "trans_fat" "text",
+    "serving_size" "text"
 );
 
 
@@ -518,6 +520,30 @@ ALTER TABLE "public"."nutrition" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";
+
+
+ALTER PUBLICATION "supabase_realtime" ADD TABLE ONLY "public"."allergens";
+
+
+
+ALTER PUBLICATION "supabase_realtime" ADD TABLE ONLY "public"."food_item";
+
+
+
+ALTER PUBLICATION "supabase_realtime" ADD TABLE ONLY "public"."location";
+
+
+
+ALTER PUBLICATION "supabase_realtime" ADD TABLE ONLY "public"."menu";
+
+
+
+ALTER PUBLICATION "supabase_realtime" ADD TABLE ONLY "public"."menu_category";
+
+
+
+ALTER PUBLICATION "supabase_realtime" ADD TABLE ONLY "public"."nutrition";
+
 
 
 GRANT USAGE ON SCHEMA "public" TO "postgres";
