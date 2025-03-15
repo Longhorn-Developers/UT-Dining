@@ -1,5 +1,5 @@
 import { FlashList } from '@shopify/flash-list';
-import { ExpoSQLiteDatabase, useLiveQuery } from 'drizzle-orm/expo-sqlite';
+import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { View, Text } from 'react-native';
