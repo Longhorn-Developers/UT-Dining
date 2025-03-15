@@ -36,7 +36,7 @@ export default {
           },
         },
       ],
-      'expo-font'
+      'expo-font',
     ],
     experiments: {
       typedRoutes: true,
