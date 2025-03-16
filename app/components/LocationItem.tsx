@@ -57,7 +57,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
     <TouchableOpacity
       onPress={async () => {
         router.push(`/location/${location.name}`);
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }}
       className="flex-row items-center justify-between rounded border border-ut-grey/15 p-4">
       <View className="flex-row items-center justify-center gap-x-4">

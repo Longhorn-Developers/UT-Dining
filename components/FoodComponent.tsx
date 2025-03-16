@@ -68,7 +68,7 @@ const FoodComponent = ({
       }}
       onSwipeableWillClose={() => {
         // Optional haptic feedback when closing
-        Haptics.selectionAsync();
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }}
       onSwipeableOpen={async (direction, swipeable) => {
         swipeable.close();

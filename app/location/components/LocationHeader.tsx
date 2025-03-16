@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import React, { useState, useMemo } from 'react';
 import { View, Text } from 'react-native';
 
@@ -39,7 +40,10 @@ const LocationHeader = React.memo(
           <TimeSchedule
             schedule={schedule}
             isOpen={timeDropdownOpen}
-            onToggle={() => setTimeDropdownOpen((prev) => !prev)}
+            onToggle={() => {
+              setTimeDropdownOpen((prev) => !prev);
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
           />
 
           <View className="my-1 w-full border-b border-b-ut-grey/15" />

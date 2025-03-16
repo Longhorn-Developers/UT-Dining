@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import { Filter, Heart, ChefHat, RotateCwIcon } from 'lucide-react-native';
 import { Text, View, TouchableOpacity, Image } from 'react-native';
 import ActionSheet, { ScrollView, SheetProps } from 'react-native-actions-sheet';
@@ -55,7 +56,10 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
             </View>
 
             <TouchableOpacity
-              onPress={resetFilters}
+              onPress={() => {
+                resetFilters();
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
               className="flex-row items-center gap-x-1 rounded-full border border-ut-grey/50 px-3 py-1">
               <RotateCwIcon size={16} color={COLORS['ut-grey']} />
               <Text className="text-sm font-medium text-ut-grey">Reset</Text>
@@ -66,7 +70,10 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
           <Text className="mb-2 text-xl font-semibold">My Items</Text>
           <View className="mb-6 flex-row gap-x-2">
             <TouchableOpacity
-              onPress={toggleFavoriteFilter}
+              onPress={() => {
+                toggleFavoriteFilter();
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
               className={cn(
                 'flex-1 flex-row items-center justify-center gap-x-2 rounded-lg border py-3',
                 filters.favorites
@@ -85,7 +92,10 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={toggleMealPlanFilter}
+              onPress={() => {
+                toggleMealPlanFilter();
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
               className={cn(
                 'flex-1 flex-row items-center justify-center gap-x-2 rounded-lg border py-3',
                 filters.mealPlan
@@ -108,7 +118,10 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
             {allergens.map(([key, iconSource]) => (
               <TouchableOpacity
                 key={key}
-                onPress={() => toggleAllergenFilter(key)}
+                onPress={() => {
+                  toggleAllergenFilter(key);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
                 className={cn(
                   'flex-row items-center gap-x-2 rounded-lg border px-3 py-2',
                   filters.allergens[key]
@@ -136,7 +149,10 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
             {dietaryOptions.map(([key, iconSource]) => (
               <TouchableOpacity
                 key={key}
-                onPress={() => toggleDietaryFilter(key)}
+                onPress={() => {
+                  toggleDietaryFilter(key);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
                 className={cn(
                   'flex-row items-center gap-x-2 rounded-lg border px-3 py-2',
                   filters.dietary[key]

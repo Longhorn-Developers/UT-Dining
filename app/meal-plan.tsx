@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import { Stack } from 'expo-router';
 import { BicepsFlexed, Flame, Wheat } from 'lucide-react-native';
 import React, { useState } from 'react';
@@ -49,6 +50,9 @@ const MealPlanComponent = ({
       rightThreshold={0}
       renderRightActions={() => null}
       renderLeftActions={(progress) => <RemoveAction progress={progress} />}
+      onSwipeableWillClose={() => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }}
       onSwipeableOpen={(direction, swipeable) => {
         swipeable.close();
 
