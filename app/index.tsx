@@ -1,5 +1,6 @@
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
+import * as Haptics from 'expo-haptics';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -109,12 +110,16 @@ export default function Home() {
   }, []);
 
   const onRefresh = async () => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
     setRefreshing(true);
     await insertDataIntoSQLiteDB(drizzleDb, true);
     setCurrentTime(new Date());
     setLastUpdated(new Date());
-    setShowRequeryAlert(false); // Reset alert after refreshing
+    setShowRequeryAlert(true); // Reset alert after refreshing
     setRefreshing(false);
+
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
     Notifier.showNotification({
       title: 'Data Refreshed!',
