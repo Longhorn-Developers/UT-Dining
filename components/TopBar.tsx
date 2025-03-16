@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Bell, ChefHat, ChevronLeft, Heart, Info, Map } from 'lucide-react-native';
@@ -25,6 +26,7 @@ const HomeTopBar = () => {
       <View className="flex flex-row gap-x-5">
         <TouchableOpacity
           onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             NativeAlert.alert(
               'Coming Soon!',
               'Push notifications for your favorite food items will be available in an upcoming update.'
@@ -35,6 +37,7 @@ const HomeTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/meal-plan`);
           }}>
           <ChefHat size={20} color={COLORS['ut-grey']} />
@@ -42,14 +45,11 @@ const HomeTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/favorites`);
           }}>
           <Heart size={20} color={COLORS['ut-grey']} />
         </TouchableOpacity>
-
-        {/* <TouchableOpacity>
-          <Cog size={20} color={COLORS['ut-grey']} />
-        </TouchableOpacity> */}
       </View>
     </View>
   );
@@ -66,15 +66,20 @@ const LocationTopBar = () => {
 
   return (
     <View className="flex w-full flex-row items-center justify-between ">
-      <TouchableOpacity className="flex flex-row items-center" onPress={() => router.back()}>
+      <TouchableOpacity
+        className="flex flex-row items-center"
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          router.back();
+        }}>
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
-
         <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>
       </TouchableOpacity>
 
       <View className="flex flex-row gap-x-5">
         <TouchableOpacity
           onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             Linking.openURL(locationInfo.mapLink);
           }}>
           <Map size={20} color={COLORS['ut-grey']} />
@@ -82,6 +87,7 @@ const LocationTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/meal-plan`);
           }}>
           <ChefHat size={20} color={COLORS['ut-grey']} />
@@ -89,6 +95,7 @@ const LocationTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/favorites`);
           }}>
           <Heart size={20} color={COLORS['ut-grey']} />
@@ -96,6 +103,7 @@ const LocationTopBar = () => {
 
         <TouchableOpacity
           onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             SheetManager.show('location-about', {
               payload: {
                 location: locationInfo,
@@ -136,7 +144,12 @@ const FoodTopBar = () => {
 
   return (
     <View className="flex w-full flex-row items-center justify-between ">
-      <TouchableOpacity className="flex flex-row items-center" onPress={() => router.back()}>
+      <TouchableOpacity
+        className="flex flex-row items-center"
+        onPress={() => {
+          router.back();
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }}>
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
 
         <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>
@@ -181,6 +194,8 @@ const FoodTopBar = () => {
                 });
               }
             }
+
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           }}>
           <ChefHat
             size={20}
@@ -214,6 +229,7 @@ const FoodTopBar = () => {
 
               const isFavorited = await toggleFavorites(db, foodItem, location, menu, category);
               setIsFavorite(isFavorited);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             }
           }}>
           <Heart
@@ -225,6 +241,7 @@ const FoodTopBar = () => {
         <TouchableOpacity
           onPress={() => {
             SheetManager.show('food-info');
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}>
           <Info size={20} color={COLORS['ut-grey']} />
         </TouchableOpacity>
@@ -236,7 +253,12 @@ const FoodTopBar = () => {
 const BackTopBar = () => {
   return (
     <View className="flex w-full flex-row items-center justify-between ">
-      <TouchableOpacity className="flex flex-row items-center" onPress={() => router.back()}>
+      <TouchableOpacity
+        className="flex flex-row items-center"
+        onPress={() => {
+          router.back();
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }}>
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
 
         <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>

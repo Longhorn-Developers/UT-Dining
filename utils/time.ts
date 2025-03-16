@@ -71,7 +71,7 @@ export function getLocationTimeMessage(
   currentTime: Date = new Date()
 ): string {
   const schedule = getTodaySchedule(locationName, currentTime);
-  if (!schedule || schedule.intervals.length === 0) return 'Closed.';
+  if (!schedule || schedule.intervals.length === 0) return 'Closed';
 
   const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
 
@@ -115,7 +115,7 @@ export function getLocationTimeMessage(
     dayOffset++;
   }
 
-  return 'Closed.';
+  return 'Closed';
 }
 
 // Helper: convert HHMM number to a formatted time string.

@@ -1,5 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
+import * as Haptics from 'expo-haptics';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { View, Text } from 'react-native';
@@ -188,7 +189,10 @@ const Location = () => {
               <CategoryHeader
                 title={item.title}
                 isExpanded={item.isExpanded}
-                onToggle={() => toggleCategory(item.id)}
+                onToggle={async () => {
+                  toggleCategory(item.id);
+                  await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
               />
             </View>
           );
@@ -283,7 +287,10 @@ const Location = () => {
         <ScrollToTopButton
           visible={showScrollToTop}
           animationValue={scrollButtonAnimation}
-          onPress={scrollToTop}
+          onPress={() => {
+            scrollToTop();
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
         />
       </Container>
     </>

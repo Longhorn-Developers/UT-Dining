@@ -57,15 +57,18 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
     <TouchableOpacity
       onPress={async () => {
         router.push(`/location/${location.name}`);
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }}
-      className="flex-row items-center justify-between rounded border border-ut-grey/15 p-4">
+      className={cn(
+        'flex-row items-center justify-between rounded border border-ut-grey/15 p-4',
+        !open && 'opacity-50'
+      )}>
       <View className="flex-row items-center justify-center gap-x-4">
         <View className="relative size-3">
           <View
             className={cn(
               'size-full rounded-full shadow',
-              open ? 'bg-green-500 shadow-green-500' : 'bg-red-300 shadow-red-300'
+              open ? 'bg-green-500 shadow-green-500' : 'bg-gray-400 shadow-gray-400'
             )}
           />
 
@@ -96,9 +99,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
           )}
         </View>
         <View>
-          <Text className={cn('text-xl font-bold', open ? 'text-ut-black' : 'text-ut-grey/75')}>
-            {location.name}
-          </Text>
+          <Text className="text-xl font-bold">{location.name}</Text>
           <Text className="text-xs font-medium text-ut-grey/75">
             {getLocationTimeMessage(location.name as string, currentTime)}
           </Text>

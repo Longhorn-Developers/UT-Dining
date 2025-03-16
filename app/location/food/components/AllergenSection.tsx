@@ -16,7 +16,7 @@ const AllergenSection = React.memo(({ title, items, showTitle }: AllergenSection
       {items.map((key) => (
         <View key={key} className="items-center">
           <Image
-            source={ALLERGEN_ICONS[key.toLowerCase() as AllergenKey]}
+            source={ALLERGEN_ICONS[key.toLowerCase().replaceAll(' ', '_') as AllergenKey]}
             className="size-4 rounded-full"
             resizeMode="contain"
           />
