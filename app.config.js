@@ -58,7 +58,7 @@ export default {
         light: './assets/icons/ios-light.png',
         tinted: './assets/icons/ios-tinted.png',
       },
-      bundleIdentifier: IS_DEV ? 'com.ethanl06.utdining.dev' : 'com.ethanl06.utdining',
+      bundleIdentifier: IS_DEV ? 'com.ethanl06.ut-dining.dev' : 'com.ethanl06.ut-dining',
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
       },
@@ -68,7 +68,7 @@ export default {
         foregroundImage: './assets/icons/adaptive-icon.png',
         backgroundColor: '#BF5700',
       },
-      package: IS_DEV ? 'com.ethanl06.utdining.dev' : 'com.ethanl06.utdining',
+      bundleIdentifier: IS_DEV ? 'com.ethanl06.ut-dining.dev' : 'com.ethanl06.ut-dining',
     },
     newArchEnabled: true,
     extra: {
