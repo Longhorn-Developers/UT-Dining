@@ -1,0 +1,3 @@
+[submodule "ut-dining-scraper"]
+	path = ut-dining-scraper
+	url = https://github.com/EthanL06/ut-dining-scraper.git
