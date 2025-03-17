@@ -16,11 +16,13 @@ const TimeSchedule = React.memo(({ schedule, isOpen, onToggle }: TimeSchedulePro
     {/* Left Column: Day Ranges */}
     <View className="flex flex-col gap-1.5">
       {(isOpen ? schedule : schedule.slice(0, 1)).map((item, index) => (
-        <View key={item.dayRange} className="flex flex-row gap-2">
+        <View key={item.dayRange} className="flex flex-row items-center gap-2">
           <View className={index === 0 ? 'flex' : 'invisible'}>
             <Clock size={12} color={COLORS['ut-grey']} />
           </View>
-          <Text className="text-sm leading-none text-ut-grey">{item.dayRange}:</Text>
+          <Text className={cn('text-sm leading-none text-ut-grey', index === 0 && 'font-semibold')}>
+            {item.dayRange}:
+          </Text>
         </View>
       ))}
     </View>
