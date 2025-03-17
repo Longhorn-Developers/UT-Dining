@@ -28,6 +28,11 @@ export interface LocationInfo {
   googleMapsLink: string;
   appleMapsLink: string;
   schedules: OpeningHours[];
+  mealTimes: {
+    breakfast?: TimeInterval;
+    lunch?: TimeInterval;
+    dinner?: TimeInterval;
+  };
 }
 
 export const LOCATION_INFO: LocationInfo[] = [
@@ -57,6 +62,11 @@ export const LOCATION_INFO: LocationInfo[] = [
         ],
       },
     ],
+    mealTimes: {
+      breakfast: { openTime: 700, closeTime: 900 },
+      lunch: { openTime: 1100, closeTime: 1330 },
+      dinner: { openTime: 1730, closeTime: 2000 },
+    },
   },
   {
     name: 'JCL Dining',
@@ -81,6 +91,10 @@ export const LOCATION_INFO: LocationInfo[] = [
         intervals: [],
       },
     ],
+    mealTimes: {
+      lunch: { openTime: 1030, closeTime: 1500 },
+      dinner: { openTime: 1500, closeTime: 2100 },
+    },
   },
   {
     name: 'Kins Dining',
@@ -109,6 +123,11 @@ export const LOCATION_INFO: LocationInfo[] = [
         ],
       },
     ],
+    mealTimes: {
+      breakfast: { openTime: 700, closeTime: 1100 },
+      lunch: { openTime: 1100, closeTime: 1630 },
+      dinner: { openTime: 1630, closeTime: 2000 },
+    },
   },
   {
     name: "Jesta' Pizza",
@@ -133,6 +152,7 @@ export const LOCATION_INFO: LocationInfo[] = [
         intervals: [{ openTime: 1600, closeTime: 2200 }],
       },
     ],
+    mealTimes: {},
   },
   {
     name: 'Cypress Bend Cafe',
@@ -157,6 +177,10 @@ export const LOCATION_INFO: LocationInfo[] = [
         intervals: [],
       },
     ],
+    mealTimes: {
+      breakfast: { openTime: 700, closeTime: 1200 },
+      lunch: { openTime: 1200, closeTime: 1700 },
+    },
   },
   {
     name: 'Jester City Market',
@@ -185,6 +209,10 @@ export const LOCATION_INFO: LocationInfo[] = [
         intervals: [{ openTime: 1200, closeTime: 2300 }],
       },
     ],
+    mealTimes: {
+      lunch: { openTime: 1000, closeTime: 1800 },
+      dinner: { openTime: 1900, closeTime: 2200 },
+    },
   },
   {
     name: 'Littlefield Patio Cafe',
@@ -209,5 +237,9 @@ export const LOCATION_INFO: LocationInfo[] = [
         intervals: [],
       },
     ],
+    mealTimes: {
+      breakfast: { openTime: 700, closeTime: 1200 },
+      lunch: { openTime: 1200, closeTime: 1900 },
+    },
   },
 ];

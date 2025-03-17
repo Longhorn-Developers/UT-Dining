@@ -8,6 +8,7 @@ import TimeSchedule from './TimeSchedule';
 
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
+import { LOCATION_INFO } from '~/data/LocationInfo';
 import { menu, location as location_schema } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { generateSchedule, isLocationOpen } from '~/utils/time';
@@ -27,6 +28,7 @@ const LocationHeader = React.memo(
     const db = useDatabase();
     const [timeDropdownOpen, setTimeDropdownOpen] = useState(false);
     const schedule = useMemo(() => generateSchedule(location), [location]);
+    const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
 
     useEffect(() => {
       const checkOpen = async () => {
@@ -88,6 +90,7 @@ const LocationHeader = React.memo(
                 setSelectedItem={setSelectedMenu}
                 useTimeOfDayDefault={filters.length > 1}
                 items={filters}
+                mealTimes={locationInfo?.mealTimes}
                 showFilterButton
               />
             </View>
