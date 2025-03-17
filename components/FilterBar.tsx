@@ -4,6 +4,7 @@ import React, { useEffect, useMemo } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 
+import { LocationInfo } from '~/data/LocationInfo';
 import { useFiltersStore } from '~/store/useFiltersStore';
 import { COLORS } from '~/utils/colors';
 import { timeOfDay } from '~/utils/time';
@@ -13,6 +14,7 @@ type FilterBarProps = {
   selectedItem: string;
   setSelectedItem: (item: string) => void;
   items: { id: string; title: string }[]; // Accepts dynamic items array
+  mealTimes?: LocationInfo['mealTimes'];
   showFilterButton?: boolean;
   useTimeOfDayDefault?: boolean;
 };
@@ -28,6 +30,7 @@ const FilterBar = ({
   selectedItem,
   setSelectedItem,
   items: filterItems,
+  mealTimes,
   showFilterButton = false,
   useTimeOfDayDefault = false,
 }: FilterBarProps) => {
@@ -49,7 +52,7 @@ const FilterBar = ({
     }
 
     if (useTimeOfDayDefault && !selectedItem) {
-      const tod = timeOfDay(new Date()); // 'morning', 'afternoon', or 'evening'
+      const tod = mealTimes ? timeOfDay(new Date(), mealTimes) : timeOfDay(new Date());
       let defaultFilter = '';
 
       if (tod === 'morning') defaultFilter = 'Breakfast';

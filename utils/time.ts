@@ -1,7 +1,7 @@
 import { parseISO, format, addDays } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 
-import { LOCATION_INFO, WeekDay } from '~/data/LocationInfo';
+import { LOCATION_INFO, LocationInfo, WeekDay } from '~/data/LocationInfo';
 import { miscStorage } from '~/store/misc-storage';
 
 const CENTRAL_TIME_ZONE = 'America/Chicago';
@@ -30,10 +30,30 @@ export const shouldRequery = async (): Promise<boolean> => {
 const weekdayName = (date: Date): WeekDay => format(date, 'EEEE') as WeekDay;
 
 // Returns time of day: 'morning', 'afternoon', or 'evening'
-export const timeOfDay = (date: Date): 'morning' | 'afternoon' | 'evening' => {
+export const timeOfDay = (
+  date: Date,
+  mealTimes?: LocationInfo['mealTimes']
+): 'morning' | 'afternoon' | 'evening' => {
   const hour = date.getHours();
+  const minutes = date.getMinutes();
+  // Convert to military time
+  const currentTime = hour * 100 + minutes;
+
+  // If mealTimes is provided, use it to determine time of day
+  if (mealTimes) {
+    const breakfastEnd = mealTimes.breakfast?.closeTime ? mealTimes.breakfast.closeTime : 1100;
+    const lunchEnd = mealTimes.lunch?.closeTime ? mealTimes.lunch.closeTime : 1700;
+
+    console.log(currentTime);
+    console.log(breakfastEnd, lunchEnd);
+    if (currentTime < breakfastEnd) return 'morning';
+    if (currentTime < lunchEnd) return 'afternoon';
+    return 'evening';
+  }
+
+  // Fall back to default logic if mealTimes not provided
   if (hour < 11) return 'morning';
-  if (hour < 18) return 'afternoon';
+  if (hour < 17) return 'afternoon';
   return 'evening';
 };
 
