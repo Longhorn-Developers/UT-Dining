@@ -44,8 +44,6 @@ export const timeOfDay = (
     const breakfastEnd = mealTimes.breakfast?.closeTime ? mealTimes.breakfast.closeTime : 1100;
     const lunchEnd = mealTimes.lunch?.closeTime ? mealTimes.lunch.closeTime : 1700;
 
-    console.log(currentTime);
-    console.log(breakfastEnd, lunchEnd);
     if (currentTime < breakfastEnd) return 'morning';
     if (currentTime < lunchEnd) return 'afternoon';
     return 'evening';
