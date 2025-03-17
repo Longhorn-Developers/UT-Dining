@@ -66,7 +66,7 @@ const LocationHeader = React.memo(
               <Text className="font-sans text-3xl font-extrabold">{location}</Text>
             </View>
             <Text className="text-lg font-semibold text-ut-burnt-orange">
-              {isLocationOpen(location) ? 'Open' : 'Closed'}
+              {open ? 'Open' : 'Closed'}
             </Text>
           </View>
 
