@@ -1,6 +1,6 @@
 import { InfoIcon, MapPin } from 'lucide-react-native';
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, Linking } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Linking, Platform } from 'react-native';
 import ActionSheet, { SheetProps } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -34,8 +34,12 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
 
           <TouchableOpacity
             onPress={() => {
-              if (location?.mapLink) {
-                Linking.openURL(location.mapLink);
+              if (location) {
+                if (Platform.OS === 'ios') {
+                  Linking.openURL(location.appleMapsLink);
+                } else {
+                  Linking.openURL(location.googleMapsLink);
+                }
               }
             }}
             className="flex-row items-center gap-x-1">
