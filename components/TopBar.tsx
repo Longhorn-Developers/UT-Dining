@@ -3,7 +3,7 @@ import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Bell, ChefHat, ChevronLeft, Heart, Info, Map } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { View, Image, TouchableOpacity, Alert as NativeAlert, Text } from 'react-native';
+import { View, Image, TouchableOpacity, Alert as NativeAlert, Text, Platform } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { Notifier } from 'react-native-notifier';
 
@@ -80,7 +80,12 @@ const LocationTopBar = () => {
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            Linking.openURL(locationInfo.mapLink);
+
+            if (Platform.OS === 'ios') {
+              Linking.openURL(locationInfo.appleMapsLink);
+            } else {
+              Linking.openURL(locationInfo.googleMapsLink);
+            }
           }}>
           <Map size={20} color={COLORS['ut-grey']} />
         </TouchableOpacity>
