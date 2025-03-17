@@ -36,7 +36,6 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
 
     checkOpen();
   }, [currentTime]);
-  // const open = isLocationOpen(location.name as string, currentTime);
 
   useEffect(() => {
     // Stop any running animation
