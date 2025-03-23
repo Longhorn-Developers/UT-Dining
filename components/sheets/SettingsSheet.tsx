@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as Application from 'expo-application';
 import { Link, router } from 'expo-router';
 import {
   ChefHat,
@@ -106,7 +107,9 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
       </TouchableOpacity>
       <TouchableOpacity
         className="mb-2 flex-row items-center"
-        onPress={() => Linking.openURL('https://utdiningapp.com/privacy')}>
+        onPress={() =>
+          Linking.openURL('https://longhorn-developers.github.io/ut-dining-website/privacy-policy')
+        }>
         <Shield size={18} color={COLORS['ut-burnt-orange']} className="mr-2" />
         <Text className="ml-2 text-ut-burnt-orange">Privacy Policy</Text>
       </TouchableOpacity>
@@ -147,7 +150,7 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
 
   const VersionInfo = (): JSX.Element => (
     <View className="mt-6 items-center">
-      <Text className="text-sm text-gray-400">Version 1.0.0</Text>
+      <Text className="text-sm text-gray-400">Version {Application.nativeApplicationVersion}</Text>
     </View>
   );
 
