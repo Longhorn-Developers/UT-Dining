@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Bell, ChefHat, ChevronLeft, Heart, Info, Map } from 'lucide-react-native';
+import { Bell, ChefHat, ChevronLeft, Cog, Heart, Info, Map } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { View, Image, TouchableOpacity, Alert as NativeAlert, Text, Platform } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
@@ -49,6 +49,14 @@ const HomeTopBar = () => {
             router.push(`/favorites`);
           }}>
           <Heart size={20} color={COLORS['ut-grey']} />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            SheetManager.show('settings');
+          }}>
+          <Cog size={20} color={COLORS['ut-grey']} />
         </TouchableOpacity>
       </View>
     </View>
