@@ -57,7 +57,7 @@ const FoodComponent = ({
       shouldCancelWhenOutside
       enableTrackpadTwoFingerGesture
       // Add these properties to fix the gliding issue
-      friction={2} // Higher friction reduces gliding
+      friction={1.5} // Higher friction reduces gliding
       overshootFriction={200} // Higher value means less overshoot
       animationOptions={{
         damping: 1, // Higher damping means less oscillation
