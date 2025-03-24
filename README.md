@@ -2,7 +2,8 @@
 
 # UT Dining
 
-UT Dining is a mobile application that provides comprehensive information about dining options at the University of Texas at Austin, including menus, nutrition data, allergens, and more.
+UT Dining is your companion app for exploring dining options at the University of Texas.
+Browse menus, check dining hours, and find the perfect meal on campus.
 
 > This project has been adopted by [Longhorn Developers](https://github.com/Longhorn-Developers). Huge thanks to Ethan Lanting (@EthanL06) for creating it!
 
