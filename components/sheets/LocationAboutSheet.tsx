@@ -13,7 +13,7 @@ const paymentMethods: PaymentMethod[] = Object.keys(PAYMENT_INFO_ICONS) as Payme
 const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) => {
   const insets = useSafeAreaInsets();
   const location = payload?.location;
-  const schedule = generateSchedule(location?.name || '', true);
+  const schedule = generateSchedule(location?.name || '', false);
 
   return (
     <ActionSheet
