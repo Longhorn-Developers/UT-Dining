@@ -10,7 +10,7 @@ Browse menus, check dining hours, and find the perfect meal on campus.
 **Currently in Beta ‼️‼️**<br/>
 Join the Beta Test here _(iOS only)_: [TestFlight - UT Dining](https://testflight.apple.com/join/y3FUJUqN)
 
-![UT Dining App Screenshot](https://github.com/user-attachments/assets/f095381b-b850-4c99-9748-8b4864226af4)
+![UT Dining App Screenshot](https://github.com/user-attachments/assets/04b49653-3202-43ce-8ecc-7a19fed814ce)
 
 ## Table of Contents
 
