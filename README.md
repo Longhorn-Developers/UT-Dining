@@ -7,8 +7,9 @@ Browse menus, check dining hours, and find the perfect meal on campus.
 
 > This project has been adopted by [Longhorn Developers](https://github.com/Longhorn-Developers). Huge thanks to Ethan Lanting (@EthanL06) for creating it!
 
-**Currently in Beta ‼️‼️**<br/>
-Join the Beta Test here _(iOS only)_: [TestFlight - UT Dining](https://testflight.apple.com/join/y3FUJUqN)
+<a href="https://apps.apple.com/us/app/ut-dining/id6743042002">
+   <img alt="Download on the app store" src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" height="48">
+</a>
 
 ![UT Dining App Screenshot](https://github.com/user-attachments/assets/04b49653-3202-43ce-8ecc-7a19fed814ce)
 
