@@ -24,6 +24,13 @@ const HomeTopBar = () => {
       <Image className="size-12" source={icon} />
 
       <View className="flex flex-row gap-x-5">
+      <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push('/microwave-map')
+          }}>
+          <Map size={20} color={COLORS['ut-grey']} />
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
