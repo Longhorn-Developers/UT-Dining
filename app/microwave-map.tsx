@@ -46,7 +46,7 @@ const MapMarkers = () => {
 
 const MicrowaveMap = () => {
   return (
-    <Container className="mx-0" disableBottomPadding>
+    <Container className="mx-0 gap-6" disableBottomPadding>
       <Stack.Screen
         options={{
           title: 'Microwave Map',
@@ -64,7 +64,7 @@ const MicrowaveMap = () => {
         </View>
       </View>
       <MapView
-        style={{ flex: 1 }}
+        style={{ flex: 1, borderTopWidth: 1, borderColor: 'rgba(51, 63, 72, 0.15)' }}
         initialRegion={{
           latitude: 30.285548,
           longitude: -97.737384,
