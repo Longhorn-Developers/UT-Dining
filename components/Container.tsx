@@ -7,10 +7,12 @@ export const Container = ({
   onLayout,
   className,
   children,
+  disableBottomPadding = false,
 }: {
   onLayout?: (event: LayoutChangeEvent) => void;
   className?: string;
   children: React.ReactNode;
+  disableBottomPadding?: boolean;
 }) => {
   const insets = useSafeAreaInsets();
 
@@ -19,7 +21,7 @@ export const Container = ({
       onLayout={onLayout}
       style={{
         paddingTop: insets.top,
-        paddingBottom: insets.bottom,
+        paddingBottom: disableBottomPadding ? 0 : insets.bottom,
         paddingLeft: insets.left,
         paddingRight: insets.right,
       }}
