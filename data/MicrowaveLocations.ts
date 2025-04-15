@@ -9,7 +9,7 @@ type MicrowaveLocation = {
   note?: string;
 };
 
-export const MICROWAVE_LOCATION: MicrowaveLocation[] = [
+export const MICROWAVE_LOCATION = [
   {
     name: 'Art Building & Museum (ART)',
     address: '2301 San Jacinto Blvd, Austin, TX 78705',
@@ -104,4 +104,4 @@ and at the corner of the food court`,
     },
     description: "3rd floor Student Lounge (3.328), near O's Cafe",
   },
-];
+] as const satisfies MicrowaveLocation[];
