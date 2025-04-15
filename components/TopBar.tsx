@@ -27,6 +27,13 @@ const HomeTopBar = () => {
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push('/microwave-map');
+          }}>
+          <Map size={20} color={COLORS['ut-grey']} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             NativeAlert.alert(
               'Coming Soon!',
               'Push notifications for your favorite food items will be available in an upcoming update.'
