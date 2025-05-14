@@ -8,11 +8,10 @@ import TimeSchedule from './TimeSchedule';
 
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
-import { LOCATION_INFO } from '~/data/LocationInfo';
+import { LOCATION_INFO, getLocationName } from '~/data/LocationInfo';
 import { menu, location as location_schema } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useSettingsStore } from '~/store/useSettingsStore';
-import { getLocationName } from '~/utils/colloquialNames';
 import { generateSchedule, isLocationOpen } from '~/utils/time';
 
 interface LocationHeaderProps {

@@ -169,15 +169,6 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
         <View className="flex-col p-6">
           <Text className="mb-6 text-3xl font-bold">Settings</Text>
 
-          <SectionHeader title="Display" />
-          <SettingItem
-            title="Use Colloquial Names"
-            Icon={Type}
-            hasToggle
-            toggleValue={useColloquialNames}
-            onToggle={toggleColloquialNames}
-          />
-
           <SectionHeader title="Quick Links" className="mt-4" />
           <SettingItem
             title="Meal Plan"
@@ -205,7 +196,14 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
               SheetManager.show('filters');
             }}
           />
-
+          <SectionHeader title="Display" />
+          <SettingItem
+            title="Use Colloquial Names"
+            Icon={Type}
+            hasToggle
+            toggleValue={useColloquialNames}
+            onToggle={toggleColloquialNames}
+          />
           <SectionHeader title="Information" className="mt-4" />
           <AboutSection />
           <CreditsSection />
