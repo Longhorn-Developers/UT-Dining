@@ -4,7 +4,9 @@ import { View, Text, Image, TouchableOpacity, Linking, Platform } from 'react-na
 import ActionSheet, { SheetProps } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { getLocationName } from '~/data/LocationInfo';
 import { PAYMENT_INFO_ICONS, PaymentMethod } from '~/data/PaymentInfo';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { generateSchedule } from '~/utils/time';
 
@@ -14,6 +16,7 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
   const insets = useSafeAreaInsets();
   const location = payload?.location;
   const schedule = generateSchedule(location?.name || '', false);
+  const { useColloquialNames } = useSettingsStore();
 
   return (
     <ActionSheet
@@ -29,7 +32,9 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
             <View>
               <InfoIcon color={COLORS['ut-burnt-orange']} />
             </View>
-            <Text className="text-3xl font-bold">About {location?.name}</Text>
+            <Text className="text-3xl font-bold">
+              About {location && getLocationName(location.name, useColloquialNames)}
+            </Text>
           </View>
 
           <TouchableOpacity

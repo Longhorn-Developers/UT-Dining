@@ -5,8 +5,10 @@ import { ChevronRight } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, Animated, Easing } from 'react-native';
 
+import { getLocationName } from '~/data/LocationInfo';
 import { Location, menu } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { getLocationTimeMessage, isLocationOpen } from '~/utils/time';
 import { cn } from '~/utils/utils';
@@ -20,6 +22,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
   const [open, setOpen] = useState(false);
   const pingAnimation = useRef(new Animated.Value(0)).current;
   const db = useDatabase();
+  const { useColloquialNames } = useSettingsStore();
 
   useEffect(() => {
     const checkOpen = async () => {
@@ -116,10 +119,10 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
         </View>
         <View>
           <Text className={cn('text-xl font-bold', open ? 'text-ut-black' : 'text-ut-grey/75')}>
-            {location.name}
+            {getLocationName(location.name ?? '', useColloquialNames)}
           </Text>
           <Text className="text-xs font-medium text-ut-grey/75">
-            {open ? getLocationTimeMessage(location.name as string, currentTime) : 'Closed'}
+            {open ? getLocationTimeMessage(location.name ?? '', currentTime) : 'Closed'}
           </Text>
         </View>
       </View>

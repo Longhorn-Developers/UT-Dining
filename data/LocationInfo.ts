@@ -22,6 +22,7 @@ export type LocationType = 'Dining Hall' | 'Restaurant' | 'Convenience Store';
 
 export interface LocationInfo {
   name: string;
+  colloquialName?: string;
   description: string;
   type: LocationType;
   address: string;
@@ -38,6 +39,7 @@ export interface LocationInfo {
 export const LOCATION_INFO: LocationInfo[] = [
   {
     name: 'J2 Dining',
+    colloquialName: 'J2',
     description:
       'Positioned on the south side of campus, J2 Dining houses a top-9 allergen free line as well as other unique options.\n\nJ2 Dining is located on the second floor of Jester Center and serves a varied menu for you to create your ideal meal. The offerings at J2 include something for everyone.',
     address: '201 E 21st St Austin, TX 78705',
@@ -70,6 +72,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: 'JCL Dining',
+    colloquialName: 'JCL',
     type: 'Dining Hall',
     googleMapsLink: 'https://maps.app.goo.gl/DccikGcpeV4tpZSj7',
     appleMapsLink:
@@ -98,6 +101,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: 'Kins Dining',
+    colloquialName: 'Kins',
     description:
       'Serving the northwest side of campus, Kins Dining hosts several serving lines and outdoor patio seating. Kins Dining is in Kinsolving Hall and offers a dining experience where you can piece together your ideal meal from the assortment of food lines and menu specials.\n\nEnjoy your meal inside the dining hall or on the outdoor patio overlooking the Kinsolving garden.',
     type: 'Dining Hall',
@@ -131,6 +135,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: "Jesta' Pizza",
+    colloquialName: "Jizza's",
     description:
       'Build your own pizza with an array of sauces and toppings and find other quick bites on the south side of campus inside Jester Center.\n\nJesta’ Pizza offers an assortment of options for you to create your ideal pie. Other snacks and beverages are also available for purchase.',
     type: 'Restaurant',
@@ -156,6 +161,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: 'Cypress Bend Cafe',
+    colloquialName: 'Cypress',
     description:
       'Explore this grill and coffee shop all in one located in San Jacinto Residence Hall. Cypress Bend Cafe serves Starbucks coffee and beverages, bakery items and other grab and go options.\n\nIn addition, you can choose from a variety of meal options at the grill.',
     type: 'Restaurant',
@@ -184,6 +190,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: 'Jester City Market',
+    colloquialName: 'Jarket',
     description:
       'Grab a bite on the go, shop for the essentials or stop in for a beverage on the ground floor of Jester Center.\n\nJester City Market has all your convenience store needs including school supplies, snacks and other goods. Stop in to see all we have to offer.',
     type: 'Convenience Store',
@@ -216,6 +223,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: 'Littlefield Patio Cafe',
+    colloquialName: 'Littlefield Cafe',
     description:
       'Discover bistro-style dining, grab and go offerings and coffee options on the northwest side of campus, adjacent to Littlefield Hall.\n\nLittlefield Patio Cafe offers a la carte meal options in addition to Starbucks coffee and drinks, bakery selections and other selections.Enjoy your meal on the namesake patio dining area or inside the cafe.',
     type: 'Restaurant',
@@ -243,3 +251,15 @@ export const LOCATION_INFO: LocationInfo[] = [
     },
   },
 ];
+
+// Function to get location name on display settings
+export const getLocationName = (originalName: string, useColloquial: boolean): string => {
+  if (!useColloquial) return originalName;
+
+  const locationInfo = LOCATION_INFO.find((location) => location.name === originalName);
+  if (locationInfo?.colloquialName) {
+    return locationInfo.colloquialName;
+  }
+
+  return originalName;
+};

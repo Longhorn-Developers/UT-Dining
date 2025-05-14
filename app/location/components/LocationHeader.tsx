@@ -8,9 +8,10 @@ import TimeSchedule from './TimeSchedule';
 
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
-import { LOCATION_INFO } from '~/data/LocationInfo';
+import { LOCATION_INFO, getLocationName } from '~/data/LocationInfo';
 import { menu, location as location_schema } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { generateSchedule, isLocationOpen } from '~/utils/time';
 
 interface LocationHeaderProps {
@@ -29,6 +30,7 @@ const LocationHeader = React.memo(
     const [timeDropdownOpen, setTimeDropdownOpen] = useState(false);
     const schedule = useMemo(() => generateSchedule(location), [location]);
     const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
+    const { useColloquialNames } = useSettingsStore();
 
     useEffect(() => {
       const checkOpen = async () => {
@@ -65,7 +67,9 @@ const LocationHeader = React.memo(
         <View className="gap-y-4">
           <View>
             <View className="w-full flex-row items-center justify-between">
-              <Text className="font-sans text-3xl font-extrabold">{location}</Text>
+              <Text className="font-sans text-3xl font-extrabold">
+                {getLocationName(location, useColloquialNames)}
+              </Text>
             </View>
             <Text className="text-lg font-semibold text-ut-burnt-orange">
               {open ? 'Open' : 'Closed'}

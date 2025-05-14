@@ -10,6 +10,7 @@ import {
   LucideIcon,
   Mail,
   Shield,
+  Type,
 } from 'lucide-react-native';
 import { View, Text, Switch, TouchableOpacity, Linking } from 'react-native';
 import ActionSheet, {
@@ -20,12 +21,14 @@ import ActionSheet, {
 } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
 
 const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
   const insets = useSafeAreaInsets();
   const sheetRef = useSheetRef('settings');
+  const { useColloquialNames, toggleColloquialNames } = useSettingsStore();
 
   const SettingItem = ({
     title,
@@ -60,7 +63,7 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
         <Switch
           value={toggleValue}
           onValueChange={onToggle}
-          trackColor={{ false: '#D1D5DB', true: '#F97316' }}
+          trackColor={{ false: '#D1D5DB', true: COLORS['ut-burnt-orange'] }}
           thumbColor="#FFFFFF"
         />
       )}
@@ -193,7 +196,15 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
               SheetManager.show('filters');
             }}
           />
+          <SectionHeader title="Display" className="mt-4" />
 
+          <SettingItem
+            title="Use Colloquial Names"
+            Icon={Type}
+            hasToggle
+            toggleValue={useColloquialNames}
+            onToggle={toggleColloquialNames}
+          />
           <SectionHeader title="Information" className="mt-4" />
           <AboutSection />
           <CreditsSection />
