@@ -9,6 +9,7 @@ import {
   HelpCircle,
   LucideIcon,
   Mail,
+  Moon,
   Shield,
   Type,
 } from 'lucide-react-native';
@@ -28,7 +29,8 @@ import { cn } from '~/utils/utils';
 const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
   const insets = useSafeAreaInsets();
   const sheetRef = useSheetRef('settings');
-  const { useColloquialNames, toggleColloquialNames } = useSettingsStore();
+  const { useColloquialNames, toggleColloquialNames, isDarkMode, toggleDarkMode } =
+    useSettingsStore();
 
   const SettingItem = ({
     title,
@@ -48,16 +50,26 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
     onPress?: () => void;
   }) => (
     <TouchableOpacity
-      className="flex-row items-center justify-between border-b border-gray-100 py-3"
+      className={cn(
+        'flex-row items-center justify-between border-b py-3',
+        isDarkMode ? 'border-gray-700' : 'border-gray-100'
+      )}
       onPress={onPress}
       disabled={!hasChevron && !onPress}>
       <View className="flex-row items-center">
         {Icon && (
-          <View className="mr-3 h-8 w-8 items-center justify-center rounded-full bg-orange-100">
+          <View
+            className={cn(
+              'mr-3 h-8 w-8 items-center justify-center rounded-full',
+              isDarkMode ? 'bg-gray-800' : 'bg-orange-100'
+            )}>
             <Icon size={16} color={COLORS['ut-burnt-orange']} />
           </View>
         )}
-        <Text className="text-base font-medium text-gray-800">{title}</Text>
+        <Text
+          className={cn('text-base font-medium', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+          {title}
+        </Text>
       </View>
       {hasToggle && (
         <Switch
@@ -67,14 +79,17 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
           thumbColor="#FFFFFF"
         />
       )}
-      {hasChevron && <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />}
+      {hasChevron && (
+        <Ionicons name="chevron-forward" size={18} color={isDarkMode ? '#888' : '#9CA3AF'} />
+      )}
     </TouchableOpacity>
   );
 
   const SectionHeader = ({ title, className }: { title: string; className?: string }) => (
     <Text
       className={cn(
-        'py-2 text-sm font-semibold uppercase tracking-wider text-gray-500',
+        'py-2 text-sm font-semibold uppercase tracking-wider',
+        isDarkMode ? 'text-gray-400' : 'text-gray-500',
         className
       )}>
       {title}
@@ -82,9 +97,15 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
   );
 
   const AboutSection = () => (
-    <View className="mt-2 rounded-lg bg-gray-50 p-4">
-      <Text className="mb-2 text-lg font-semibold text-gray-800">About UT Dining</Text>
-      <Text className="text-gray-600">
+    <View className={cn('mt-2 rounded-lg p-4', isDarkMode ? 'bg-gray-800' : 'bg-gray-50')}>
+      <Text
+        className={cn(
+          'mb-2 text-lg font-semibold',
+          isDarkMode ? 'text-gray-100' : 'text-gray-800'
+        )}>
+        About UT Dining
+      </Text>
+      <Text className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
         UT Dining is your companion app for exploring dining options at the University of Texas.
         Browse menus, check dining hours, and find the perfect meal on campus.
       </Text>
@@ -92,8 +113,14 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
   );
 
   const HelpSupportSection = (): JSX.Element => (
-    <View className="mt-4 rounded-lg bg-gray-50 p-4">
-      <Text className="mb-2 text-lg font-semibold text-gray-800">Help & Support</Text>
+    <View className={cn('mt-4 rounded-lg p-4', isDarkMode ? 'bg-gray-800' : 'bg-gray-50')}>
+      <Text
+        className={cn(
+          'mb-2 text-lg font-semibold',
+          isDarkMode ? 'text-gray-100' : 'text-gray-800'
+        )}>
+        Help & Support
+      </Text>
       <TouchableOpacity
         className="mb-2 mt-1 flex-row items-center"
         onPress={() => Linking.openURL('mailto:ethanlanting@gmail.com')}>
@@ -126,20 +153,31 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
   );
 
   const CreditsSection = (): JSX.Element => (
-    <View className="mt-4 gap-y-2 rounded-lg bg-gray-50 p-4">
-      <Text className="text-lg font-semibold text-gray-800">Credits</Text>
+    <View className={cn('mt-4 gap-y-2 rounded-lg p-4', isDarkMode ? 'bg-gray-800' : 'bg-gray-50')}>
+      <Text className={cn('text-lg font-semibold', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+        Credits
+      </Text>
       <View>
-        <Link href="https://ethanlanting.dev" className="text-base font-medium text-gray-700 ">
+        <Link
+          href="https://ethanlanting.dev"
+          className={cn('text-base font-medium', isDarkMode ? 'text-gray-200' : 'text-gray-700')}>
           Ethan Lanting
         </Link>
-        <Text className="text-gray-600">Lead Developer & Designer</Text>
+        <Text className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
+          Lead Developer & Designer
+        </Text>
       </View>
       <View>
-        <Text className="text-base font-medium text-gray-700">David Nguyen & Austin Tran</Text>
-        <Text className="text-gray-600">Open Source Contributors</Text>
+        <Text
+          className={cn('text-base font-medium', isDarkMode ? 'text-gray-200' : 'text-gray-700')}>
+          David Nguyen & Austin Tran
+        </Text>
+        <Text className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
+          Open Source Contributors
+        </Text>
       </View>
       <View>
-        <Text className="text-sm text-gray-600">
+        <Text className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
           Adopted by{' '}
           <Link
             href="https://github.com/Longhorn-Developers"
@@ -153,7 +191,9 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
 
   const VersionInfo = (): JSX.Element => (
     <View className="mt-6 items-center">
-      <Text className="text-sm text-gray-400">Version {Application.nativeApplicationVersion}</Text>
+      <Text className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
+        Version {Application.nativeApplicationVersion}
+      </Text>
     </View>
   );
 
@@ -161,13 +201,15 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
     <ActionSheet
       id={sheetId}
       defaultOverlayOpacity={0.5}
-      containerStyle={{ backgroundColor: 'white' }}
+      containerStyle={{ backgroundColor: isDarkMode ? '#1f2937' : 'white' }}
       gestureEnabled
       safeAreaInsets={insets}
       useBottomSafeAreaPadding>
       <ScrollView showsVerticalScrollIndicator={false} className="max-h-[70vh]">
         <View className="flex-col p-6">
-          <Text className="mb-6 text-3xl font-bold">Settings</Text>
+          <Text className={cn('mb-6 text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
+            Settings
+          </Text>
 
           <SectionHeader title="Display" />
           <SettingItem
@@ -176,6 +218,13 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
             hasToggle
             toggleValue={useColloquialNames}
             onToggle={toggleColloquialNames}
+          />
+          <SettingItem
+            title="Dark Mode"
+            Icon={Moon}
+            hasToggle
+            toggleValue={isDarkMode}
+            onToggle={toggleDarkMode}
           />
 
           <SectionHeader title="Quick Links" className="mt-4" />

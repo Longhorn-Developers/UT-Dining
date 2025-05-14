@@ -6,6 +6,8 @@ import { zustandStorage } from './rnmmkv-storage';
 interface SettingsState {
   useColloquialNames: boolean;
   toggleColloquialNames: () => void;
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -15,6 +17,12 @@ export const useSettingsStore = create<SettingsState>()(
       toggleColloquialNames: () => {
         set((state) => ({
           useColloquialNames: !state.useColloquialNames,
+        }));
+      },
+      isDarkMode: false,
+      toggleDarkMode: () => {
+        set((state) => ({
+          isDarkMode: !state.isDarkMode,
         }));
       },
     }),
