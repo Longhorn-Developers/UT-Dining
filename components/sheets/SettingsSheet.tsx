@@ -211,22 +211,6 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
             Settings
           </Text>
 
-          <SectionHeader title="Display" />
-          <SettingItem
-            title="Use Colloquial Names"
-            Icon={Type}
-            hasToggle
-            toggleValue={useColloquialNames}
-            onToggle={toggleColloquialNames}
-          />
-          <SettingItem
-            title="Dark Mode"
-            Icon={Moon}
-            hasToggle
-            toggleValue={isDarkMode}
-            onToggle={toggleDarkMode}
-          />
-
           <SectionHeader title="Quick Links" className="mt-4" />
           <SettingItem
             title="Meal Plan"
@@ -254,7 +238,21 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
               SheetManager.show('filters');
             }}
           />
-
+          <SectionHeader title="Display" className="mt-4" />
+          <SettingItem
+            title="Dark Mode"
+            Icon={Moon}
+            hasToggle
+            toggleValue={isDarkMode}
+            onToggle={toggleDarkMode}
+          />
+          <SettingItem
+            title="Use Colloquial Names"
+            Icon={Type}
+            hasToggle
+            toggleValue={useColloquialNames}
+            onToggle={toggleColloquialNames}
+          />
           <SectionHeader title="Information" className="mt-4" />
           <AboutSection />
           <CreditsSection />
