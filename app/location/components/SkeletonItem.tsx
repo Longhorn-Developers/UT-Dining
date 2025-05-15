@@ -2,6 +2,7 @@ import { ChevronDown } from 'lucide-react-native';
 import React, { useEffect } from 'react';
 import { View, Animated } from 'react-native';
 
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 
 interface SkeletonItemProps {
@@ -9,6 +10,8 @@ interface SkeletonItemProps {
 }
 
 const SkeletonItem = React.memo(({ isHeader = false }: SkeletonItemProps) => {
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
+
   // Create animated value for the shimmer effect
   const shimmerAnimation = React.useRef(new Animated.Value(0)).current;
 
@@ -35,10 +38,9 @@ const SkeletonItem = React.memo(({ isHeader = false }: SkeletonItemProps) => {
     return () => shimmerAnimation.stopAnimation();
   }, []);
 
-  // Interpolate the background color
   const backgroundColor = shimmerAnimation.interpolate({
     inputRange: [0, 1],
-    outputRange: ['#d1d5db', '#f3f4f6'], // Light gray to darker gray
+    outputRange: isDarkMode ? ['#374151', '#1F2937'] : ['#d1d5db', '#f3f4f6'],
   });
 
   // Header skeleton
@@ -46,7 +48,7 @@ const SkeletonItem = React.memo(({ isHeader = false }: SkeletonItemProps) => {
     <View className="my-2 flex-row items-center justify-between">
       <Animated.View style={{ backgroundColor }} className="h-10 w-72 rounded-md" />
       <View className="rotate-180">
-        <ChevronDown size={20} color={COLORS['ut-grey']} />
+        <ChevronDown size={20} color={isDarkMode ? '#fff' : COLORS['ut-grey']} />
       </View>
     </View>
   );

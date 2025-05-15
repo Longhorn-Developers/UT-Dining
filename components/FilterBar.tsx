@@ -6,6 +6,7 @@ import { SheetManager } from 'react-native-actions-sheet';
 
 import { LocationInfo } from '~/data/LocationInfo';
 import { useFiltersStore } from '~/store/useFiltersStore';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { timeOfDay } from '~/utils/time';
 import { cn } from '~/utils/utils';
@@ -34,6 +35,8 @@ const FilterBar = ({
   showFilterButton = false,
   useTimeOfDayDefault = false,
 }: FilterBarProps) => {
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
+
   // Sort items based on meal order
   const sortedItems = useMemo(() => {
     return [...filterItems].sort((a, b) => {
@@ -88,13 +91,21 @@ const FilterBar = ({
               key={item.id}
               onPress={() => onPressItem(item.id)}
               className={cn(
-                'self-start rounded-full p-2',
-                selectedItem === item.id ? 'bg-ut-burnt-orange' : 'border border-ut-grey/75'
+                'self-start rounded-full border px-3 py-1',
+                selectedItem === item.id
+                  ? 'border-ut-burnt-orange bg-ut-burnt-orange text-white'
+                  : isDarkMode
+                    ? 'border-gray-700 bg-gray-800 text-gray-200'
+                    : 'border-gray-200 bg-white text-ut-grey'
               )}>
               <Text
                 className={cn(
                   'text-xs',
-                  selectedItem === item.id ? 'font-bold text-white' : 'font-medium text-ut-grey/75'
+                  selectedItem === item.id
+                    ? 'font-bold text-white'
+                    : isDarkMode
+                      ? 'font-medium text-gray-200'
+                      : 'font-medium text-ut-grey/75'
                 )}>
                 {item.title}
               </Text>

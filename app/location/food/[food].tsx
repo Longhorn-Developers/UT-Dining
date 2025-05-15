@@ -12,7 +12,9 @@ import { useFoodData } from '../../../hooks/useFoodData';
 
 import { Container } from '~/components/Container';
 import TopBar from '~/components/TopBar';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
+import { cn } from '~/utils/utils';
 
 const FoodScreen = () => {
   const params = useLocalSearchParams<{
@@ -23,6 +25,7 @@ const FoodScreen = () => {
     favorite: string;
   }>();
   const { food, menu, category, location, favorite } = params;
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   const { foodItem, nutritionData, hasAllergens, allergenList, dietaryList } = useFoodData(
     location,
@@ -36,20 +39,26 @@ const FoodScreen = () => {
   const nutritionDataFiltered = nutritionData.filter((item) => item.key !== 'Serving Size');
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       <Stack.Screen options={{ title: 'Food' }} />
       <Container className="mx-0">
         <FlashList
           estimatedItemSize={14}
           data={nutritionDataFiltered}
-          renderItem={({ item }) => <NutritionRow item={item} />}
+          renderItem={({ item }) => <NutritionRow item={item} isDarkMode={isDarkMode} />}
           ListHeaderComponent={
             <View className="mx-6 mt-6 flex gap-y-5">
               <TopBar variant="food" />
 
               {foodItem && (
                 <View>
-                  <Text className="font-sans text-3xl font-extrabold">{foodItem.name}</Text>
+                  <Text
+                    className={cn(
+                      'font-sans text-3xl font-extrabold',
+                      isDarkMode ? 'text-white' : 'text-black'
+                    )}>
+                    {foodItem.name}
+                  </Text>
 
                   <View className="flex-row gap-x-2">
                     <NutritionInfo
@@ -61,6 +70,7 @@ const FoodScreen = () => {
                         />
                       }
                       value={`${foodItem.nutrition?.calories} kcal`}
+                      isDarkMode={isDarkMode}
                     />
                     <NutritionInfo
                       icon={
@@ -71,6 +81,7 @@ const FoodScreen = () => {
                         />
                       }
                       value={`${foodItem.nutrition?.protein} Protein`}
+                      isDarkMode={isDarkMode}
                     />
                     <NutritionInfo
                       icon={
@@ -81,6 +92,7 @@ const FoodScreen = () => {
                         />
                       }
                       value={`${foodItem.nutrition?.total_carbohydrates} Carbs`}
+                      isDarkMode={isDarkMode}
                     />
                   </View>
 
@@ -90,25 +102,47 @@ const FoodScreen = () => {
                         title="Allergens:"
                         items={allergenList}
                         showTitle={allergenList.length > 0}
+                        isDarkMode={isDarkMode}
                       />
                       <AllergenSection
                         title="Dietary:"
                         items={dietaryList}
                         showTitle={dietaryList.length > 0}
+                        isDarkMode={isDarkMode}
                       />
                     </View>
                   )}
 
-                  <View className="my-4 w-full border-b border-b-ut-grey/15" />
+                  <View
+                    className={cn(
+                      'my-4 w-full border-b',
+                      isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15'
+                    )}
+                  />
 
-                  <Text className="mb-2 text-2xl font-bold">Nutrition Facts</Text>
+                  <Text
+                    className={cn(
+                      'mb-2 text-2xl font-bold',
+                      isDarkMode ? 'text-white' : 'text-black'
+                    )}>
+                    Nutrition Facts
+                  </Text>
 
                   <View className="mb-2">
                     <View className="mb-2 flex-row justify-between">
-                      <Text className="font-bold">Serving Size</Text>
-                      <Text className="font-bold">{foodItem.nutrition?.serving_size}</Text>
+                      <Text className={cn('font-bold', isDarkMode ? 'text-white' : 'text-black')}>
+                        Serving Size
+                      </Text>
+                      <Text className={cn('font-bold', isDarkMode ? 'text-white' : 'text-black')}>
+                        {foodItem.nutrition?.serving_size}
+                      </Text>
                     </View>
-                    <View className="w-full border-b border-b-ut-grey/15" />
+                    <View
+                      className={cn(
+                        'w-full border-b',
+                        isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15'
+                      )}
+                    />
                   </View>
                 </View>
               )}
@@ -121,13 +155,14 @@ const FoodScreen = () => {
                   ingredients={foodItem.nutrition?.ingredients as string}
                   allergens={allergenList}
                   dietary={dietaryList}
+                  isDarkMode={isDarkMode}
                 />
               </View>
             )
           }
         />
       </Container>
-    </>
+    </View>
   );
 };
 

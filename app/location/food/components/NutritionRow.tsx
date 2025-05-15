@@ -6,9 +6,10 @@ import { cn } from '~/utils/utils';
 
 interface NutritionRowProps {
   item: { key: string; value: unknown };
+  isDarkMode?: boolean;
 }
 
-const NutritionRow = React.memo(({ item }: NutritionRowProps) => {
+const NutritionRow = React.memo(({ item, isDarkMode }: NutritionRowProps) => {
   const nutrientValue = parseFloat(String(item.value ?? 0));
   const percentage = getPercentage(nutrientValue, item.key);
 
@@ -22,21 +23,46 @@ const NutritionRow = React.memo(({ item }: NutritionRowProps) => {
         <View className="flex-row gap-x-0.5">
           {item.key === 'Trans Fat' ? (
             <>
-              <Text className={cn('italic', INDENTED_NUTRITION.has(item.key) && 'font-normal')}>
+              <Text
+                className={cn(
+                  'italic',
+                  INDENTED_NUTRITION.has(item.key) && 'font-normal',
+                  isDarkMode ? 'text-gray-300' : 'text-black'
+                )}>
                 Trans
               </Text>
-              <Text className={cn(INDENTED_NUTRITION.has(item.key) && 'font-normal')}> Fat</Text>
+              <Text
+                className={cn(
+                  INDENTED_NUTRITION.has(item.key) && 'font-normal',
+                  isDarkMode ? 'text-gray-300' : 'text-black'
+                )}>
+                {' Fat'}
+              </Text>
             </>
           ) : (
-            <Text className={cn(INDENTED_NUTRITION.has(item.key) ? 'font-normal' : 'font-bold')}>
+            <Text
+              className={cn(
+                INDENTED_NUTRITION.has(item.key) ? 'font-normal' : 'font-bold',
+                isDarkMode ? 'text-gray-300' : 'text-black'
+              )}>
               {item.key}
             </Text>
           )}
-          <Text>{item.key === 'Calories' ? ` ${item.value} kcal` : ` ${item.value}`}</Text>
+          <Text className={isDarkMode ? 'text-gray-300' : 'text-black'}>
+            {item.key === 'Calories' ? ` ${item.value} kcal` : ` ${item.value}`}
+          </Text>
         </View>
-        <View>{DAILY_VALUES[item.key] && <Text className="font-bold">{percentage}%</Text>}</View>
+        <View>
+          {DAILY_VALUES[item.key] && (
+            <Text className={cn('font-bold', isDarkMode ? 'text-gray-300' : 'text-black')}>
+              {percentage}%
+            </Text>
+          )}
+        </View>
       </View>
-      <View className="w-full border-b border-b-ut-grey/15" />
+      <View
+        className={cn('w-full border-b', isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15')}
+      />
     </View>
   );
 });

@@ -15,10 +15,13 @@ import { useDatabase } from '~/hooks/useDatabase';
 import { useFoodData } from '~/hooks/useFoodData';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 import { COLORS } from '~/utils/colors';
+import { useSettingsStore } from '~/store/useSettingsStore';
 
 const icon = require('../assets/image.png');
 
 const HomeTopBar = () => {
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
+
   return (
     <View className="flex w-full flex-row items-center justify-between ">
       <Image className="size-12" source={icon} />
@@ -32,7 +35,7 @@ const HomeTopBar = () => {
               'Push notifications for your favorite food items will be available in an upcoming update.'
             );
           }}>
-          <Bell size={20} color={COLORS['ut-grey']} />
+          <Bell size={20} color={isDarkMode ? COLORS['ut-grey'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -40,7 +43,7 @@ const HomeTopBar = () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/meal-plan`);
           }}>
-          <ChefHat size={20} color={COLORS['ut-grey']} />
+          <ChefHat size={20} color={isDarkMode ? COLORS['ut-grey'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -48,7 +51,7 @@ const HomeTopBar = () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/favorites`);
           }}>
-          <Heart size={20} color={COLORS['ut-grey']} />
+          <Heart size={20} color={isDarkMode ? COLORS['ut-grey'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -56,7 +59,7 @@ const HomeTopBar = () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             SheetManager.show('settings');
           }}>
-          <Cog size={20} color={COLORS['ut-grey']} />
+          <Cog size={20} color={isDarkMode ? COLORS['ut-grey'] : COLORS['ut-grey']} />
         </TouchableOpacity>
       </View>
     </View>

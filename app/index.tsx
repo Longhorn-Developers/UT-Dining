@@ -7,6 +7,7 @@ import { useSQLiteContext } from 'expo-sqlite';
 import React, { useState, useEffect, useCallback } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
 import { Notifier } from 'react-native-notifier';
+import { useSettingsStore } from '~/store/useSettingsStore';
 
 import * as schema from '../db/schema';
 import HomeHeader from './components/HomeHeader';
@@ -51,6 +52,8 @@ export default function Home() {
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
   useDrizzleStudio(db);
+
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   // Check if data needs to be refreshed
   useEffect(() => {
@@ -155,9 +158,8 @@ export default function Home() {
   }
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       <Stack.Screen options={{ title: 'Home' }} />
-
       <Container onLayout={onLayoutRootView}>
         <FlatList
           extraData={[currentTime, selectedFilter]}
@@ -174,7 +176,6 @@ export default function Home() {
           renderItem={({ item }) => {
             const locationInfo = LOCATION_INFO.find((info) => info.name === item.name);
             if (!locationInfo) return null;
-
             return <LocationItem location={item} currentTime={currentTime} />;
           }}
           keyExtractor={(item) => item.id.toString()}
@@ -191,6 +192,6 @@ export default function Home() {
           }
         />
       </Container>
-    </>
+    </View>
   );
 }

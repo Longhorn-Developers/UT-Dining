@@ -19,6 +19,7 @@ import { FavoriteAction, RemoveAction, AddMealPlanAction } from './AnimatedActio
 import { ALLERGEN_ICONS } from '~/data/AllergenInfo';
 import { FoodItem } from '~/db/database';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
 
@@ -45,6 +46,7 @@ const FoodComponent = ({
 }) => {
   const isMealPlan = useMealPlanStore((state) => state.isMealPlanItem(food.name as string));
   const toggleMealPlanItem = useMealPlanStore((state) => state.toggleMealPlanItem);
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   return (
     <ReanimatedSwipeable
@@ -138,7 +140,8 @@ const FoodComponent = ({
           });
         }}
         className={cn(
-          'flex-row items-center justify-between rounded border bg-white px-3 py-2',
+          'flex-row items-center justify-between rounded border px-3 py-2',
+          isDarkMode ? 'border-gray-700 bg-gray-800' : 'bg-white',
           isFavorite || isMealPlan ? 'border-ut-burnt-orange' : 'border-ut-grey/15'
         )}>
         <FoodContent
@@ -146,6 +149,7 @@ const FoodComponent = ({
           isFavorite={isFavorite}
           isMealPlan={isMealPlan}
           showExtraInfo={showExtraInfo}
+          isDarkMode={isDarkMode}
         />
       </TouchableOpacity>
     </ReanimatedSwipeable>
@@ -158,16 +162,22 @@ const FoodContent = ({
   isFavorite,
   isMealPlan,
   showExtraInfo,
+  isDarkMode,
 }: {
   food: FoodItem;
   isFavorite: boolean;
   isMealPlan: boolean;
   showExtraInfo: boolean;
+  isDarkMode: boolean;
 }) => (
   <>
     <View className="gap-1">
       <View className="flex-row items-center gap-2">
-        <Text className="line-clamp-2 max-w-[16rem] text-lg font-medium leading-6">
+        <Text
+          className={cn(
+            'line-clamp-2 max-w-[16rem] text-lg font-medium leading-6',
+            isDarkMode ? 'text-white' : 'text-black'
+          )}>
           {food.name}
         </Text>
         {isFavorite && showExtraInfo && (
@@ -181,7 +191,13 @@ const FoodContent = ({
           <View className="flex flex-row gap-2">
             <View className="flex-row items-center gap-x-0.5">
               <Flame fill={COLORS['ut-burnt-orange']} size={10} color={COLORS['ut-burnt-orange']} />
-              <Text className="text-xs font-medium">{food.nutrition?.calories} kcal</Text>
+              <Text
+                className={cn(
+                  'text-xs font-medium',
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                )}>
+                {food.nutrition?.calories} kcal
+              </Text>
             </View>
             <View className="flex-row items-center gap-x-0.5">
               <BicepsFlexed
@@ -189,11 +205,21 @@ const FoodContent = ({
                 size={10}
                 color={COLORS['ut-burnt-orange']}
               />
-              <Text className="text-xs font-medium">{food.nutrition?.protein} Protein</Text>
+              <Text
+                className={cn(
+                  'text-xs font-medium',
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                )}>
+                {food.nutrition?.protein} Protein
+              </Text>
             </View>
             <View className="flex-row items-center gap-x-0.5">
               <Wheat fill={COLORS['ut-burnt-orange']} size={10} color={COLORS['ut-burnt-orange']} />
-              <Text className="text-xs font-medium">
+              <Text
+                className={cn(
+                  'text-xs font-medium',
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                )}>
                 {food.nutrition?.total_carbohydrates} Carbs
               </Text>
             </View>
@@ -217,7 +243,7 @@ const FoodContent = ({
       )}
     </View>
     <View className="flex-row items-center gap-x-1">
-      <ChevronRight size={20} color={COLORS['ut-burnt-orange']} />
+      <ChevronRight size={20} color={isDarkMode ? '#fff' : COLORS['ut-burnt-orange']} />
     </View>
   </>
 );
