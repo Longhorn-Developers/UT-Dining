@@ -1,6 +1,7 @@
 import { eq, sql } from 'drizzle-orm';
 import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 
+import { addCoffeeShopLocations, preserveCoffeeShopLocations } from './coffee-shops';
 import { allergens, food_item, location, menu, menu_category, nutrition } from './schema';
 import * as schema from '../db/schema';
 
@@ -108,6 +109,8 @@ export const insertDataIntoSQLiteDB = async (
 
     if (!shouldRefresh) {
       console.log('Data already added to database');
+      // Add coffee shop locations even if we don't refresh from Supabase
+      await addCoffeeShopLocations(db);
       return;
     }
   }
@@ -117,25 +120,37 @@ export const insertDataIntoSQLiteDB = async (
 
   if (data) {
     try {
-      await Promise.all([
-        db.delete(location).execute(),
-        db.delete(menu).execute(),
-        db.delete(menu_category).execute(),
-        db.delete(food_item).execute(),
-        db.delete(nutrition).execute(),
-        db.delete(allergens).execute(),
-      ]);
+      // Preserve coffee shop locations if they exist
+      const preserved = await preserveCoffeeShopLocations(db);
 
+      if (!preserved) {
+        // If no coffee shops to preserve, delete everything
+        await Promise.all([
+          db.delete(location).execute(),
+          db.delete(menu).execute(),
+          db.delete(menu_category).execute(),
+          db.delete(food_item).execute(),
+          db.delete(nutrition).execute(),
+          db.delete(allergens).execute(),
+        ]);
+      }
+
+      // Insert data from Supabase
       await Promise.all([
-        db.insert(location).values(data.location),
-        db.insert(menu).values(data.menu),
-        db.insert(menu_category).values(data.menu_category),
-        db.insert(food_item).values(data.food_item),
-        db.insert(nutrition).values(data.nutrition),
-        db.insert(allergens).values(data.allergens),
+        data.location.length > 0 ? db.insert(location).values(data.location) : Promise.resolve(),
+        data.menu.length > 0 ? db.insert(menu).values(data.menu) : Promise.resolve(),
+        data.menu_category.length > 0
+          ? db.insert(menu_category).values(data.menu_category)
+          : Promise.resolve(),
+        data.food_item.length > 0 ? db.insert(food_item).values(data.food_item) : Promise.resolve(),
+        data.nutrition.length > 0 ? db.insert(nutrition).values(data.nutrition) : Promise.resolve(),
+        data.allergens.length > 0 ? db.insert(allergens).values(data.allergens) : Promise.resolve(),
       ]);
 
       console.log('Data added to database');
+
+      // Add coffee shop locations if they don't exist yet
+      await addCoffeeShopLocations(db);
     } catch (error) {
       console.error('Error inserting data into SQLite:', error);
       return;

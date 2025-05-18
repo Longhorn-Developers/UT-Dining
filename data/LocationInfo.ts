@@ -18,7 +18,7 @@ export interface OpeningHours {
   intervals: TimeInterval[];
 }
 
-export type LocationType = 'Dining Hall' | 'Restaurant' | 'Convenience Store';
+export type LocationType = 'Dining Hall' | 'Restaurant' | 'Convenience Store' | 'Coffee Shop';
 
 export interface LocationInfo {
   name: string;
@@ -248,6 +248,132 @@ export const LOCATION_INFO: LocationInfo[] = [
     mealTimes: {
       breakfast: { openTime: 700, closeTime: 1200 },
       lunch: { openTime: 1200, closeTime: 1900 },
+    },
+  },
+
+  // Coffee Shop Locations
+  {
+    name: 'Jester Java',
+    colloquialName: 'Java',
+    description:
+      'Order breakfast tacos, Starbucks coffee and baked goods on the south side of campus, inside Jester Center.',
+    type: 'Coffee Shop',
+    address: '201 E 21st St Austin, TX 78705',
+    googleMapsLink: 'https://maps.app.goo.gl/CtBnkvwy6qCDNtyi9',
+    appleMapsLink: 'https://maps.apple.com/?address=201%20E%2021st%20St,%20Austin,%20TX%20%2078705',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        intervals: [{ openTime: 730, closeTime: 1600 }],
+      },
+      {
+        days: ['Saturday', 'Sunday'],
+        intervals: [],
+      },
+    ],
+    mealTimes: {
+      breakfast: { openTime: 730, closeTime: 1100 },
+      lunch: { openTime: 1100, closeTime: 1600 },
+    },
+  },
+  {
+    name: 'Longhorn Coffee Co.',
+    colloquialName: 'LCC',
+    description:
+      'Check out this coffee shop proudly serving Starbucks coffee and other on the go options in the WCP Student Activity Center.',
+    type: 'Coffee Shop',
+    address: '2201 Speedway, Austin, TX 78712',
+    googleMapsLink: 'https://maps.app.goo.gl/',
+    appleMapsLink: 'https://maps.apple.com/?address=2201%20Speedway,%20Austin,%20TX%2078712',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        intervals: [{ openTime: 800, closeTime: 1700 }],
+      },
+      {
+        days: ['Saturday', 'Sunday'],
+        intervals: [],
+      },
+    ],
+    mealTimes: {
+      breakfast: { openTime: 800, closeTime: 1100 },
+      lunch: { openTime: 1100, closeTime: 1700 },
+    },
+  },
+  {
+    name: "Prufrock's",
+    colloquialName: "Prufrock's",
+    description:
+      'Order Starbucks beverages and quick food options on the ground floor of the Perry-Castañeda Library.',
+    type: 'Coffee Shop',
+    address: '101 E 21st St, Austin, TX 78705',
+    googleMapsLink: 'https://maps.app.goo.gl/',
+    appleMapsLink: 'https://maps.apple.com/?address=101%20E%2021st%20St,%20Austin,%20TX%2078705',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        intervals: [{ openTime: 800, closeTime: 2000 }],
+      },
+      {
+        days: ['Saturday'],
+        intervals: [{ openTime: 1000, closeTime: 1700 }],
+      },
+      {
+        days: ['Sunday'],
+        intervals: [{ openTime: 1200, closeTime: 2000 }],
+      },
+    ],
+    mealTimes: {
+      breakfast: { openTime: 800, closeTime: 1100 },
+      lunch: { openTime: 1100, closeTime: 1700 },
+    },
+  },
+  {
+    name: 'Union Coffee House',
+    colloquialName: 'Union',
+    description:
+      'Make a stop at the Texas Union and pick up Starbucks coffee, bakery items and other grab and go options.',
+    type: 'Coffee Shop',
+    address: '2308 Whitis Ave, Austin, TX 78712',
+    googleMapsLink: 'https://maps.app.goo.gl/',
+    appleMapsLink: 'https://maps.apple.com/?address=2308%20Whitis%20Ave,%20Austin,%20TX%2078712',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        intervals: [{ openTime: 730, closeTime: 1800 }],
+      },
+      {
+        days: ['Saturday', 'Sunday'],
+        intervals: [],
+      },
+    ],
+    mealTimes: {
+      breakfast: { openTime: 730, closeTime: 1100 },
+      lunch: { openTime: 1100, closeTime: 1800 },
+    },
+  },
+  {
+    name: 'Up and Atom',
+    colloquialName: 'Up & Atom',
+    description:
+      'Power your day with quick bites and Ruta Maya coffee at this conveniently located coffee shop in Welch Hall.',
+    type: 'Coffee Shop',
+    address: '105 E 24th St, Austin, TX 78712',
+    googleMapsLink: 'https://maps.app.goo.gl/',
+    appleMapsLink: 'https://maps.apple.com/?address=105%20E%2024th%20St,%20Austin,%20TX%2078712',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        intervals: [{ openTime: 730, closeTime: 1700 }],
+      },
+      {
+        days: ['Saturday', 'Sunday'],
+        intervals: [],
+      },
+    ],
+    mealTimes: {
+      breakfast: { openTime: 730, closeTime: 1100 },
+      lunch: { openTime: 1100, closeTime: 1700 },
     },
   },
 ];
