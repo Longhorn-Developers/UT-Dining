@@ -31,7 +31,7 @@ const LocationHeader = React.memo(
     const schedule = useMemo(() => generateSchedule(location), [location]);
     const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
     const { useColloquialNames } = useSettingsStore();
-
+    const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
     useEffect(() => {
       const checkOpen = async () => {
         // Checking if there are any menus for the location
@@ -64,44 +64,45 @@ const LocationHeader = React.memo(
       <View className="mx-6 mt-6 flex gap-y-5">
         <TopBar variant="location" />
 
-        <View className="gap-y-4">
-          <View>
-            <View className="w-full flex-row items-center justify-between">
-              <Text className="font-sans text-3xl font-extrabold">
-                {getLocationName(location, useColloquialNames)}
+        {!isCoffeeShop && (
+          <View className="gap-y-4">
+            <View>
+              <View className="w-full flex-row items-center justify-between">
+                <Text className="font-sans text-3xl font-extrabold">
+                  {getLocationName(location, useColloquialNames)}
+                </Text>
+              </View>
+              <Text className="text-lg font-semibold text-ut-burnt-orange">
+                {open ? 'Open' : 'Closed'}
               </Text>
             </View>
-            <Text className="text-lg font-semibold text-ut-burnt-orange">
-              {open ? 'Open' : 'Closed'}
-            </Text>
-          </View>
 
-          <TimeSchedule
-            schedule={schedule}
-            isOpen={timeDropdownOpen}
-            onToggle={() => {
-              setTimeDropdownOpen((prev) => !prev);
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            }}
-          />
+            <TimeSchedule
+              schedule={schedule}
+              isOpen={timeDropdownOpen}
+              onToggle={() => {
+                setTimeDropdownOpen((prev) => !prev);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+            />
 
-          <View className="my-1 w-full border-b border-b-ut-grey/15" />
+            <View className="my-1 w-full border-b border-b-ut-grey/15" />
+            <View className="gap-y-3">
+              <View className="flex-row items-center justify-between">
+                <FilterBar
+                  selectedItem={selectedMenu as string}
+                  setSelectedItem={setSelectedMenu}
+                  useTimeOfDayDefault={filters.length > 1}
+                  items={filters}
+                  mealTimes={locationInfo?.mealTimes}
+                  showFilterButton
+                />
+              </View>
 
-          <View className="gap-y-3">
-            <View className="flex-row items-center justify-between">
-              <FilterBar
-                selectedItem={selectedMenu as string}
-                setSelectedItem={setSelectedMenu}
-                useTimeOfDayDefault={filters.length > 1}
-                items={filters}
-                mealTimes={locationInfo?.mealTimes}
-                showFilterButton
-              />
+              {filters && filters.length > 1 && <SearchBar query={query} setQuery={setQuery} />}
             </View>
-
-            {filters && filters.length > 1 && <SearchBar query={query} setQuery={setQuery} />}
           </View>
-        </View>
+        )}
       </View>
     );
   }

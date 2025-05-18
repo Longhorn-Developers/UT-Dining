@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { View, Text } from 'react-native';
 
 import CategoryHeader from './components/CategoryHeader';
+import CoffeeShopSection from './components/CoffeeShopSection';
 import FoodItemRow from './components/FoodItemRow';
 import LocationHeader from './components/LocationHeader';
 import ScrollToTopButton from './components/ScrollToTopButton';
@@ -15,6 +16,7 @@ import { useLocationData } from '../../hooks/useLocationData';
 import { useScrollToTop } from '../../hooks/useScrollToTop';
 
 import { Container } from '~/components/Container';
+import { LOCATION_INFO } from '~/data/LocationInfo';
 import * as schema from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useDebounce } from '~/hooks/useDebounce';
@@ -230,6 +232,13 @@ const Location = () => {
   // Empty state component
   const EmptyState = useCallback(() => {
     if (loading) return null;
+
+    const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
+    const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
+
+    if (isCoffeeShop) {
+      return <CoffeeShopSection locationName={location} />;
+    }
 
     const subtitle = () => {
       if (debouncedSearchQuery) {

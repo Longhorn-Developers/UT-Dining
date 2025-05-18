@@ -34,6 +34,7 @@ export interface LocationInfo {
     lunch?: TimeInterval;
     dinner?: TimeInterval;
   };
+  image?: string;
 }
 
 export const LOCATION_INFO: LocationInfo[] = [
@@ -275,20 +276,25 @@ export const LOCATION_INFO: LocationInfo[] = [
       breakfast: { openTime: 730, closeTime: 1100 },
       lunch: { openTime: 1100, closeTime: 1600 },
     },
+    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
   },
   {
     name: 'Longhorn Coffee Co.',
     colloquialName: 'LCC',
     description:
-      'Check out this coffee shop proudly serving Starbucks coffee and other on the go options in the WCP Student Activity Center.',
+      'Check out this coffee shop proudly serving Starbucks coffee and other on the go options in the WCP Student Activity Center. Longhorn Coffee Co. has a variety of hot and cold beverages to choose from, as well as bakery items and other food selections.',
     type: 'Coffee Shop',
     address: '2201 Speedway, Austin, TX 78712',
     googleMapsLink: 'https://maps.app.goo.gl/',
     appleMapsLink: 'https://maps.apple.com/?address=2201%20Speedway,%20Austin,%20TX%2078712',
     schedules: [
       {
-        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-        intervals: [{ openTime: 800, closeTime: 1700 }],
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+        intervals: [{ openTime: 800, closeTime: 1400 }],
+      },
+      {
+        days: ['Friday'],
+        intervals: [{ openTime: 0, closeTime: 0 }],
       },
       {
         days: ['Saturday', 'Sunday'],
@@ -299,6 +305,7 @@ export const LOCATION_INFO: LocationInfo[] = [
       breakfast: { openTime: 800, closeTime: 1100 },
       lunch: { openTime: 1100, closeTime: 1700 },
     },
+    image: 'https://images.unsplash.com/photo-1464983953574-0892a716854b',
   },
   {
     name: "Prufrock's",
@@ -327,6 +334,7 @@ export const LOCATION_INFO: LocationInfo[] = [
       breakfast: { openTime: 800, closeTime: 1100 },
       lunch: { openTime: 1100, closeTime: 1700 },
     },
+    image: 'https://images.unsplash.com/photo-1511920170033-f8396924c348',
   },
   {
     name: 'Union Coffee House',
@@ -351,6 +359,7 @@ export const LOCATION_INFO: LocationInfo[] = [
       breakfast: { openTime: 730, closeTime: 1100 },
       lunch: { openTime: 1100, closeTime: 1800 },
     },
+    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
   },
   {
     name: 'Up and Atom',
@@ -368,13 +377,14 @@ export const LOCATION_INFO: LocationInfo[] = [
       },
       {
         days: ['Saturday', 'Sunday'],
-        intervals: [],
+        intervals: [{ openTime: 730, closeTime: 2300 }],
       },
     ],
     mealTimes: {
       breakfast: { openTime: 730, closeTime: 1100 },
       lunch: { openTime: 1100, closeTime: 1700 },
     },
+    image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca',
   },
 ];
 
