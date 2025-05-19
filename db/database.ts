@@ -1,7 +1,7 @@
 import { eq, sql } from 'drizzle-orm';
 import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 
-import { addCoffeeShopLocations, preserveCoffeeShopLocations } from './coffee-shops';
+import { addCoffeeShopLocations } from './coffee-shops';
 import { allergens, food_item, location, menu, menu_category, nutrition } from './schema';
 import * as schema from '../db/schema';
 
@@ -131,7 +131,14 @@ export const insertDataIntoSQLiteDB = async (
 
       // Insert data from Supabase
       await Promise.all([
-        data.location.length > 0 ? db.insert(location).values(data.location) : Promise.resolve(),
+        data.location.length > 0
+          ? db.insert(location).values(
+              data.location.map((loc) => ({
+                name: loc.name ?? '',
+                updated_at: loc.updated_at,
+              }))
+            )
+          : Promise.resolve(),
         data.menu.length > 0 ? db.insert(menu).values(data.menu) : Promise.resolve(),
         data.menu_category.length > 0
           ? db.insert(menu_category).values(data.menu_category)

@@ -50,6 +50,6 @@ export const addCoffeeShopLocations = async (db: ExpoSQLiteDatabase<typeof schem
     }
   } catch (error) {
     console.error('Error adding coffee shop locations to database:', error);
-    throw error; // Re-throw to handle it in the calling function
+    throw error;
   }
 };
