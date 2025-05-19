@@ -16,6 +16,11 @@ export const addCoffeeShopLocations = async (db: ExpoSQLiteDatabase<typeof schem
       )
       .execute();
 
+    console.log(
+      'Existing coffee shop locations:',
+      existingLocations.map((loc) => loc.name)
+    );
+
     const existingNames = new Set(existingLocations.map((loc) => loc.name));
 
     // Filter out locations that already exist
@@ -28,18 +33,23 @@ export const addCoffeeShopLocations = async (db: ExpoSQLiteDatabase<typeof schem
       { name: 'Shake Smart', updated_at: new Date().toISOString() },
     ].filter((loc) => !existingNames.has(loc.name));
 
+    console.log(
+      'Coffee shops to add:',
+      coffeeShopLocationValues.map((loc) => loc.name)
+    );
+
     if (coffeeShopLocationValues.length > 0) {
-      // Insert only new locations with ON CONFLICT DO NOTHING
-      await db
-        .insert(location)
-        .values(coffeeShopLocationValues)
-        .onConflictDoNothing({ target: location.name })
-        .returning();
-      console.log('New coffee shop locations added to database');
+      // Insert only new locations
+      const result = await db.insert(location).values(coffeeShopLocationValues).returning();
+      console.log(
+        'Successfully added coffee shop locations:',
+        result.map((loc) => loc.name)
+      );
     } else {
       console.log('All coffee shop locations already exist in database');
     }
   } catch (error) {
     console.error('Error adding coffee shop locations to database:', error);
+    throw error; // Re-throw to handle it in the calling function
   }
 };

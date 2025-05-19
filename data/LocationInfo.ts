@@ -255,7 +255,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   // Coffee Shop Locations
   {
     name: 'Jester Java',
-    colloquialName: 'Java',
+    colloquialName: 'Jester Java',
     description:
       'Order breakfast tacos, Starbucks coffee and baked goods on the south side of campus, inside Jester Center.',
     type: 'Coffee Shop',
@@ -281,7 +281,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: 'Longhorn Coffee Co.',
-    colloquialName: 'LCC',
+    colloquialName: 'Longhorn Coffee',
     description:
       'Check out this coffee shop proudly serving Starbucks coffee and other on the go options in the WCP Student Activity Center. Longhorn Coffee Co. has a variety of hot and cold beverages to choose from, as well as bakery items and other food selections.',
     type: 'Coffee Shop',
@@ -341,7 +341,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: 'Union Coffee House',
-    colloquialName: 'Union',
+    colloquialName: 'Union Coffee',
     description:
       'Make a stop at the Texas Union and pick up Starbucks coffee, bakery items and other grab and go options.',
     type: 'Coffee Shop',
@@ -414,7 +414,7 @@ export const LOCATION_INFO: LocationInfo[] = [
       lunch: { openTime: 1000, closeTime: 1600 },
     },
     image:
-      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_450w_300h/public/2021-07/Shake_Smart_Logo_680x454.png.webp?itok=WPuAgLry',
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_1800w/public/2022-02/smart.png.webp?itok=YtA0utb9',
   },
 ];
 
