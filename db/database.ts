@@ -109,7 +109,6 @@ export const insertDataIntoSQLiteDB = async (
 
     if (!shouldRefresh) {
       console.log('Data already added to database');
-      // Add coffee shop locations even if we don't refresh from Supabase
       await addCoffeeShopLocations(db);
       return;
     }
@@ -120,20 +119,15 @@ export const insertDataIntoSQLiteDB = async (
 
   if (data) {
     try {
-      // Preserve coffee shop locations if they exist
-      const preserved = await preserveCoffeeShopLocations(db);
-
-      if (!preserved) {
-        // If no coffee shops to preserve, delete everything
-        await Promise.all([
-          db.delete(location).execute(),
-          db.delete(menu).execute(),
-          db.delete(menu_category).execute(),
-          db.delete(food_item).execute(),
-          db.delete(nutrition).execute(),
-          db.delete(allergens).execute(),
-        ]);
-      }
+      // Delete everything to start fresh
+      await Promise.all([
+        db.delete(location).execute(),
+        db.delete(menu).execute(),
+        db.delete(menu_category).execute(),
+        db.delete(food_item).execute(),
+        db.delete(nutrition).execute(),
+        db.delete(allergens).execute(),
+      ]);
 
       // Insert data from Supabase
       await Promise.all([
@@ -149,7 +143,7 @@ export const insertDataIntoSQLiteDB = async (
 
       console.log('Data added to database');
 
-      // Add coffee shop locations if they don't exist yet
+      // Always add coffee shop locations
       await addCoffeeShopLocations(db);
     } catch (error) {
       console.error('Error inserting data into SQLite:', error);

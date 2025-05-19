@@ -4,76 +4,42 @@ import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import { location } from './schema';
 import * as schema from '../db/schema';
 
-/**
- * Adds coffee shop locations to the database
- *
- * @param db - The Expo SQLite database instance.
- */
+// add coffee shop locations to the database
 export const addCoffeeShopLocations = async (db: ExpoSQLiteDatabase<typeof schema>) => {
   try {
-    // Check if coffee shop locations already exist
-    const coffeeShopLocations = await db
+    // Get existing coffee shop locations
+    const existingLocations = await db
       .select()
       .from(location)
       .where(
-        sql`${location.name} IN ('Jester Java', 'Longhorn Coffee Co.', 'Prufrock''s', 'Union Coffee House', 'Up and Atom')`
+        sql`${location.name} IN ('Jester Java', 'Longhorn Coffee Co.', 'Prufrock''s', 'Union Coffee House', 'Up and Atom', 'Shake Smart')`
       )
       .execute();
 
-    if (coffeeShopLocations.length > 0) {
-      console.log('Coffee shop locations already exist in database');
-      return;
-    }
+    const existingNames = new Set(existingLocations.map((loc) => loc.name));
 
-    // Insert coffee shop locations
+    // Filter out locations that already exist
     const coffeeShopLocationValues = [
       { name: 'Jester Java', updated_at: new Date().toISOString() },
       { name: 'Longhorn Coffee Co.', updated_at: new Date().toISOString() },
       { name: "Prufrock's", updated_at: new Date().toISOString() },
       { name: 'Union Coffee House', updated_at: new Date().toISOString() },
       { name: 'Up and Atom', updated_at: new Date().toISOString() },
-    ];
+      { name: 'Shake Smart', updated_at: new Date().toISOString() },
+    ].filter((loc) => !existingNames.has(loc.name));
 
-    // Insert locations only - no menus
-    await db.insert(location).values(coffeeShopLocationValues).returning();
-
-    console.log('Coffee shop locations added to database');
+    if (coffeeShopLocationValues.length > 0) {
+      // Insert only new locations with ON CONFLICT DO NOTHING
+      await db
+        .insert(location)
+        .values(coffeeShopLocationValues)
+        .onConflictDoNothing({ target: location.name })
+        .returning();
+      console.log('New coffee shop locations added to database');
+    } else {
+      console.log('All coffee shop locations already exist in database');
+    }
   } catch (error) {
     console.error('Error adding coffee shop locations to database:', error);
-  }
-};
-
-/**
- * Preserves coffee shop locations when refreshing the database
- *
- * @param db - The Expo SQLite database instance.
- */
-export const preserveCoffeeShopLocations = async (db: ExpoSQLiteDatabase<typeof schema>) => {
-  try {
-    // Save coffee shop locations before clearing the database
-    const coffeeShopLocations = await db
-      .select()
-      .from(location)
-      .where(
-        sql`${location.name} IN ('Jester Java', 'Longhorn Coffee Co.', 'Prufrock''s', 'Union Coffee House', 'Up and Atom')`
-      )
-      .execute();
-
-    if (coffeeShopLocations.length === 0) {
-      return false;
-    }
-
-    // Delete non-coffee shop locations
-    await db
-      .delete(location)
-      .where(
-        sql`${location.name} NOT IN ('Jester Java', 'Longhorn Coffee Co.', 'Prufrock''s', 'Union Coffee House', 'Up and Atom')`
-      )
-      .execute();
-
-    return true;
-  } catch (error) {
-    console.error('Error preserving coffee shop locations:', error);
-    return false;
   }
 };

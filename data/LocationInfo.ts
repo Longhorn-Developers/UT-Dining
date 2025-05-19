@@ -276,7 +276,8 @@ export const LOCATION_INFO: LocationInfo[] = [
       breakfast: { openTime: 730, closeTime: 1100 },
       lunch: { openTime: 1100, closeTime: 1600 },
     },
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_1800w/public/2021-07/Jester%20_Java_Logo_680x454.png.webp?itok=Fgnyii1L',
   },
   {
     name: 'Longhorn Coffee Co.',
@@ -305,7 +306,8 @@ export const LOCATION_INFO: LocationInfo[] = [
       breakfast: { openTime: 800, closeTime: 1100 },
       lunch: { openTime: 1100, closeTime: 1700 },
     },
-    image: 'https://images.unsplash.com/photo-1464983953574-0892a716854b',
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_450w_300h/public/2021-07/Longhorn_Coffee_Co_Logo_680x454.png.webp?itok=Peq67Hth',
   },
   {
     name: "Prufrock's",
@@ -334,7 +336,8 @@ export const LOCATION_INFO: LocationInfo[] = [
       breakfast: { openTime: 800, closeTime: 1100 },
       lunch: { openTime: 1100, closeTime: 1700 },
     },
-    image: 'https://images.unsplash.com/photo-1511920170033-f8396924c348',
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_450w_300h/public/2021-10/prufrocks_logo.png.webp?itok=0t3Crktg',
   },
   {
     name: 'Union Coffee House',
@@ -359,7 +362,8 @@ export const LOCATION_INFO: LocationInfo[] = [
       breakfast: { openTime: 730, closeTime: 1100 },
       lunch: { openTime: 1100, closeTime: 1800 },
     },
-    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836',
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_450w_300h/public/2021-07/Union_Coffee_House_Logo_680x454.png.webp?itok=WPuAgLry',
   },
   {
     name: 'Up and Atom',
@@ -384,7 +388,33 @@ export const LOCATION_INFO: LocationInfo[] = [
       breakfast: { openTime: 730, closeTime: 1100 },
       lunch: { openTime: 1100, closeTime: 1700 },
     },
-    image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca',
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_450w_300h/public/2022-10/878_up_and_atom_680x454.png.webp?itok=Wkka8edw',
+  },
+  {
+    name: 'Shake Smart',
+    colloquialName: 'Shake Smart',
+    description:
+      'Find freshly blended protein shakes, cold brew coffee and quick nutritious bites at this Texas Union location of the health food chain. Make Shake Smart your one-stop shop for pre- and post-gym fuel and a regular destination for when you’re on the go.',
+    type: 'Coffee Shop',
+    address: '2308 Whitis Ave Austin, TX 78712',
+    googleMapsLink: 'https://maps.app.goo.gl/',
+    appleMapsLink: 'https://maps.apple.com/?address=2308%20Whitis%20Ave,%20Austin,%20TX%2078712',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        intervals: [{ openTime: 1000, closeTime: 1600 }],
+      },
+      {
+        days: ['Saturday', 'Sunday'],
+        intervals: [],
+      },
+    ],
+    mealTimes: {
+      lunch: { openTime: 1000, closeTime: 1600 },
+    },
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_450w_300h/public/2021-07/Shake_Smart_Logo_680x454.png.webp?itok=WPuAgLry',
   },
 ];
 

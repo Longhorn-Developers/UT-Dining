@@ -1,4 +1,4 @@
-import { InfoIcon, MapPin, Clock } from 'lucide-react-native';
+import { MapPin, Clock } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Linking, Platform, ScrollView } from 'react-native';
 
@@ -37,7 +37,9 @@ const CoffeeShopSection = ({ locationName }: CoffeeShopSectionProps) => {
   const schedule = generateSchedule(location.name, false);
 
   return (
-    <ScrollView className="flex-1" contentContainerStyle={{ padding: 0, alignItems: 'center' }}>
+    <ScrollView
+      className="flex-1 py-6"
+      contentContainerStyle={{ padding: 0, alignItems: 'center' }}>
       {/* Image */}
       {location.image && (
         <Image
@@ -60,7 +62,6 @@ const CoffeeShopSection = ({ locationName }: CoffeeShopSectionProps) => {
         {/* Header */}
         <View className="gap-2">
           <View className="flex-row items-center gap-x-2">
-            <InfoIcon color={COLORS['ut-burnt-orange']} size={24} />
             <Text className="text-3xl font-bold">
               {getLocationName(location.name, useColloquialNames)}
             </Text>
@@ -68,14 +69,11 @@ const CoffeeShopSection = ({ locationName }: CoffeeShopSectionProps) => {
 
           {/* Open/Closed Status */}
           <View className="flex-row items-center gap-x-2">
-            <View className={`h-3 w-3 rounded-full ${isOpen ? 'bg-green-500' : 'bg-red-500'}`} />
-            <Text className={`text-lg font-semibold ${isOpen ? 'text-green-600' : 'text-red-500'}`}>
-              {isOpen ? 'Open' : 'Closed'}
-            </Text>
-            <Text className="text-ut-grey">•</Text>
             <View className="flex-row items-center gap-x-1">
-              <Clock size={16} color={COLORS['ut-grey']} />
-              <Text className="text-ut-grey">{timeMessage}</Text>
+              <Clock size={16} color={COLORS['ut-burnt-orange']} />
+              <Text className="text-lg font-semibold text-ut-burnt-orange">
+                {isOpen ? 'Open' : 'Closed'}
+              </Text>
             </View>
           </View>
 
@@ -89,7 +87,7 @@ const CoffeeShopSection = ({ locationName }: CoffeeShopSectionProps) => {
             }}
             className="flex-row items-center gap-x-1">
             <MapPin size={16} color={COLORS['ut-burnt-orange']} />
-            <Text className="text-ut-grey underline">{location.address}</Text>
+            <Text className="text-ut-grey">{location.address}</Text>
           </TouchableOpacity>
         </View>
 
