@@ -22,7 +22,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
   const [open, setOpen] = useState(false);
   const pingAnimation = useRef(new Animated.Value(0)).current;
   const db = useDatabase();
-  const { useColloquialNames } = useSettingsStore();
+  const { useColloquialNames, isDarkMode } = useSettingsStore();
 
   useEffect(() => {
     const checkOpen = async () => {
@@ -92,7 +92,10 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
         router.push(`/location/${location.name}`);
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       }}
-      className="flex-row items-center justify-between rounded border border-ut-grey/15 p-4">
+      className={cn(
+        'mb-2 flex-row items-center justify-between rounded p-4',
+        isDarkMode ? 'border border-gray-700 bg-gray-800' : 'border border-ut-grey/15 bg-white'
+      )}>
       <View className="flex-row items-center justify-center gap-x-4">
         <View className="relative size-3">
           <View
@@ -129,17 +132,28 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
           )}
         </View>
         <View>
-          <Text className={cn('text-xl font-bold', open ? 'text-ut-black' : 'text-ut-grey/75')}>
+          <Text
+            className={cn(
+              'text-xl font-bold',
+              open
+                ? isDarkMode
+                  ? 'text-white'
+                  : 'text-ut-black'
+                : isDarkMode
+                  ? 'text-gray-300'
+                  : 'text-ut-grey/75'
+            )}>
             {getLocationName(location.name ?? '', useColloquialNames)}
           </Text>
-          <Text className="text-xs font-medium text-ut-grey/75">
+          <Text
+            className={cn('text-xs font-medium', isDarkMode ? 'text-gray-400' : 'text-ut-grey/75')}>
             {open ? getLocationTimeMessage(location.name ?? '', currentTime) : 'Closed'}
           </Text>
         </View>
       </View>
 
       <View className="flex-row items-center justify-center gap-x-3">
-        <ChevronRight color={COLORS['ut-burnt-orange']} size={20} />
+        <ChevronRight color={isDarkMode ? '#fff' : COLORS['ut-burnt-orange']} size={20} />
       </View>
     </TouchableOpacity>
   );

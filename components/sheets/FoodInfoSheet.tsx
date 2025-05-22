@@ -6,7 +6,9 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ALLERGEN_ICONS, ALLERGEN_EXCEPTIONS } from '~/data/AllergenInfo';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
+import { cn } from '~/utils/utils';
 
 // Helper function to organize allergen data
 const categorizeAllergens = () => {
@@ -38,12 +40,13 @@ const categorizeAllergens = () => {
 const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
   const insets = useSafeAreaInsets();
   const { allergens, dietary } = categorizeAllergens();
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   return (
     <ActionSheet
       id={sheetId}
       defaultOverlayOpacity={0.5}
-      containerStyle={{ backgroundColor: 'white' }}
+      containerStyle={{ backgroundColor: isDarkMode ? '#1F2937' : 'white' }}
       gestureEnabled
       safeAreaInsets={insets}
       useBottomSafeAreaPadding>
@@ -53,27 +56,39 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
           <View>
             <View className="mb-2 flex-row items-center gap-x-2">
               <InfoIcon color={COLORS['ut-burnt-orange']} />
-              <Text className="text-3xl font-bold">Food Legend</Text>
+              <Text className={cn('text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
+                Food Legend
+              </Text>
             </View>
           </View>
 
           {/* Allergens Section */}
           <View>
-            <Text className="text-xl font-semibold">Allergens</Text>
-            <Text className="mb-3 text-sm text-ut-grey">
+            <Text className={cn('text-xl font-semibold', isDarkMode ? 'text-white' : 'text-black')}>
+              Allergens
+            </Text>
+            <Text className={cn('mb-3 text-sm', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
               Foods containing these allergens are labeled
             </Text>
             <View className="flex-row flex-wrap gap-4">
               {allergens.map((item) => (
                 <View key={item.key} className="mb-4 w-[21%] items-center">
-                  <View className="mb-1 rounded-full border border-gray-200 bg-gray-50 p-3">
+                  <View
+                    className={cn(
+                      'mb-1 rounded-full border p-3',
+                      isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
+                    )}>
                     <Image
                       source={item.icon}
                       className="size-10 rounded-full"
                       resizeMode="contain"
                     />
                   </View>
-                  <Text className="text-center text-xs font-medium text-ut-grey">
+                  <Text
+                    className={cn(
+                      'text-center text-xs font-medium',
+                      isDarkMode ? 'text-gray-300' : 'text-ut-grey'
+                    )}>
                     {item.displayName}
                   </Text>
                 </View>
@@ -82,21 +97,36 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
           </View>
 
           {/* Divider */}
-          <View className="mb-4 w-full border-b border-b-ut-grey/15" />
+          <View
+            className={cn(
+              'mb-4 w-full border-b',
+              isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15'
+            )}
+          />
 
           {/* Dietary Section */}
           <View>
-            <Text className="text-xl font-semibold">Dietary Preferences</Text>
-            <Text className="mb-3 text-sm text-ut-grey">
+            <Text className={cn('text-xl font-semibold', isDarkMode ? 'text-white' : 'text-black')}>
+              Dietary Preferences
+            </Text>
+            <Text className={cn('mb-3 text-sm', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
               Foods that meet these preferences are labeled
             </Text>
             <View className="flex-row flex-wrap gap-4">
               {dietary.map((item) => (
                 <View key={item.key} className="mb-4 w-[21%] items-center">
-                  <View className="mb-1 rounded-full border border-gray-200 bg-gray-50 p-3">
+                  <View
+                    className={cn(
+                      'mb-1 rounded-full border p-3',
+                      isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
+                    )}>
                     <Image source={item.icon} className="size-10" resizeMode="contain" />
                   </View>
-                  <Text className="text-center text-xs font-medium text-ut-grey">
+                  <Text
+                    className={cn(
+                      'text-center text-xs font-medium',
+                      isDarkMode ? 'text-gray-300' : 'text-ut-grey'
+                    )}>
                     {item.displayName}
                   </Text>
                 </View>

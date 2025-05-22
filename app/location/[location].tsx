@@ -21,7 +21,9 @@ import * as schema from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useDebounce } from '~/hooks/useDebounce';
 import { useFiltersStore } from '~/store/useFiltersStore';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { filterFoodItems } from '~/utils/filter';
+import { cn } from '~/utils/utils';
 
 /**
  * Filter items based on search query and user-selected filters
@@ -129,6 +131,7 @@ const useSkeletonItems = () => {
 };
 
 const Location = () => {
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   // Core state and data
   const { location } = useLocalSearchParams<{ location: string }>();
   const {
@@ -257,13 +260,15 @@ const Location = () => {
     return (
       <View className="mt-12 flex-1 items-center justify-center">
         <Text className="text-xl font-bold text-ut-burnt-orange">No items found.</Text>
-        <Text className="text-sm">{subtitle()}</Text>
+        <Text className={cn('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
+          {subtitle()}
+        </Text>
       </View>
     );
-  }, [loading, debouncedSearchQuery, activeFilters]);
+  }, [loading, debouncedSearchQuery, activeFilters, isDarkMode]);
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       <Stack.Screen options={{ title: 'Location' }} />
       <Container className="relative mx-0 w-full flex-1">
         <FlashList
@@ -302,7 +307,7 @@ const Location = () => {
           }}
         />
       </Container>
-    </>
+    </View>
   );
 };
 
