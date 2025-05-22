@@ -121,6 +121,7 @@ const FilterBar = ({
 
 const FilterButton = () => {
   const filters = useFiltersStore((state) => state.filters);
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   // If there are any filters, make this true
   const hasFilters = () => {
@@ -141,7 +142,7 @@ const FilterButton = () => {
         SheetManager.show('filters');
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }}>
-      <Filter size={18} color={COLORS['ut-grey']} />
+      <Filter size={18} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
 
       {hasFilters() && (
         <View className="absolute right-0 top-0 -mr-2 -mt-2">
