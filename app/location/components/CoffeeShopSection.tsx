@@ -6,7 +6,7 @@ import { LOCATION_INFO, getLocationName } from '~/data/LocationInfo';
 import { PAYMENT_INFO_ICONS, PaymentMethod } from '~/data/PaymentInfo';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
-import { generateSchedule, isLocationOpen, getLocationTimeMessage } from '~/utils/time';
+import { generateSchedule, isLocationOpen } from '~/utils/time';
 
 const paymentMethods: PaymentMethod[] = Object.keys(PAYMENT_INFO_ICONS) as PaymentMethod[];
 
@@ -18,13 +18,11 @@ const CoffeeShopSection = ({ locationName }: CoffeeShopSectionProps) => {
   const location = LOCATION_INFO.find((loc) => loc.name === locationName);
   const { useColloquialNames } = useSettingsStore();
   const [isOpen, setIsOpen] = useState(false);
-  const [timeMessage, setTimeMessage] = useState('');
 
   useEffect(() => {
     const checkOpenStatus = () => {
       const open = isLocationOpen(locationName);
       setIsOpen(open);
-      setTimeMessage(getLocationTimeMessage(locationName));
     };
 
     checkOpenStatus();
