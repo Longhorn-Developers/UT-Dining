@@ -12,7 +12,7 @@ export const addCoffeeShopLocations = async (db: ExpoSQLiteDatabase<typeof schem
       .select()
       .from(location)
       .where(
-        sql`${location.name} IN ('Jester Java', 'Longhorn Coffee Co.', 'Prufrock''s', 'Union Coffee House', 'Up and Atom', 'Shake Smart')`
+        sql`${location.name} IN ('Jester Java', 'Longhorn Coffee Co.', 'Prufrock''s', 'Union Coffee House', 'Up and Atom', 'Shake Smart', 'Varsity Grounds')`
       )
       .execute();
 
@@ -31,6 +31,7 @@ export const addCoffeeShopLocations = async (db: ExpoSQLiteDatabase<typeof schem
       { name: 'Union Coffee House', updated_at: new Date().toISOString() },
       { name: 'Up and Atom', updated_at: new Date().toISOString() },
       { name: 'Shake Smart', updated_at: new Date().toISOString() },
+      { name: 'Varsity Grounds', updated_at: new Date().toISOString() },
     ].filter((loc) => !existingNames.has(loc.name));
 
     console.log(

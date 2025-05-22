@@ -257,7 +257,7 @@ export const LOCATION_INFO: LocationInfo[] = [
     name: 'Jester Java',
     colloquialName: 'Jester Java',
     description:
-      'Order breakfast tacos, Starbucks coffee and baked goods on the south side of campus, inside Jester Center.',
+      'Order breakfast tacos, Starbucks coffee and baked goods on the south side of campus, inside Jester Center. You’ll find an array of espresso, cold beverages and snacks.',
     type: 'Coffee Shop',
     address: '201 E 21st St Austin, TX 78705',
     googleMapsLink: 'https://maps.app.goo.gl/CtBnkvwy6qCDNtyi9',
@@ -283,7 +283,7 @@ export const LOCATION_INFO: LocationInfo[] = [
     name: 'Longhorn Coffee Co.',
     colloquialName: 'Longhorn Coffee',
     description:
-      'Check out this coffee shop proudly serving Starbucks coffee and other on the go options in the WCP Student Activity Center. Longhorn Coffee Co. has a variety of hot and cold beverages to choose from, as well as bakery items and other food selections.',
+      'Check out this coffee shop proudly serving Starbucks coffee and other on the go options in the WCP Student Activity Center.\n\nLocated at WCP 1.302.',
     type: 'Coffee Shop',
     address: '2201 Speedway, Austin, TX 78712',
     googleMapsLink: 'https://maps.app.goo.gl/',
@@ -313,7 +313,7 @@ export const LOCATION_INFO: LocationInfo[] = [
     name: "Prufrock's",
     colloquialName: "Prufrock's",
     description:
-      'Order Starbucks beverages and quick food options on the ground floor of the Perry-Castañeda Library.',
+      'Order Starbucks beverages and quick food options on the ground floor of the Perry-Castañeda Library.\n\nPrufrock’s offers hot and cold drink options, pastries and grab and go selections. Give your studying at the library a boost with a trip to Prufrock’s.',
     type: 'Coffee Shop',
     address: '101 E 21st St, Austin, TX 78705',
     googleMapsLink: 'https://maps.app.goo.gl/',
@@ -343,7 +343,7 @@ export const LOCATION_INFO: LocationInfo[] = [
     name: 'Union Coffee House',
     colloquialName: 'Union Coffee',
     description:
-      'Make a stop at the Texas Union and pick up Starbucks coffee, bakery items and other grab and go options.',
+      'Union Coffee House proudly serves Starbucks coffee and beverages, bakery items and grab and go options.\n\nLocated in the second floor food court.',
     type: 'Coffee Shop',
     address: '2308 Whitis Ave, Austin, TX 78712',
     googleMapsLink: 'https://maps.app.goo.gl/',
@@ -369,7 +369,7 @@ export const LOCATION_INFO: LocationInfo[] = [
     name: 'Up and Atom',
     colloquialName: 'Up & Atom',
     description:
-      'Power your day with quick bites and Ruta Maya coffee at this conveniently located coffee shop in Welch Hall.',
+      'Power your day with quick bites and Ruta Maya coffee at this conveniently located coffee shop in Welch Hall.\n\nPair a beverage made from shade-grown Arabica beans with a grab and go item to fuel up for your next class or study session.',
     type: 'Coffee Shop',
     address: '105 E 24th St, Austin, TX 78712',
     googleMapsLink: 'https://maps.app.goo.gl/',
@@ -395,7 +395,7 @@ export const LOCATION_INFO: LocationInfo[] = [
     name: 'Shake Smart',
     colloquialName: 'Shake Smart',
     description:
-      'Find freshly blended protein shakes, cold brew coffee and quick nutritious bites at this Texas Union location of the health food chain. Make Shake Smart your one-stop shop for pre- and post-gym fuel and a regular destination for when you’re on the go.',
+      'Find freshly blended protein shakes, cold brew coffee and quick nutritious bites at this Texas Union location of the health food chain.\n\nMake Shake Smart your one-stop shop for pre- and post-gym fuel and a regular destination for when you’re on the go.',
     type: 'Coffee Shop',
     address: '2308 Whitis Ave Austin, TX 78712',
     googleMapsLink: 'https://maps.app.goo.gl/',
@@ -415,6 +415,35 @@ export const LOCATION_INFO: LocationInfo[] = [
     },
     image:
       'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_1800w/public/2022-02/smart.png.webp?itok=YtA0utb9',
+  },
+  {
+    name: 'Varsity Grounds',
+    colloquialName: 'Varisty Grounds',
+    description:
+      'Find premium coffee, freshly brewed teas, pastries, grab and go options and more at this coffee shop located in East Campus Graduate Apartments.\n\nWhether you need a latte to-go between classes or a spot to connect with friends, Varsity Grounds offers the perfect blend of convenience and community.',
+    type: 'Coffee Shop',
+    address: '2105 Comal St. Austin, TX 78712',
+    googleMapsLink: 'https://maps.app.goo.gl/',
+    appleMapsLink: 'https://maps.apple.com/?address=2308%20Whitis%20Ave,%20Austin,%20TX%2078712',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+        intervals: [{ openTime: 800, closeTime: 2000 }],
+      },
+      {
+        days: ['Friday'],
+        intervals: [{ openTime: 800, closeTime: 1400 }],
+      },
+      {
+        days: ['Saturday', 'Sunday'],
+        intervals: [],
+      },
+    ],
+    mealTimes: {
+      lunch: { openTime: 1000, closeTime: 1600 },
+    },
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_1800w/public/2025-01/Varsity_Grounds_680x454.png.webp?itok=Pvs9nbCG',
   },
 ];
 
