@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 
 import { useDatabase } from './useDatabase';
 
-import { getLocationMenuNames, getLocationMenuData, Location } from '~/db/database';
 import { LOCATION_INFO } from '~/data/LocationInfo';
+import { getLocationMenuNames, getLocationMenuData, Location } from '~/db/database';
 
 export function useLocationData(location: string) {
   const db = useDatabase();
