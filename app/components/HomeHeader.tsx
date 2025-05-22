@@ -74,7 +74,7 @@ const HomeHeader = ({
 
             {!showRequeryAlert && lastUpdated && (
               <Text
-                className={cn('text-[9px] italic', isDarkMode ? 'text-gray-400' : 'text-ut-grey')}>
+                className={cn('text-[9px] italic', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
                 Last updated:{' '}
                 {lastUpdated.toLocaleString('en-US', {
                   month: 'short',
