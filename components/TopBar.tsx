@@ -293,6 +293,7 @@ const BackTopBar = () => {
 const CoffeeShopTopBar = () => {
   const { location } = useLocalSearchParams<{ location: string }>();
   const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   if (!locationInfo) {
     return null;
@@ -321,7 +322,7 @@ const CoffeeShopTopBar = () => {
               Linking.openURL(locationInfo.googleMapsLink);
             }
           }}>
-          <Map size={20} color={COLORS['ut-grey']} />
+          <Map size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
       </View>
     </View>
