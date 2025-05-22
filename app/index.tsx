@@ -7,7 +7,6 @@ import { useSQLiteContext } from 'expo-sqlite';
 import React, { useState, useEffect, useCallback } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
 import { Notifier } from 'react-native-notifier';
-import { useSettingsStore } from '~/store/useSettingsStore';
 
 import * as schema from '../db/schema';
 import HomeHeader from './components/HomeHeader';
@@ -18,6 +17,7 @@ import { Container } from '~/components/Container';
 import { LOCATION_INFO } from '~/data/LocationInfo';
 import { insertDataIntoSQLiteDB } from '~/db/database';
 import { miscStorage } from '~/store/misc-storage';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { shouldRequery } from '~/utils/time';
 
