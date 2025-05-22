@@ -4,7 +4,6 @@ import { View, Text } from 'react-native';
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
 import { useSettingsStore } from '~/store/useSettingsStore';
-import { COLORS } from '~/utils/colors';
 import { timeOfDay } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
