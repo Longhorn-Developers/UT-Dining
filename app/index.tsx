@@ -150,6 +150,7 @@ export default function Home() {
           if (selectedFilter === 'dining') return locationInfo.type === 'Dining Hall';
           if (selectedFilter === 'restaurants') return locationInfo.type === 'Restaurant';
           if (selectedFilter === 'convenience') return locationInfo.type === 'Convenience Store';
+          if (selectedFilter === 'coffee') return locationInfo.type === 'Coffee Shop';
           return false;
         });
 

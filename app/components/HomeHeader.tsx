@@ -95,6 +95,7 @@ const HomeHeader = ({
             { id: 'dining', title: 'Dining Hall' },
             { id: 'restaurants', title: 'Restaurants' },
             { id: 'convenience', title: 'Convenience Store' },
+            { id: 'coffee', title: 'Coffee Shop' },
           ]}
         />
       </View>

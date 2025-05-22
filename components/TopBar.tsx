@@ -290,19 +290,70 @@ const BackTopBar = () => {
   );
 };
 
-interface TopBarProps {
-  variant?: 'home' | 'location' | 'back' | 'food';
-}
+const CoffeeShopTopBar = () => {
+  const { location } = useLocalSearchParams<{ location: string }>();
+  const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
-const BarComponent = {
-  home: <HomeTopBar />,
-  location: <LocationTopBar />,
-  back: <BackTopBar />,
-  food: <FoodTopBar />,
+  if (!locationInfo) {
+    return null;
+  }
+
+  return (
+    <View className="flex w-full flex-row items-center justify-between ">
+      <TouchableOpacity
+        className="flex flex-row items-center"
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          router.back();
+        }}>
+        <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
+        <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>
+      </TouchableOpacity>
+
+      <View className="flex flex-row gap-x-5">
+        <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+            if (Platform.OS === 'ios') {
+              Linking.openURL(locationInfo.appleMapsLink);
+            } else {
+              Linking.openURL(locationInfo.googleMapsLink);
+            }
+          }}>
+          <Map size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 };
 
+interface TopBarProps {
+  variant?: 'home' | 'location' | 'back' | 'food' | 'coffee-shop';
+}
+
 const TopBar = ({ variant = 'home' }: TopBarProps) => {
-  return BarComponent[variant];
+  const { location } = useLocalSearchParams<{ location: string }>();
+  const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
+  const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
+
+  if (isCoffeeShop) {
+    return <CoffeeShopTopBar />;
+  }
+
+  switch (variant) {
+    case 'home':
+      return <HomeTopBar />;
+    case 'location':
+      return <LocationTopBar />;
+    case 'back':
+      return <BackTopBar />;
+    case 'food':
+      return <FoodTopBar />;
+    default:
+      return <HomeTopBar />;
+  }
 };
 
 export default TopBar;

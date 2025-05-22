@@ -5,7 +5,7 @@ import { ChevronRight } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, Animated, Easing } from 'react-native';
 
-import { getLocationName } from '~/data/LocationInfo';
+import { getLocationName, LOCATION_INFO } from '~/data/LocationInfo';
 import { Location, menu } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useSettingsStore } from '~/store/useSettingsStore';
@@ -29,6 +29,17 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
       // Checking if there are any menus for the location
       const res = db.select().from(menu).where(eq(menu.location_id, location.id)).get();
 
+      // Check if this location is a Coffee Shop from LOCATION_INFO
+      const locationInfo = LOCATION_INFO.find((loc) => loc.name === location.name);
+      const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
+
+      // For Coffee Shops, only check if there's a schedule, don't check for menus
+      if (isCoffeeShop) {
+        setOpen(isLocationOpen(location.name as string, currentTime));
+        return;
+      }
+
+      // For other locations, check for menu presence
       if (!res) {
         setOpen(false);
         return;
