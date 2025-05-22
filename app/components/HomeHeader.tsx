@@ -3,7 +3,9 @@ import { View, Text } from 'react-native';
 
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { timeOfDay } from '~/utils/time';
+import { cn } from '~/utils/utils';
 
 type HomeHeaderProps = {
   currentTime: Date;
@@ -20,6 +22,8 @@ const HomeHeader = ({
   setSelectedFilter,
   showRequeryAlert,
 }: HomeHeaderProps) => {
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
+
   const getGreetingMessage = () => {
     const hour = currentTime.getHours();
     if (hour < 11) {
@@ -50,9 +54,17 @@ const HomeHeader = ({
 
       <View className="gap-y-4">
         <View>
-          <Text className="font-sans text-3xl font-extrabold">{getGreetingMessage()}</Text>
+          <Text
+            className={cn(
+              'font-sans text-3xl font-extrabold',
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            )}>
+            {getGreetingMessage()}
+          </Text>
           <View className="flex-row items-center justify-between">
-            <Text className="font-medium text-ut-grey">{getSubtitleMessage()}</Text>
+            <Text className={cn('font-medium', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
+              {getSubtitleMessage()}
+            </Text>
             {showRequeryAlert && (
               <Text className="text-[9px] font-semibold italic text-ut-burnt-orange">
                 Data is outdated. Pull down to refresh.
@@ -60,7 +72,8 @@ const HomeHeader = ({
             )}
 
             {!showRequeryAlert && lastUpdated && (
-              <Text className="text-[9px] italic text-ut-grey">
+              <Text
+                className={cn('text-[9px] italic', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
                 Last updated:{' '}
                 {lastUpdated.toLocaleString('en-US', {
                   month: 'short',

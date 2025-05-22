@@ -14,11 +14,14 @@ import { isFavoriteItem, toggleFavorites } from '~/db/database';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useFoodData } from '~/hooks/useFoodData';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 
 const icon = require('../assets/image.png');
 
 const HomeTopBar = () => {
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
+
   return (
     <View className="flex w-full flex-row items-center justify-between ">
       <Image className="size-12" source={icon} />
@@ -32,7 +35,7 @@ const HomeTopBar = () => {
               'Push notifications for your favorite food items will be available in an upcoming update.'
             );
           }}>
-          <Bell size={20} color={COLORS['ut-grey']} />
+          <Bell size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -40,7 +43,7 @@ const HomeTopBar = () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/meal-plan`);
           }}>
-          <ChefHat size={20} color={COLORS['ut-grey']} />
+          <ChefHat size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -48,7 +51,7 @@ const HomeTopBar = () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/favorites`);
           }}>
-          <Heart size={20} color={COLORS['ut-grey']} />
+          <Heart size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -56,7 +59,7 @@ const HomeTopBar = () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             SheetManager.show('settings');
           }}>
-          <Cog size={20} color={COLORS['ut-grey']} />
+          <Cog size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
       </View>
     </View>
@@ -65,6 +68,7 @@ const HomeTopBar = () => {
 
 const LocationTopBar = () => {
   const { location } = useLocalSearchParams<{ location: string }>();
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
 
@@ -95,7 +99,7 @@ const LocationTopBar = () => {
               Linking.openURL(locationInfo.googleMapsLink);
             }
           }}>
-          <Map size={20} color={COLORS['ut-grey']} />
+          <Map size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -103,7 +107,7 @@ const LocationTopBar = () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/meal-plan`);
           }}>
-          <ChefHat size={20} color={COLORS['ut-grey']} />
+          <ChefHat size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -111,7 +115,7 @@ const LocationTopBar = () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/favorites`);
           }}>
-          <Heart size={20} color={COLORS['ut-grey']} />
+          <Heart size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -123,7 +127,7 @@ const LocationTopBar = () => {
               },
             });
           }}>
-          <Info size={20} color={COLORS['ut-grey']} />
+          <Info size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
       </View>
     </View>
@@ -142,6 +146,7 @@ const FoodTopBar = () => {
   const { foodItem } = useFoodData(location, menu, category, food, favorite === 'true');
   const toggleMealPlanItem = useMealPlanStore((state) => state.toggleMealPlanItem);
   const isMealPlanItem = useMealPlanStore((state) => state.isMealPlanItem(food));
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   const db = useDatabase();
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -154,6 +159,11 @@ const FoodTopBar = () => {
   if (!foodItem) {
     return null;
   }
+
+  const getIconColor = (isActive: boolean) => {
+    if (isActive) return COLORS['ut-burnt-orange'];
+    return isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey'];
+  };
 
   return (
     <View className="flex w-full flex-row items-center justify-between ">
@@ -212,8 +222,8 @@ const FoodTopBar = () => {
           }}>
           <ChefHat
             size={20}
-            color={isMealPlanItem ? COLORS['ut-burnt-orange'] : COLORS['ut-grey']}
-            fill={isMealPlanItem ? COLORS['ut-burnt-orange'] : 'white'}
+            color={getIconColor(isMealPlanItem)}
+            fill={isMealPlanItem ? COLORS['ut-burnt-orange'] : 'transparent'}
           />
         </TouchableOpacity>
 
@@ -247,8 +257,8 @@ const FoodTopBar = () => {
           }}>
           <Heart
             size={20}
-            color={isFavorite ? COLORS['ut-burnt-orange'] : COLORS['ut-grey']}
-            fill={isFavorite ? COLORS['ut-burnt-orange'] : 'white'}
+            color={getIconColor(isFavorite)}
+            fill={isFavorite ? COLORS['ut-burnt-orange'] : 'transparent'}
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -256,7 +266,7 @@ const FoodTopBar = () => {
             SheetManager.show('food-info');
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}>
-          <Info size={20} color={COLORS['ut-grey']} />
+          <Info size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
       </View>
     </View>

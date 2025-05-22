@@ -13,6 +13,7 @@ import { menu, location as location_schema } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { generateSchedule, isLocationOpen } from '~/utils/time';
+import { cn } from '~/utils/utils';
 
 interface LocationHeaderProps {
   location: string;
@@ -31,6 +32,7 @@ const LocationHeader = React.memo(
     const schedule = useMemo(() => generateSchedule(location), [location]);
     const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
     const { useColloquialNames } = useSettingsStore();
+    const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
     useEffect(() => {
       const checkOpen = async () => {
@@ -67,7 +69,11 @@ const LocationHeader = React.memo(
         <View className="gap-y-4">
           <View>
             <View className="w-full flex-row items-center justify-between">
-              <Text className="font-sans text-3xl font-extrabold">
+              <Text
+                className={cn(
+                  'font-sans text-3xl font-extrabold',
+                  isDarkMode ? 'text-white' : 'text-black'
+                )}>
                 {getLocationName(location, useColloquialNames)}
               </Text>
             </View>
@@ -85,7 +91,12 @@ const LocationHeader = React.memo(
             }}
           />
 
-          <View className="my-1 w-full border-b border-b-ut-grey/15" />
+          <View
+            className={cn(
+              'my-1 w-full border-b',
+              isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15'
+            )}
+          />
 
           <View className="gap-y-3">
             <View className="flex-row items-center justify-between">

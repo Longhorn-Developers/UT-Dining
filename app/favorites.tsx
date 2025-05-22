@@ -13,12 +13,15 @@ import TopBar from '~/components/TopBar';
 import { toggleFavorites } from '~/db/database';
 import * as schema from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
+import { cn } from '~/utils/utils';
 
 const Favorites = () => {
   const db = useDatabase();
   const { data: favorites } = useLiveQuery(db.select().from(schema.favorites));
   const [loading, setLoading] = useState(true);
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   useEffect(() => {
     if (favorites) {
@@ -36,7 +39,7 @@ const Favorites = () => {
   }, [favorites]);
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       <Stack.Screen
         options={{
           title: 'Favorites',
@@ -44,29 +47,31 @@ const Favorites = () => {
         }}
       />
       <Container>
+        <View className="my-6 flex gap-y-5">
+          <TopBar variant="back" />
+          <View>
+            <View className="flex-row items-center gap-x-2">
+              <Text
+                className={cn('text-3xl font-extrabold', isDarkMode ? 'text-white' : 'text-black')}>
+                Your Favorites
+              </Text>
+              <Heart size={20} color={COLORS['ut-burnt-orange']} fill={COLORS['ut-burnt-orange']} />
+            </View>
+            <Text className={cn('font-medium', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
+              Your favorite campus dishes are saved here! Look for the heart icon in menus. Swipe
+              left to remove.
+            </Text>
+          </View>
+
+          <View
+            className={cn(
+              'my-1 w-full border-b',
+              isDarkMode ? 'border-gray-700' : 'border-ut-grey/15'
+            )}
+          />
+        </View>
         <FlashList
           estimatedItemSize={100}
-          ListHeaderComponent={
-            <View className="my-6 flex gap-y-5">
-              <TopBar variant="back" />
-              <View>
-                <View className="flex-row items-center gap-x-2">
-                  <Text className="text-3xl font-extrabold">Your Favorites</Text>
-                  <Heart
-                    size={20}
-                    color={COLORS['ut-burnt-orange']}
-                    fill={COLORS['ut-burnt-orange']}
-                  />
-                </View>
-                <Text className="font-medium text-ut-grey">
-                  Your favorite campus dishes are saved here! Look for the heart icon in menus.
-                  Swipe left to remove.
-                </Text>
-              </View>
-
-              <View className="my-1 w-full border-b border-b-ut-grey/15" />
-            </View>
-          }
           data={sortedFavorites}
           renderItem={({ item }) => (
             <View>
@@ -121,7 +126,11 @@ const Favorites = () => {
                     </Text>
                   )}
 
-                  <Text className="mb-6 max-w-64 text-center text-ut-grey">
+                  <Text
+                    className={cn(
+                      'mb-6 max-w-64 text-center',
+                      isDarkMode ? 'text-gray-300' : 'text-ut-grey'
+                    )}>
                     Find your favorite dishes by browsing dining locations.
                   </Text>
                   <TouchableOpacity
@@ -135,7 +144,7 @@ const Favorites = () => {
           }
         />
       </Container>
-    </>
+    </View>
   );
 };
 
