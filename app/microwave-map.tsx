@@ -2,7 +2,7 @@ import * as Haptics from 'expo-haptics';
 import * as Linking from 'expo-linking';
 import { Stack } from 'expo-router';
 import { View, Text, Platform } from 'react-native';
-import MapView, { Marker, Callout, CalloutSubview } from 'react-native-maps';
+import MapView, { Marker, Callout, CalloutSubview, PROVIDER_DEFAULT } from 'react-native-maps';
 
 import { Container } from '~/components/Container';
 import TopBar from '~/components/TopBar';
@@ -65,6 +65,7 @@ const MicrowaveMap = () => {
       </View>
       <MapView
         style={{ flex: 1, borderTopWidth: 1, borderColor: 'rgba(51, 63, 72, 0.15)' }}
+        provider={PROVIDER_DEFAULT}
         initialRegion={{
           latitude: 30.285548,
           longitude: -97.737384,

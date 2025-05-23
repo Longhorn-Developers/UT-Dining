@@ -69,6 +69,7 @@ export default {
         backgroundColor: '#BF5700',
       },
       bundleIdentifier: IS_DEV ? 'com.ethanl06.ut-dining.dev' : 'com.ethanl06.ut-dining',
+      package: 'com.ethanl06.utdining',
     },
     newArchEnabled: true,
     extra: {
