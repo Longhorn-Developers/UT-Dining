@@ -10,6 +10,8 @@ interface SettingsState {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
   setDarkMode: (isDarkMode: boolean) => void;
+  isColorBlindMode: boolean;
+  toggleColorBlindMode: () => void;
 }
 
 // Get the initial color scheme from device
@@ -32,6 +34,12 @@ export const useSettingsStore = create<SettingsState>()(
       },
       setDarkMode: (isDarkMode) => {
         set({ isDarkMode });
+      },
+      isColorBlindMode: false,
+      toggleColorBlindMode: () => {
+        set((state) => ({
+          isColorBlindMode: !state.isColorBlindMode,
+        }));
       },
     }),
     {

@@ -9,7 +9,7 @@ import { getLocationName, LOCATION_INFO } from '~/data/LocationInfo';
 import { Location, menu } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useSettingsStore } from '~/store/useSettingsStore';
-import { COLORS } from '~/utils/colors';
+import { getColor } from '~/utils/colors';
 import { getLocationTimeMessage, isLocationOpen } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
@@ -22,7 +22,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
   const [open, setOpen] = useState(false);
   const pingAnimation = useRef(new Animated.Value(0)).current;
   const db = useDatabase();
-  const { useColloquialNames, isDarkMode } = useSettingsStore();
+  const { useColloquialNames, isDarkMode, isColorBlindMode } = useSettingsStore();
 
   useEffect(() => {
     const checkOpen = async () => {
@@ -99,10 +99,20 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
       <View className="flex-row items-center justify-center gap-x-4">
         <View className="relative size-3">
           <View
-            className={cn(
-              'size-full rounded-full shadow',
-              open ? 'bg-green-500 shadow-green-500' : 'bg-red-300 shadow-red-300'
-            )}
+            style={{
+              width: '100%',
+              height: '100%',
+              borderRadius: 9999,
+              backgroundColor: open
+                ? getColor('status-open', isColorBlindMode)
+                : getColor('status-closed', isColorBlindMode),
+              shadowColor: open
+                ? getColor('status-open', isColorBlindMode)
+                : getColor('status-closed', isColorBlindMode),
+              shadowOpacity: 0.5,
+              shadowRadius: 4,
+              shadowOffset: { width: 0, height: 2 },
+            }}
           />
 
           {open && (
@@ -112,7 +122,9 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
                 width: 12,
                 height: 12,
                 borderRadius: 12,
-                backgroundColor: 'rgba(34, 197, 94, 0.75)',
+                backgroundColor: isColorBlindMode
+                  ? 'rgba(0, 90, 181, 0.75)'
+                  : 'rgba(34, 197, 94, 0.75)',
                 transform: [
                   {
                     scale: pingAnimation.interpolate({
@@ -140,7 +152,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
                   ? 'text-white'
                   : 'text-ut-black'
                 : isDarkMode
-                  ? 'text-gray-300'
+                  ? 'text-gray-500'
                   : 'text-ut-grey/75'
             )}>
             {getLocationName(location.name ?? '', useColloquialNames)}
@@ -153,7 +165,10 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
       </View>
 
       <View className="flex-row items-center justify-center gap-x-3">
-        <ChevronRight color={isDarkMode ? '#fff' : COLORS['ut-burnt-orange']} size={20} />
+        <ChevronRight
+          color={isDarkMode ? '#fff' : getColor('ut-burnt-orange', isColorBlindMode)}
+          size={20}
+        />
       </View>
     </TouchableOpacity>
   );

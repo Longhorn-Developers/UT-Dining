@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Application from 'expo-application';
 import { Link, router } from 'expo-router';
 import {
+  Accessibility,
   ChefHat,
   Code,
   Filter,
@@ -23,14 +24,20 @@ import ActionSheet, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useSettingsStore } from '~/store/useSettingsStore';
-import { COLORS } from '~/utils/colors';
+import { getColor } from '~/utils/colors';
 import { cn } from '~/utils/utils';
 
 const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
   const insets = useSafeAreaInsets();
   const sheetRef = useSheetRef('settings');
-  const { useColloquialNames, toggleColloquialNames, isDarkMode, toggleDarkMode } =
-    useSettingsStore();
+  const {
+    useColloquialNames,
+    toggleColloquialNames,
+    isDarkMode,
+    toggleDarkMode,
+    isColorBlindMode,
+    toggleColorBlindMode,
+  } = useSettingsStore();
 
   const SettingItem = ({
     title,
@@ -63,7 +70,7 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
               'mr-3 h-8 w-8 items-center justify-center rounded-full',
               isDarkMode ? 'bg-gray-800' : 'bg-orange-100'
             )}>
-            <Icon size={16} color={COLORS['ut-burnt-orange']} />
+            <Icon size={16} color={getColor('ut-burnt-orange', false)} />
           </View>
         )}
         <Text
@@ -75,7 +82,7 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
         <Switch
           value={toggleValue}
           onValueChange={onToggle}
-          trackColor={{ false: '#D1D5DB', true: COLORS['ut-burnt-orange'] }}
+          trackColor={{ false: '#D1D5DB', true: getColor('ut-burnt-orange', false) }}
           thumbColor="#FFFFFF"
         />
       )}
@@ -124,15 +131,17 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
       <TouchableOpacity
         className="mb-2 mt-1 flex-row items-center"
         onPress={() => Linking.openURL('mailto:ethanlanting@gmail.com')}>
-        <Mail size={18} color={COLORS['ut-burnt-orange']} className="mr-2" />
-        <Text className="ml-2 text-ut-burnt-orange">Contact Support</Text>
+        <Mail size={18} color={getColor('ut-burnt-orange', false)} className="mr-2" />
+        <Text style={{ color: getColor('ut-burnt-orange', false) }} className="ml-2">
+          Contact Support
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
         className="mb-2 flex-row items-center"
         onPress={() =>
           Linking.openURL('https://longhorn-developers.github.io/ut-dining-website/faq')
         }>
-        <HelpCircle size={18} color={COLORS['ut-burnt-orange']} className="mr-2" />
+        <HelpCircle size={18} color={getColor('ut-burnt-orange', false)} className="mr-2" />
         <Text className="ml-2 text-ut-burnt-orange">FAQ</Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -140,13 +149,13 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
         onPress={() =>
           Linking.openURL('https://longhorn-developers.github.io/ut-dining-website/privacy-policy')
         }>
-        <Shield size={18} color={COLORS['ut-burnt-orange']} className="mr-2" />
+        <Shield size={18} color={getColor('ut-burnt-orange', false)} className="mr-2" />
         <Text className="ml-2 text-ut-burnt-orange">Privacy Policy</Text>
       </TouchableOpacity>
       <TouchableOpacity
         className="flex-row items-center"
         onPress={() => Linking.openURL('https://github.com/Longhorn-Developers/UT-Dining')}>
-        <Code size={18} color={COLORS['ut-burnt-orange']} className="mr-2" />
+        <Code size={18} color={getColor('ut-burnt-orange', false)} className="mr-2" />
         <Text className="ml-2 text-ut-burnt-orange">Source Code</Text>
       </TouchableOpacity>
     </View>
@@ -245,6 +254,13 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
             hasToggle
             toggleValue={isDarkMode}
             onToggle={toggleDarkMode}
+          />
+          <SettingItem
+            title="Colorblind Mode"
+            Icon={Accessibility}
+            hasToggle
+            toggleValue={isColorBlindMode}
+            onToggle={toggleColorBlindMode}
           />
           <SettingItem
             title="Use Colloquial Names"
