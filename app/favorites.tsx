@@ -134,7 +134,9 @@ const Favorites = () => {
                     Find your favorite dishes by browsing dining locations.
                   </Text>
                   <TouchableOpacity
-                    onPress={() => router.push('/')}
+                    onPress={() => {
+                      router.dismissTo('/');
+                    }}
                     className="rounded-full bg-ut-burnt-orange px-4 py-2">
                     <Text className="font-bold text-white">Browse Dining Locations</Text>
                   </TouchableOpacity>
