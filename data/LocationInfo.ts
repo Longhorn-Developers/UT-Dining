@@ -18,10 +18,11 @@ export interface OpeningHours {
   intervals: TimeInterval[];
 }
 
-export type LocationType = 'Dining Hall' | 'Restaurant' | 'Convenience Store';
+export type LocationType = 'Dining Hall' | 'Restaurant' | 'Convenience Store' | 'Coffee Shop';
 
 export interface LocationInfo {
   name: string;
+  colloquialName?: string;
   description: string;
   type: LocationType;
   address: string;
@@ -33,11 +34,13 @@ export interface LocationInfo {
     lunch?: TimeInterval;
     dinner?: TimeInterval;
   };
+  image?: string;
 }
 
 export const LOCATION_INFO: LocationInfo[] = [
   {
     name: 'J2 Dining',
+    colloquialName: 'J2',
     description:
       'Positioned on the south side of campus, J2 Dining houses a top-9 allergen free line as well as other unique options.\n\nJ2 Dining is located on the second floor of Jester Center and serves a varied menu for you to create your ideal meal. The offerings at J2 include something for everyone.',
     address: '201 E 21st St Austin, TX 78705',
@@ -70,6 +73,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: 'JCL Dining',
+    colloquialName: 'JCL',
     type: 'Dining Hall',
     googleMapsLink: 'https://maps.app.goo.gl/DccikGcpeV4tpZSj7',
     appleMapsLink:
@@ -98,6 +102,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: 'Kins Dining',
+    colloquialName: 'Kins',
     description:
       'Serving the northwest side of campus, Kins Dining hosts several serving lines and outdoor patio seating. Kins Dining is in Kinsolving Hall and offers a dining experience where you can piece together your ideal meal from the assortment of food lines and menu specials.\n\nEnjoy your meal inside the dining hall or on the outdoor patio overlooking the Kinsolving garden.',
     type: 'Dining Hall',
@@ -131,6 +136,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: "Jesta' Pizza",
+    colloquialName: "Jizza's",
     description:
       'Build your own pizza with an array of sauces and toppings and find other quick bites on the south side of campus inside Jester Center.\n\nJesta’ Pizza offers an assortment of options for you to create your ideal pie. Other snacks and beverages are also available for purchase.',
     type: 'Restaurant',
@@ -156,6 +162,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: 'Cypress Bend Cafe',
+    colloquialName: 'Cypress',
     description:
       'Explore this grill and coffee shop all in one located in San Jacinto Residence Hall. Cypress Bend Cafe serves Starbucks coffee and beverages, bakery items and other grab and go options.\n\nIn addition, you can choose from a variety of meal options at the grill.',
     type: 'Restaurant',
@@ -184,6 +191,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: 'Jester City Market',
+    colloquialName: 'Jarket',
     description:
       'Grab a bite on the go, shop for the essentials or stop in for a beverage on the ground floor of Jester Center.\n\nJester City Market has all your convenience store needs including school supplies, snacks and other goods. Stop in to see all we have to offer.',
     type: 'Convenience Store',
@@ -216,6 +224,7 @@ export const LOCATION_INFO: LocationInfo[] = [
   },
   {
     name: 'Littlefield Patio Cafe',
+    colloquialName: 'Littlefield Cafe',
     description:
       'Discover bistro-style dining, grab and go offerings and coffee options on the northwest side of campus, adjacent to Littlefield Hall.\n\nLittlefield Patio Cafe offers a la carte meal options in addition to Starbucks coffee and drinks, bakery selections and other selections.Enjoy your meal on the namesake patio dining area or inside the cafe.',
     type: 'Restaurant',
@@ -242,4 +251,210 @@ export const LOCATION_INFO: LocationInfo[] = [
       lunch: { openTime: 1200, closeTime: 1900 },
     },
   },
+
+  // Coffee Shop Locations
+  {
+    name: 'Jester Java',
+    colloquialName: 'Jester Java',
+    description:
+      'Order breakfast tacos, Starbucks coffee and baked goods on the south side of campus, inside Jester Center. You’ll find an array of espresso, cold beverages and snacks.',
+    type: 'Coffee Shop',
+    address: '201 E 21st St Austin, TX 78705',
+    googleMapsLink: 'https://maps.app.goo.gl/CtBnkvwy6qCDNtyi9',
+    appleMapsLink: 'https://maps.apple.com/?address=201%20E%2021st%20St,%20Austin,%20TX%20%2078705',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        intervals: [{ openTime: 730, closeTime: 1600 }],
+      },
+      {
+        days: ['Saturday', 'Sunday'],
+        intervals: [],
+      },
+    ],
+    mealTimes: {
+      breakfast: { openTime: 730, closeTime: 1100 },
+      lunch: { openTime: 1100, closeTime: 1600 },
+    },
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_1800w/public/2021-07/Jester%20_Java_Logo_680x454.png.webp?itok=Fgnyii1L',
+  },
+  {
+    name: 'Longhorn Coffee Co.',
+    colloquialName: 'Longhorn Coffee',
+    description:
+      'Check out this coffee shop proudly serving Starbucks coffee and other on the go options in the WCP Student Activity Center.\n\nLocated at WCP 1.302.',
+    type: 'Coffee Shop',
+    address: '2201 Speedway, Austin, TX 78712',
+    googleMapsLink: 'https://maps.app.goo.gl/',
+    appleMapsLink: 'https://maps.apple.com/?address=2201%20Speedway,%20Austin,%20TX%2078712',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+        intervals: [{ openTime: 800, closeTime: 1400 }],
+      },
+      {
+        days: ['Friday'],
+        intervals: [{ openTime: 0, closeTime: 0 }],
+      },
+      {
+        days: ['Saturday', 'Sunday'],
+        intervals: [],
+      },
+    ],
+    mealTimes: {
+      breakfast: { openTime: 800, closeTime: 1100 },
+      lunch: { openTime: 1100, closeTime: 1700 },
+    },
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_450w_300h/public/2021-07/Longhorn_Coffee_Co_Logo_680x454.png.webp?itok=Peq67Hth',
+  },
+  {
+    name: "Prufrock's",
+    colloquialName: "Prufrock's",
+    description:
+      'Order Starbucks beverages and quick food options on the ground floor of the Perry-Castañeda Library.\n\nPrufrock’s offers hot and cold drink options, pastries and grab and go selections. Give your studying at the library a boost with a trip to Prufrock’s.',
+    type: 'Coffee Shop',
+    address: '101 E 21st St, Austin, TX 78705',
+    googleMapsLink: 'https://maps.app.goo.gl/',
+    appleMapsLink: 'https://maps.apple.com/?address=101%20E%2021st%20St,%20Austin,%20TX%2078705',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        intervals: [{ openTime: 800, closeTime: 2000 }],
+      },
+      {
+        days: ['Saturday'],
+        intervals: [{ openTime: 1000, closeTime: 1700 }],
+      },
+      {
+        days: ['Sunday'],
+        intervals: [{ openTime: 1200, closeTime: 2000 }],
+      },
+    ],
+    mealTimes: {
+      breakfast: { openTime: 800, closeTime: 1100 },
+      lunch: { openTime: 1100, closeTime: 1700 },
+    },
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_450w_300h/public/2021-10/prufrocks_logo.png.webp?itok=0t3Crktg',
+  },
+  {
+    name: 'Union Coffee House',
+    colloquialName: 'Union Coffee',
+    description:
+      'Union Coffee House proudly serves Starbucks coffee and beverages, bakery items and grab and go options.\n\nLocated in the second floor food court.',
+    type: 'Coffee Shop',
+    address: '2308 Whitis Ave, Austin, TX 78712',
+    googleMapsLink: 'https://maps.app.goo.gl/',
+    appleMapsLink: 'https://maps.apple.com/?address=2308%20Whitis%20Ave,%20Austin,%20TX%2078712',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        intervals: [{ openTime: 730, closeTime: 1800 }],
+      },
+      {
+        days: ['Saturday', 'Sunday'],
+        intervals: [],
+      },
+    ],
+    mealTimes: {
+      breakfast: { openTime: 730, closeTime: 1100 },
+      lunch: { openTime: 1100, closeTime: 1800 },
+    },
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_450w_300h/public/2021-07/Union_Coffee_House_Logo_680x454.png.webp?itok=WPuAgLry',
+  },
+  {
+    name: 'Up and Atom',
+    colloquialName: 'Up & Atom',
+    description:
+      'Power your day with quick bites and Ruta Maya coffee at this conveniently located coffee shop in Welch Hall.\n\nPair a beverage made from shade-grown Arabica beans with a grab and go item to fuel up for your next class or study session.',
+    type: 'Coffee Shop',
+    address: '105 E 24th St, Austin, TX 78712',
+    googleMapsLink: 'https://maps.app.goo.gl/',
+    appleMapsLink: 'https://maps.apple.com/?address=105%20E%2024th%20St,%20Austin,%20TX%2078712',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        intervals: [{ openTime: 730, closeTime: 1700 }],
+      },
+      {
+        days: ['Saturday', 'Sunday'],
+        intervals: [{ openTime: 730, closeTime: 2300 }],
+      },
+    ],
+    mealTimes: {
+      breakfast: { openTime: 730, closeTime: 1100 },
+      lunch: { openTime: 1100, closeTime: 1700 },
+    },
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_450w_300h/public/2022-10/878_up_and_atom_680x454.png.webp?itok=Wkka8edw',
+  },
+  {
+    name: 'Shake Smart',
+    colloquialName: 'Shake Smart',
+    description:
+      'Find freshly blended protein shakes, cold brew coffee and quick nutritious bites at this Texas Union location of the health food chain.\n\nMake Shake Smart your one-stop shop for pre- and post-gym fuel and a regular destination for when you’re on the go.',
+    type: 'Coffee Shop',
+    address: '2308 Whitis Ave Austin, TX 78712',
+    googleMapsLink: 'https://maps.app.goo.gl/',
+    appleMapsLink: 'https://maps.apple.com/?address=2308%20Whitis%20Ave,%20Austin,%20TX%2078712',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        intervals: [{ openTime: 1000, closeTime: 1600 }],
+      },
+      {
+        days: ['Saturday', 'Sunday'],
+        intervals: [],
+      },
+    ],
+    mealTimes: {
+      lunch: { openTime: 1000, closeTime: 1600 },
+    },
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_1800w/public/2022-02/smart.png.webp?itok=YtA0utb9',
+  },
+  {
+    name: 'Varsity Grounds',
+    colloquialName: 'Varisty Grounds',
+    description:
+      'Find premium coffee, freshly brewed teas, pastries, grab and go options and more at this coffee shop located in East Campus Graduate Apartments.\n\nWhether you need a latte to-go between classes or a spot to connect with friends, Varsity Grounds offers the perfect blend of convenience and community.',
+    type: 'Coffee Shop',
+    address: '2105 Comal St. Austin, TX 78712',
+    googleMapsLink: 'https://maps.app.goo.gl/',
+    appleMapsLink: 'https://maps.apple.com/?address=2308%20Whitis%20Ave,%20Austin,%20TX%2078712',
+    schedules: [
+      {
+        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday'],
+        intervals: [{ openTime: 800, closeTime: 2000 }],
+      },
+      {
+        days: ['Friday'],
+        intervals: [{ openTime: 800, closeTime: 1400 }],
+      },
+      {
+        days: ['Saturday', 'Sunday'],
+        intervals: [],
+      },
+    ],
+    mealTimes: {
+      lunch: { openTime: 1000, closeTime: 1600 },
+    },
+    image:
+      'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_1800w/public/2025-01/Varsity_Grounds_680x454.png.webp?itok=Pvs9nbCG',
+  },
 ];
+
+// Function to get location name on display settings
+export const getLocationName = (originalName: string, useColloquial: boolean): string => {
+  if (!useColloquial) return originalName;
+
+  const locationInfo = LOCATION_INFO.find((location) => location.name === originalName);
+  if (locationInfo?.colloquialName) {
+    return locationInfo.colloquialName;
+  }
+
+  return originalName;
+};

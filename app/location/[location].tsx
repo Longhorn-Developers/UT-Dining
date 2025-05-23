@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { View, Text } from 'react-native';
 
 import CategoryHeader from './components/CategoryHeader';
+import CoffeeShopSection from './components/CoffeeShopSection';
 import FoodItemRow from './components/FoodItemRow';
 import LocationHeader from './components/LocationHeader';
 import ScrollToTopButton from './components/ScrollToTopButton';
@@ -15,11 +16,14 @@ import { useLocationData } from '../../hooks/useLocationData';
 import { useScrollToTop } from '../../hooks/useScrollToTop';
 
 import { Container } from '~/components/Container';
+import { LOCATION_INFO } from '~/data/LocationInfo';
 import * as schema from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useDebounce } from '~/hooks/useDebounce';
 import { useFiltersStore } from '~/store/useFiltersStore';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { filterFoodItems } from '~/utils/filter';
+import { cn } from '~/utils/utils';
 
 /**
  * Filter items based on search query and user-selected filters
@@ -127,6 +131,7 @@ const useSkeletonItems = () => {
 };
 
 const Location = () => {
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   // Core state and data
   const { location } = useLocalSearchParams<{ location: string }>();
   const {
@@ -231,6 +236,13 @@ const Location = () => {
   const EmptyState = useCallback(() => {
     if (loading) return null;
 
+    const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
+    const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
+
+    if (isCoffeeShop) {
+      return <CoffeeShopSection locationName={location} />;
+    }
+
     const subtitle = () => {
       if (debouncedSearchQuery) {
         return 'Try a different search term.';
@@ -248,13 +260,15 @@ const Location = () => {
     return (
       <View className="mt-12 flex-1 items-center justify-center">
         <Text className="text-xl font-bold text-ut-burnt-orange">No items found.</Text>
-        <Text className="text-sm">{subtitle()}</Text>
+        <Text className={cn('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
+          {subtitle()}
+        </Text>
       </View>
     );
-  }, [loading, debouncedSearchQuery, activeFilters]);
+  }, [loading, debouncedSearchQuery, activeFilters, isDarkMode]);
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       <Stack.Screen options={{ title: 'Location' }} />
       <Container className="relative mx-0 w-full flex-1">
         <FlashList
@@ -293,7 +307,7 @@ const Location = () => {
           }}
         />
       </Container>
-    </>
+    </View>
   );
 };
 

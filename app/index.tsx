@@ -17,6 +17,7 @@ import { Container } from '~/components/Container';
 import { LOCATION_INFO } from '~/data/LocationInfo';
 import { insertDataIntoSQLiteDB } from '~/db/database';
 import { miscStorage } from '~/store/misc-storage';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { shouldRequery } from '~/utils/time';
 
@@ -51,6 +52,8 @@ export default function Home() {
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
   useDrizzleStudio(db);
+
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   // Check if data needs to be refreshed
   useEffect(() => {
@@ -147,6 +150,7 @@ export default function Home() {
           if (selectedFilter === 'dining') return locationInfo.type === 'Dining Hall';
           if (selectedFilter === 'restaurants') return locationInfo.type === 'Restaurant';
           if (selectedFilter === 'convenience') return locationInfo.type === 'Convenience Store';
+          if (selectedFilter === 'coffee') return locationInfo.type === 'Coffee Shop';
           return false;
         });
 
@@ -155,9 +159,8 @@ export default function Home() {
   }
 
   return (
-    <>
+    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       <Stack.Screen options={{ title: 'Home' }} />
-
       <Container onLayout={onLayoutRootView}>
         <FlatList
           extraData={[currentTime, selectedFilter]}
@@ -174,7 +177,6 @@ export default function Home() {
           renderItem={({ item }) => {
             const locationInfo = LOCATION_INFO.find((info) => info.name === item.name);
             if (!locationInfo) return null;
-
             return <LocationItem location={item} currentTime={currentTime} />;
           }}
           keyExtractor={(item) => item.id.toString()}
@@ -191,6 +193,6 @@ export default function Home() {
           }
         />
       </Container>
-    </>
+    </View>
   );
 }

@@ -5,9 +5,11 @@ import { ChevronRight } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, Animated, Easing } from 'react-native';
 
+import { getLocationName, LOCATION_INFO } from '~/data/LocationInfo';
 import { Location, menu } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
-import { COLORS } from '~/utils/colors';
+import { useSettingsStore } from '~/store/useSettingsStore';
+import { getColor } from '~/utils/colors';
 import { getLocationTimeMessage, isLocationOpen } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
@@ -20,12 +22,24 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
   const [open, setOpen] = useState(false);
   const pingAnimation = useRef(new Animated.Value(0)).current;
   const db = useDatabase();
+  const { useColloquialNames, isDarkMode, isColorBlindMode } = useSettingsStore();
 
   useEffect(() => {
     const checkOpen = async () => {
       // Checking if there are any menus for the location
       const res = db.select().from(menu).where(eq(menu.location_id, location.id)).get();
 
+      // Check if this location is a Coffee Shop from LOCATION_INFO
+      const locationInfo = LOCATION_INFO.find((loc) => loc.name === location.name);
+      const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
+
+      // For Coffee Shops, only check if there's a schedule, don't check for menus
+      if (isCoffeeShop) {
+        setOpen(isLocationOpen(location.name as string, currentTime));
+        return;
+      }
+
+      // For other locations, check for menu presence
       if (!res) {
         setOpen(false);
         return;
@@ -78,14 +92,27 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
         router.push(`/location/${location.name}`);
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       }}
-      className="flex-row items-center justify-between rounded border border-ut-grey/15 p-4">
+      className={cn(
+        'mb-2 flex-row items-center justify-between rounded p-4',
+        isDarkMode ? 'border border-gray-700 bg-gray-800' : 'border border-ut-grey/15 bg-white'
+      )}>
       <View className="flex-row items-center justify-center gap-x-4">
         <View className="relative size-3">
           <View
-            className={cn(
-              'size-full rounded-full shadow',
-              open ? 'bg-green-500 shadow-green-500' : 'bg-red-300 shadow-red-300'
-            )}
+            style={{
+              width: '100%',
+              height: '100%',
+              borderRadius: 9999,
+              backgroundColor: open
+                ? getColor('status-open', isColorBlindMode)
+                : getColor('status-closed', isColorBlindMode),
+              shadowColor: open
+                ? getColor('status-open', isColorBlindMode)
+                : getColor('status-closed', isColorBlindMode),
+              shadowOpacity: 0.5,
+              shadowRadius: 4,
+              shadowOffset: { width: 0, height: 2 },
+            }}
           />
 
           {open && (
@@ -95,7 +122,9 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
                 width: 12,
                 height: 12,
                 borderRadius: 12,
-                backgroundColor: 'rgba(34, 197, 94, 0.75)',
+                backgroundColor: isColorBlindMode
+                  ? 'rgba(0, 90, 181, 0.75)'
+                  : 'rgba(34, 197, 94, 0.75)',
                 transform: [
                   {
                     scale: pingAnimation.interpolate({
@@ -115,17 +144,31 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
           )}
         </View>
         <View>
-          <Text className={cn('text-xl font-bold', open ? 'text-ut-black' : 'text-ut-grey/75')}>
-            {location.name}
+          <Text
+            className={cn(
+              'text-xl font-bold',
+              open
+                ? isDarkMode
+                  ? 'text-white'
+                  : 'text-ut-black'
+                : isDarkMode
+                  ? 'text-gray-500'
+                  : 'text-ut-grey/75'
+            )}>
+            {getLocationName(location.name ?? '', useColloquialNames)}
           </Text>
-          <Text className="text-xs font-medium text-ut-grey/75">
-            {open ? getLocationTimeMessage(location.name as string, currentTime) : 'Closed'}
+          <Text
+            className={cn('text-xs font-medium', isDarkMode ? 'text-gray-400' : 'text-ut-grey/75')}>
+            {open ? getLocationTimeMessage(location.name ?? '', currentTime) : 'Closed'}
           </Text>
         </View>
       </View>
 
       <View className="flex-row items-center justify-center gap-x-3">
-        <ChevronRight color={COLORS['ut-burnt-orange']} size={20} />
+        <ChevronRight
+          color={isDarkMode ? '#fff' : getColor('ut-burnt-orange', isColorBlindMode)}
+          size={20}
+        />
       </View>
     </TouchableOpacity>
   );

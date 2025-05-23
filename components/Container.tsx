@@ -1,6 +1,7 @@
 import { LayoutChangeEvent, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { cn } from '~/utils/utils';
 
 export const Container = ({
@@ -15,6 +16,7 @@ export const Container = ({
   disableBottomPadding?: boolean;
 }) => {
   const insets = useSafeAreaInsets();
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   return (
     <View
@@ -25,7 +27,11 @@ export const Container = ({
         paddingLeft: insets.left,
         paddingRight: insets.right,
       }}
-      className={cn(styles.container, className)}>
+      className={cn(
+        'mx-6 flex flex-1 flex-col gap-y-8 pb-24',
+        isDarkMode ? 'bg-gray-900' : 'bg-white',
+        className
+      )}>
       {children}
     </View>
   );
