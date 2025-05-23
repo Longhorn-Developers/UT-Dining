@@ -140,7 +140,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
                   ? 'text-white'
                   : 'text-ut-black'
                 : isDarkMode
-                  ? 'text-gray-300'
+                  ? 'text-gray-500'
                   : 'text-ut-grey/75'
             )}>
             {getLocationName(location.name ?? '', useColloquialNames)}
