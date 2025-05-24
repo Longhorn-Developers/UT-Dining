@@ -27,14 +27,7 @@ const HomeTopBar = () => {
       <Image className="size-12" source={icon} />
 
       <View className="flex flex-row gap-x-5">
-        <TouchableOpacity
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push('/microwave-map');
-          }}>
-          <Map size={20} color={COLORS['ut-grey']} />
-        </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             NativeAlert.alert(
@@ -43,6 +36,14 @@ const HomeTopBar = () => {
             );
           }}>
           <Bell size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
+        </TouchableOpacity> */}
+
+        <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push('/microwave-map');
+          }}>
+          <Map size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -286,8 +287,8 @@ const BackTopBar = () => {
       <TouchableOpacity
         className="flex flex-row items-center"
         onPress={() => {
-          router.back();
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          router.back();
         }}>
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
 
@@ -311,8 +312,8 @@ const CoffeeShopTopBar = () => {
       <TouchableOpacity
         className="flex flex-row items-center"
         onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           router.back();
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }}>
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
         <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>
