@@ -1,9 +1,9 @@
 import * as Haptics from 'expo-haptics';
 import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Bell, ChefHat, ChevronLeft, Cog, Heart, Info, Map } from 'lucide-react-native';
+import { ChefHat, ChevronLeft, Cog, Heart, Info, Map } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { View, Image, TouchableOpacity, Alert as NativeAlert, Text, Platform } from 'react-native';
+import { View, Image, TouchableOpacity, Text, Platform } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { Notifier } from 'react-native-notifier';
 
@@ -27,7 +27,7 @@ const HomeTopBar = () => {
       <Image className="size-12" source={icon} />
 
       <View className="flex flex-row gap-x-5">
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             NativeAlert.alert(
@@ -36,6 +36,14 @@ const HomeTopBar = () => {
             );
           }}>
           <Bell size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
+        </TouchableOpacity> */}
+
+        <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push('/microwave-map');
+          }}>
+          <Map size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -279,8 +287,8 @@ const BackTopBar = () => {
       <TouchableOpacity
         className="flex flex-row items-center"
         onPress={() => {
-          router.back();
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          router.back();
         }}>
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
 
@@ -304,8 +312,8 @@ const CoffeeShopTopBar = () => {
       <TouchableOpacity
         className="flex flex-row items-center"
         onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           router.back();
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }}>
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
         <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>

@@ -34,7 +34,7 @@
     "expo": "^52.0.37",
     "expo-application": "~6.0.2",
     "expo-constants": "~17.0.7",
-    "expo-dev-client": "~5.0.12",
+    "expo-dev-client": "~5.0.19",
     "expo-drizzle-studio-plugin": "^0.1.1",
     "expo-font": "~13.0.4",
     "expo-haptics": "~14.0.1",
@@ -63,7 +63,8 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.19.13",
     "tailwind-merge": "^3.0.2",
-    "zustand": "^4.5.6"
+    "zustand": "^4.5.6",
+    "react-native-maps": "1.18.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.9",
