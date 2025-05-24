@@ -8,7 +8,7 @@ import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Container } from '~/components/Container';
-import { MICROWAVE_LOCATION } from '~/data/MicrowaveLocations';
+import { MICROWAVE_LOCATIONS } from '~/data/MicrowaveLocations';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
@@ -46,9 +46,9 @@ const MapMarkers = ({
 }) => {
   return (
     <>
-      {MICROWAVE_LOCATION.map((location, index) => (
+      {MICROWAVE_LOCATIONS.map((location, index) => (
         <Marker
-          key={index}
+          key={location.name + index}
           coordinate={location.coordinates}
           tracksViewChanges={false}
           onPress={() => {
