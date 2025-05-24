@@ -1,9 +1,9 @@
 import * as Haptics from 'expo-haptics';
 import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Bell, ChefHat, ChevronLeft, Cog, Heart, Info, Map } from 'lucide-react-native';
+import { ChefHat, ChevronLeft, Cog, Heart, Info, Map } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { View, Image, TouchableOpacity, Alert as NativeAlert, Text, Platform } from 'react-native';
+import { View, Image, TouchableOpacity, Text, Platform } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { Notifier } from 'react-native-notifier';
 
