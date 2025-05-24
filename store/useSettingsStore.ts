@@ -48,10 +48,3 @@ export const useSettingsStore = create<SettingsState>()(
     }
   )
 );
-
-// Listen for changes in the system color scheme
-Appearance.addChangeListener(({ colorScheme }) => {
-  const currentStore = useSettingsStore.getState();
-  if (currentStore.isDarkMode === (colorScheme === 'dark')) return;
-  currentStore.setDarkMode(colorScheme === 'dark');
-});
