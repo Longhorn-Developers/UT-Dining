@@ -9,11 +9,13 @@ export const Container = ({
   className,
   children,
   disableBottomPadding = false,
+  disableInsets = false,
 }: {
   onLayout?: (event: LayoutChangeEvent) => void;
   className?: string;
   children: React.ReactNode;
   disableBottomPadding?: boolean;
+  disableInsets?: boolean;
 }) => {
   const insets = useSafeAreaInsets();
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
@@ -22,10 +24,10 @@ export const Container = ({
     <View
       onLayout={onLayout}
       style={{
-        paddingTop: insets.top,
-        paddingBottom: disableBottomPadding ? 0 : insets.bottom,
-        paddingLeft: insets.left,
-        paddingRight: insets.right,
+        paddingTop: disableInsets ? 0 : insets.top,
+        paddingBottom: disableInsets || disableBottomPadding ? 0 : insets.bottom,
+        paddingLeft: disableInsets ? 0 : insets.left,
+        paddingRight: disableInsets ? 0 : insets.right,
       }}
       className={cn(
         'mx-6 flex flex-1 flex-col gap-y-8 pb-24',
