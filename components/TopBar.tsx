@@ -1,7 +1,7 @@
 import * as Haptics from 'expo-haptics';
 import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ChefHat, ChevronLeft, Cog, Heart, Info, Map } from 'lucide-react-native';
+import { ChefHat, ChevronLeft, Cog, Heart, Info, Map, Microwave } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { View, Image, TouchableOpacity, Text, Platform } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
@@ -43,7 +43,10 @@ const HomeTopBar = () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push('/microwave-map');
           }}>
-          <Map size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
+          <Microwave
+            size={20}
+            color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity
