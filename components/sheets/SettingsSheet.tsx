@@ -179,7 +179,7 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
       <View>
         <Text
           className={cn('text-base font-medium', isDarkMode ? 'text-gray-200' : 'text-gray-700')}>
-          David Nguyen & Austin Tran
+          David Nguyen, Austin Tran, & Ali Vayani
         </Text>
         <Text className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
           Open Source Contributors
