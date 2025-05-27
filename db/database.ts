@@ -131,21 +131,12 @@ export const insertDataIntoSQLiteDB = async (
 
       // Insert data from Supabase
       await Promise.all([
-        data.location.length > 0
-          ? db.insert(location).values(
-              data.location.map((loc) => ({
-                name: loc.name ?? '',
-                updated_at: loc.updated_at,
-              }))
-            )
-          : Promise.resolve(),
-        data.menu.length > 0 ? db.insert(menu).values(data.menu) : Promise.resolve(),
-        data.menu_category.length > 0
-          ? db.insert(menu_category).values(data.menu_category)
-          : Promise.resolve(),
-        data.food_item.length > 0 ? db.insert(food_item).values(data.food_item) : Promise.resolve(),
-        data.nutrition.length > 0 ? db.insert(nutrition).values(data.nutrition) : Promise.resolve(),
-        data.allergens.length > 0 ? db.insert(allergens).values(data.allergens) : Promise.resolve(),
+        db.insert(location).values(data.location),
+        db.insert(menu).values(data.menu),
+        db.insert(menu_category).values(data.menu_category),
+        db.insert(food_item).values(data.food_item),
+        db.insert(nutrition).values(data.nutrition),
+        db.insert(allergens).values(data.allergens),
       ]);
 
       console.log('Data added to database');

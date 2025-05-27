@@ -2,7 +2,7 @@ import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 
 export const location = sqliteTable('location', {
   id: integer('id').primaryKey(),
-  name: text('name').notNull().unique(),
+  name: text('name').unique(),
   updated_at: text('updated_at'),
 });
 
