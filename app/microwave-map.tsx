@@ -5,6 +5,7 @@ import { useRef } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
+import type {Region} from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Container } from '~/components/Container';
@@ -88,6 +89,35 @@ const MapMarkers = ({
 const MicrowaveMap = () => {
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   const mapRef = useRef<MapView>(null);
+  const allowedBounds = {
+    north:30.3,
+    south:30.27,
+    east:-97.73,
+    west:-97.75
+  }
+
+  const handleRegionChangeComplete = (region: Region) => {
+    const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
+
+    const maxLatitudeDelta = 0.015;
+    const maxLongitudeDelta = 0.015;
+
+
+    if (
+      (latitude > allowedBounds.north || latitude < allowedBounds.south) ||
+      (longitude > allowedBounds.east || longitude < allowedBounds.west) ||
+      latitudeDelta > maxLatitudeDelta ||
+      longitudeDelta > maxLongitudeDelta
+    ) {
+      mapRef.current?.animateToRegion({
+        latitude: initialRegion.latitude,
+        longitude: initialRegion.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    }
+  };
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -163,6 +193,7 @@ const MicrowaveMap = () => {
           }}
           provider={PROVIDER_DEFAULT}
           initialRegion={initialRegion}
+          onRegionChangeComplete = {handleRegionChangeComplete}
           userInterfaceStyle={isDarkMode ? 'dark' : 'light'}>
           <MapMarkers onMarkerPress={handleMarkerPress} />
         </MapView>
