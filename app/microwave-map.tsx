@@ -5,7 +5,7 @@ import { useRef } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
-import type {Region} from 'react-native-maps';
+import type { Region } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Container } from '~/components/Container';
@@ -90,11 +90,11 @@ const MicrowaveMap = () => {
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   const mapRef = useRef<MapView>(null);
   const allowedBounds = {
-    north:30.3,
-    south:30.27,
-    east:-97.73,
-    west:-97.75
-  }
+    north: 30.31,
+    south: 30.26,
+    east: -97.72,
+    west: -97.76,
+  };
 
   const handleRegionChangeComplete = (region: Region) => {
     const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
@@ -102,18 +102,26 @@ const MicrowaveMap = () => {
     const maxLatitudeDelta = 0.015;
     const maxLongitudeDelta = 0.015;
 
+    // Clamp the coordinates to the allowed bounds
+    const clampedLatitude = Math.max(allowedBounds.south, Math.min(allowedBounds.north, latitude));
+    const clampedLongitude = Math.max(allowedBounds.west, Math.min(allowedBounds.east, longitude));
 
+    // Clamp the deltas to the maximum allowed zoom
+    const clampedLatitudeDelta = Math.min(latitudeDelta, maxLatitudeDelta);
+    const clampedLongitudeDelta = Math.min(longitudeDelta, maxLongitudeDelta);
+
+    // Only animate if the region needs to be adjusted
     if (
-      (latitude > allowedBounds.north || latitude < allowedBounds.south) ||
-      (longitude > allowedBounds.east || longitude < allowedBounds.west) ||
-      latitudeDelta > maxLatitudeDelta ||
-      longitudeDelta > maxLongitudeDelta
+      latitude !== clampedLatitude ||
+      longitude !== clampedLongitude ||
+      latitudeDelta !== clampedLatitudeDelta ||
+      longitudeDelta !== clampedLongitudeDelta
     ) {
       mapRef.current?.animateToRegion({
-        latitude: initialRegion.latitude,
-        longitude: initialRegion.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
+        latitude: clampedLatitude,
+        longitude: clampedLongitude,
+        latitudeDelta: clampedLatitudeDelta,
+        longitudeDelta: clampedLongitudeDelta,
       });
     }
   };
@@ -193,7 +201,7 @@ const MicrowaveMap = () => {
           }}
           provider={PROVIDER_DEFAULT}
           initialRegion={initialRegion}
-          onRegionChangeComplete = {handleRegionChangeComplete}
+          onRegionChangeComplete={handleRegionChangeComplete}
           userInterfaceStyle={isDarkMode ? 'dark' : 'light'}>
           <MapMarkers onMarkerPress={handleMarkerPress} />
         </MapView>
