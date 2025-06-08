@@ -70,8 +70,8 @@ export const MICROWAVE_LOCATIONS = [
     name: 'George I. Sánchez Building (SZB)',
     address: '1912 Speedway, Austin, TX 78712',
     coordinates: {
-      latitude: 30.282539,
-      longitude: -97.737556,
+      latitude: 30.281291033040265,
+      longitude: -97.73892609567247,
     },
     description: '2nd floor, vending machine area by 2.210.',
   },
