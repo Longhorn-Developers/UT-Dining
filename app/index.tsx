@@ -34,7 +34,7 @@ SplashScreen.setOptions({
 });
 
 // Types
-export type FilterType = 'all' | 'dining' | 'restaurants' | 'convenience' | 'coffee';
+export type FilterType = 'all' | string;
 
 // Utility functions
 const sortLocations = (data: schema.Location[]): schema.Location[] => {
@@ -47,23 +47,17 @@ const sortLocations = (data: schema.Location[]): schema.Location[] => {
 
 const filterLocationsByType = (
   locations: schema.Location[],
+  locationTypes: schema.LocationType[],
   filter: FilterType
 ): schema.Location[] => {
   if (filter === 'all') return locations;
 
-  return locations.filter((item) => {
-    const locationInfo = LOCATION_INFO.find((info) => info.name === item.name);
-    if (!locationInfo) return false;
+  // Find the location type that matches the filter
+  const targetType = locationTypes.find((type) => type.name === filter);
+  if (!targetType) return locations;
 
-    const typeMap: Record<string, string> = {
-      dining: 'Dining Hall',
-      restaurants: 'Restaurant',
-      convenience: 'Convenience Store',
-      coffee: 'Coffee Shop',
-    };
-
-    return locationInfo.type === typeMap[filter];
-  });
+  // Filter locations by type_id
+  return locations.filter((location) => location.type_id === targetType.id);
 };
 
 export default function Home() {
@@ -73,6 +67,7 @@ export default function Home() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [showRequeryAlert, setShowRequeryAlert] = useState(false);
   const [locations, setLocations] = useState<schema.Location[] | null>(null);
+  const [locationTypes, setLocationTypes] = useState<schema.LocationType[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const db = useSQLiteContext();
@@ -87,8 +82,15 @@ export default function Home() {
       console.log('🚀 Preparing app...');
 
       await insertDataIntoSQLiteDB(drizzleDb);
-      const data = await drizzleDb.select().from(schema.location);
+
+      // Fetch locations and location types concurrently
+      const [data, types] = await Promise.all([
+        drizzleDb.select().from(schema.location),
+        drizzleDb.select().from(schema.location_type).orderBy(schema.location_type.display_order),
+      ]);
+
       setLocations(data);
+      setLocationTypes(types);
 
       const storedLastUpdated = miscStorage.getString('lastQueryTime');
       if (storedLastUpdated) {
@@ -112,6 +114,16 @@ export default function Home() {
 
     try {
       await insertDataIntoSQLiteDB(drizzleDb, true);
+
+      // Refresh both locations and location types concurrently
+      const [data, types] = await Promise.all([
+        drizzleDb.select().from(schema.location),
+        drizzleDb.select().from(schema.location_type).orderBy(schema.location_type.display_order),
+      ]);
+
+      setLocations(data);
+      setLocationTypes(types);
+
       const now = new Date();
       setCurrentTime(now);
       setLastUpdated(now);
@@ -179,7 +191,7 @@ export default function Home() {
 
   // Prepare data
   const sortedLocations = sortLocations(locations);
-  const filteredLocations = filterLocationsByType(sortedLocations, selectedFilter);
+  const filteredLocations = filterLocationsByType(sortedLocations, locationTypes, selectedFilter);
 
   return (
     <View
@@ -216,6 +228,7 @@ export default function Home() {
               selectedFilter={selectedFilter}
               setSelectedFilter={setSelectedFilter}
               showRequeryAlert={showRequeryAlert}
+              locationTypes={locationTypes}
             />
           }
         />

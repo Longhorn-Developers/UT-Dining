@@ -1,9 +1,9 @@
-import { desc } from 'drizzle-orm';
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 
 export const location_type = sqliteTable('location_type', {
   id: text('id').primaryKey(),
   name: text('name').notNull().unique(),
+  display_order: integer('display_order').notNull().default(0),
   created_at: text('created_at').default('CURRENT_TIMESTAMP'),
   updated_at: text('updated_at').default('CURRENT_TIMESTAMP'),
 });

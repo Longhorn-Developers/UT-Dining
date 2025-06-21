@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text } from 'react-native';
 
 import { FilterType } from '..';
+import * as schema from '../../db/schema';
 
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
@@ -15,6 +16,7 @@ type HomeHeaderProps = {
   selectedFilter: string;
   setSelectedFilter: (filter: FilterType) => void;
   showRequeryAlert: boolean;
+  locationTypes: schema.LocationType[];
 };
 
 const HomeHeader = ({
@@ -23,8 +25,20 @@ const HomeHeader = ({
   selectedFilter,
   setSelectedFilter,
   showRequeryAlert,
+  locationTypes,
 }: HomeHeaderProps) => {
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
+
+  // Generate filter items dynamically from location types, sorted by display_order
+  const filterItems = [
+    { id: 'all', title: 'All' },
+    ...locationTypes
+      .sort((a, b) => a.display_order - b.display_order)
+      .map((type) => ({
+        id: type.name,
+        title: type.name,
+      })),
+  ];
 
   const getGreetingMessage = () => {
     const hour = currentTime.getHours();
@@ -92,13 +106,7 @@ const HomeHeader = ({
         <FilterBar
           selectedItem={selectedFilter}
           setSelectedItem={setSelectedFilter}
-          items={[
-            { id: 'all', title: 'All' },
-            { id: 'dining', title: 'Dining Hall' },
-            { id: 'restaurants', title: 'Restaurants' },
-            { id: 'convenience', title: 'Convenience Store' },
-            { id: 'coffee', title: 'Coffee Shop' },
-          ]}
+          items={filterItems}
         />
       </View>
     </View>
