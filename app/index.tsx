@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import * as Haptics from 'expo-haptics';
+import * as Network from 'expo-network';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useSQLiteContext } from 'expo-sqlite';
@@ -81,6 +82,22 @@ export default function Home() {
   const initializeApp = async () => {
     try {
       console.log('🚀 Preparing app...');
+
+      // If there is no internet, skip data insertion, using expo network pacakage
+      if (!(await Network.getNetworkStateAsync()).isConnected) {
+        console.warn('⚠️ No internet connection, skipping data initialization.');
+        setAppIsReady(true);
+
+        // Create notification for no internet
+        Notifier.showNotification({
+          title: 'No Internet',
+          description: 'Please check your internet connection.',
+          duration: NOTIFICATION_DURATION,
+          Component: Alert,
+        });
+
+        return;
+      }
 
       await insertDataIntoSQLiteDB(drizzleDb);
 
