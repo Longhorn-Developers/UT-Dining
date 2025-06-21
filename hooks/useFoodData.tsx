@@ -64,7 +64,7 @@ export function useFoodData(
 
         setFoodItem(item);
       } catch (error) {
-        console.error('Error fetching food item:', error);
+        console.error('❌ Error fetching food item:', error);
       }
     };
 

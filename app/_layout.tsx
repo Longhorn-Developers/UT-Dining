@@ -23,16 +23,17 @@ configureReanimatedLogger({
   strict: false, // Reanimated runs in strict mode by default
 });
 
+const expoDb = openDatabaseSync(DATABASE_NAME);
+const db = drizzle<typeof schema>(expoDb);
+
 export default function Layout() {
-  const expoDb = openDatabaseSync(DATABASE_NAME);
-  const db = drizzle<typeof schema>(expoDb);
   const { success, error } = useMigrations(db, migrations);
 
   useEffect(() => {
     if (success) {
-      console.log('Database migrated successfully');
+      console.log('✅ Database migrated successfully');
     } else if (error) {
-      console.error('Error migrating database:', error);
+      console.error('❌ Error migrating database:', error);
     }
   }, [success]);
 

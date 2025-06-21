@@ -6,6 +6,8 @@ import * as schema from '../db/schema';
 
 // add coffee shop locations to the database
 export const addCoffeeShopLocations = async (db: ExpoSQLiteDatabase<typeof schema>) => {
+  return;
+
   try {
     // Get existing coffee shop locations
     const existingLocations = await db
@@ -17,7 +19,7 @@ export const addCoffeeShopLocations = async (db: ExpoSQLiteDatabase<typeof schem
       .execute();
 
     console.log(
-      'Existing coffee shop locations:',
+      '☕ Existing coffee shop locations:',
       existingLocations.map((loc) => loc.name)
     );
 
@@ -35,7 +37,7 @@ export const addCoffeeShopLocations = async (db: ExpoSQLiteDatabase<typeof schem
     ].filter((loc) => !existingNames.has(loc.name));
 
     console.log(
-      'Coffee shops to add:',
+      '➕ Coffee shops to add:',
       coffeeShopLocationValues.map((loc) => loc.name)
     );
 
@@ -43,14 +45,14 @@ export const addCoffeeShopLocations = async (db: ExpoSQLiteDatabase<typeof schem
       // Insert only new locations
       const result = await db.insert(location).values(coffeeShopLocationValues).returning();
       console.log(
-        'Successfully added coffee shop locations:',
+        '✅ Successfully added coffee shop locations:',
         result.map((loc) => loc.name)
       );
     } else {
-      console.log('All coffee shop locations already exist in database');
+      console.log('✅ All coffee shop locations already exist in database');
     }
   } catch (error) {
-    console.error('Error adding coffee shop locations to database:', error);
+    console.error('❌ Error adding coffee shop locations to database:', error);
     throw error;
   }
 };

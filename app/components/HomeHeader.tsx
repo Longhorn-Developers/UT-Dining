@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
+import { FilterType } from '..';
+
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
 import { useSettingsStore } from '~/store/useSettingsStore';
@@ -11,7 +13,7 @@ type HomeHeaderProps = {
   currentTime: Date;
   lastUpdated: Date | null;
   selectedFilter: string;
-  setSelectedFilter: (filter: string) => void;
+  setSelectedFilter: (filter: FilterType) => void;
   showRequeryAlert: boolean;
 };
 

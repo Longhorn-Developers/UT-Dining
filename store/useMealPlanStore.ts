@@ -120,11 +120,11 @@ export const useMealPlanStore = create<MealPlanState>()(
         try {
           // If data should be requeried (e.g., it's a new day), clear the meal plan
           if (await shouldRequery()) {
-            console.log('Menu data is stale, clearing meal plan');
+            console.log('🗑️ Menu data is stale, clearing meal plan');
             get().clearMealPlan();
           }
         } catch (error) {
-          console.error('Error checking meal plan staleness:', error);
+          console.error('❌ Error checking meal plan staleness:', error);
         }
       },
     }),

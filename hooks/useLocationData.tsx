@@ -46,7 +46,7 @@ export function useLocationData(location: string) {
       } catch (e) {
         setData(null);
         setFilters([]);
-        console.log(e);
+        console.log('⚠️', e);
       } finally {
         setLoading(false);
       }
@@ -70,7 +70,7 @@ export function useLocationData(location: string) {
         const data = await getLocationMenuData(db, location, selectedMenu);
         setData(data);
       } catch (error) {
-        console.error(error);
+        console.error('❌', error);
       } finally {
         setTimeout(() => setLoading(false), 1000);
       }

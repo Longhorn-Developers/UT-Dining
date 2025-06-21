@@ -9,7 +9,7 @@ import { miscStorage } from '~/store/misc-storage';
 import { supabase } from '~/utils/supabase';
 import { shouldRequery } from '~/utils/time';
 
-export interface Location {
+export interface Location extends schema.Location {
   location_name: schema.Location['name'];
   menus: Menu[];
 }
@@ -35,6 +35,7 @@ const querySupabase = async () => {
   try {
     const [
       locationResult,
+      locationTypeResult,
       menuResult,
       menuCategoryResult,
       foodItemResult,
@@ -42,6 +43,7 @@ const querySupabase = async () => {
       allergensResult,
     ] = await Promise.all([
       supabase.from('location').select('*'),
+      supabase.from('location_type').select('*'),
       supabase.from('menu').select('*'),
       supabase.from('menu_category').select('*'),
       supabase.from('food_item').select('*'),
@@ -52,27 +54,31 @@ const querySupabase = async () => {
     const errors = [];
     if (locationResult.error) {
       errors.push(`location: ${locationResult.error.message}`);
-      console.error('Error fetching location:', locationResult.error);
+      console.error('❌ Error fetching location:', locationResult.error);
+    }
+    if (locationTypeResult.error) {
+      errors.push(`location_type: ${locationTypeResult.error.message}`);
+      console.error('❌ Error fetching location_type:', locationTypeResult.error);
     }
     if (menuResult.error) {
       errors.push(`menu: ${menuResult.error.message}`);
-      console.error('Error fetching menu:', menuResult.error);
+      console.error('❌ Error fetching menu:', menuResult.error);
     }
     if (menuCategoryResult.error) {
       errors.push(`menu_category: ${menuCategoryResult.error.message}`);
-      console.error('Error fetching menu_category:', menuCategoryResult.error);
+      console.error('❌ Error fetching menu_category:', menuCategoryResult.error);
     }
     if (foodItemResult.error) {
       errors.push(`food_item: ${foodItemResult.error.message}`);
-      console.error('Error fetching food_item:', foodItemResult.error);
+      console.error('❌ Error fetching food_item:', foodItemResult.error);
     }
     if (nutritionResult.error) {
       errors.push(`nutrition: ${nutritionResult.error.message}`);
-      console.error('Error fetching nutrition:', nutritionResult.error);
+      console.error('❌ Error fetching nutrition:', nutritionResult.error);
     }
     if (allergensResult.error) {
       errors.push(`allergens: ${allergensResult.error.message}`);
-      console.error('Error fetching allergens:', allergensResult.error);
+      console.error('❌ Error fetching allergens:', allergensResult.error);
     }
 
     if (errors.length > 0) {
@@ -81,6 +87,7 @@ const querySupabase = async () => {
 
     return {
       location: locationResult.data ?? [],
+      location_type: locationTypeResult.data ?? [],
       menu: menuResult.data ?? [],
       menu_category: menuCategoryResult.data ?? [],
       food_item: foodItemResult.data ?? [],
@@ -88,7 +95,7 @@ const querySupabase = async () => {
       allergens: allergensResult.data ?? [],
     };
   } catch (error) {
-    console.error('Unexpected error fetching Supabase data:', error);
+    console.error('❌ Unexpected error fetching Supabase data:', error);
     return null;
   }
 };
@@ -105,16 +112,16 @@ export const insertDataIntoSQLiteDB = async (
 ) => {
   if (!force) {
     const shouldRefresh = await shouldRequery();
-    console.log('Should refresh data:', shouldRefresh);
+    console.log('🔄 Should refresh data:', shouldRefresh);
 
     if (!shouldRefresh) {
-      console.log('Data already added to database');
+      console.log('✅ Data already added to database');
       await addCoffeeShopLocations(db);
       return;
     }
   }
 
-  console.log('Fetching fresh data from Supabase...');
+  console.log('📡 Fetching fresh data from Supabase...');
   const data = await querySupabase();
 
   if (data) {
@@ -122,6 +129,7 @@ export const insertDataIntoSQLiteDB = async (
       // Delete everything to start fresh
       await Promise.all([
         db.delete(location).execute(),
+        db.delete(schema.location_type).execute(),
         db.delete(menu).execute(),
         db.delete(menu_category).execute(),
         db.delete(food_item).execute(),
@@ -132,6 +140,7 @@ export const insertDataIntoSQLiteDB = async (
       // Insert data from Supabase
       await Promise.all([
         db.insert(location).values(data.location),
+        db.insert(schema.location_type).values(data.location_type),
         db.insert(menu).values(data.menu),
         db.insert(menu_category).values(data.menu_category),
         db.insert(food_item).values(data.food_item),
@@ -139,18 +148,18 @@ export const insertDataIntoSQLiteDB = async (
         db.insert(allergens).values(data.allergens),
       ]);
 
-      console.log('Data added to database');
+      console.log('✅ Data added to database');
 
       // Always add coffee shop locations
       await addCoffeeShopLocations(db);
     } catch (error) {
-      console.error('Error inserting data into SQLite:', error);
+      console.error('❌ Error inserting data into SQLite:', error);
       return;
     }
 
     miscStorage.set('lastQueryTime', new Date().toISOString());
   } else {
-    console.error('Error fetching data from Supabase');
+    console.error('❌ Error fetching data from Supabase');
   }
 };
 

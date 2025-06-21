@@ -4,6 +4,7 @@ import React, { useEffect, useMemo } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 
+import { FilterType } from '~/app';
 import { LocationInfo } from '~/data/LocationInfo';
 import { useFiltersStore } from '~/store/useFiltersStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
@@ -13,7 +14,7 @@ import { cn } from '~/utils/utils';
 
 type FilterBarProps = {
   selectedItem: string;
-  setSelectedItem: (item: string) => void;
+  setSelectedItem: (item: FilterType) => void;
   items: { id: string; title: string }[]; // Accepts dynamic items array
   mealTimes?: LocationInfo['mealTimes'];
   showFilterButton?: boolean;
@@ -50,7 +51,7 @@ const FilterBar = ({
   useEffect(() => {
     // If there's only one item, automatically select it
     if (filterItems.length === 1 && !selectedItem) {
-      setSelectedItem(filterItems[0].id);
+      setSelectedItem(filterItems[0].id as FilterType);
       return;
     }
 
@@ -66,16 +67,16 @@ const FilterBar = ({
       const matchingItem = filterItems.find((item) => item.title === defaultFilter);
 
       if (matchingItem) {
-        setSelectedItem(matchingItem.id);
+        setSelectedItem(matchingItem.id as FilterType);
       } else {
         // Fallback to first item if no match
-        setSelectedItem(filterItems[0]?.id || '');
+        setSelectedItem(filterItems[0]?.id as FilterType);
       }
     }
   }, [filterItems, selectedItem, useTimeOfDayDefault, setSelectedItem]);
 
-  const onPressItem = async (id: string) => {
-    setSelectedItem(id);
+  const onPressItem = async (id: FilterType) => {
+    setSelectedItem(id as FilterType);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
@@ -89,7 +90,7 @@ const FilterBar = ({
           {sortedItems.map((item) => (
             <TouchableOpacity
               key={item.id}
-              onPress={() => onPressItem(item.id)}
+              onPress={() => onPressItem(item.id as FilterType)}
               className={cn(
                 'self-start rounded-full border px-3 py-1',
                 selectedItem === item.id
