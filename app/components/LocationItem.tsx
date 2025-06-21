@@ -5,12 +5,13 @@ import { ChevronRight } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, Animated, Easing } from 'react-native';
 
-import { getLocationName, LOCATION_INFO } from '~/data/LocationInfo';
+import { LOCATION_INFO } from '~/data/LocationInfo';
 import { Location, menu } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
+import { useLocationNameFromDB } from '~/utils/locationNames';
 import { getLocationTimeMessageFromData, isLocationOpenFromData } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
@@ -25,6 +26,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
   const db = useDatabase();
   const { useColloquialNames, isDarkMode, isColorBlindMode } = useSettingsStore();
   const { locationData } = useLocationDetails(location.name ?? '');
+  const displayName = useLocationNameFromDB(location.name ?? '', useColloquialNames);
 
   useEffect(() => {
     const checkOpen = async () => {
@@ -157,7 +159,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
                   ? 'text-gray-500'
                   : 'text-ut-grey/75'
             )}>
-            {getLocationName(location.name ?? '', useColloquialNames)}
+            {displayName}
           </Text>
           <Text
             className={cn('text-xs font-medium', isDarkMode ? 'text-gray-400' : 'text-ut-grey/75')}>

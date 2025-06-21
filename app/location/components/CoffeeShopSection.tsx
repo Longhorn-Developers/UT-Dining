@@ -2,11 +2,12 @@ import { MapPin, Clock } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Linking, Platform, ScrollView } from 'react-native';
 
-import { LOCATION_INFO, getLocationName } from '~/data/LocationInfo';
+import { LOCATION_INFO } from '~/data/LocationInfo';
 import { PAYMENT_INFO_ICONS, PaymentMethod } from '~/data/PaymentInfo';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
+import { useLocationNameFromDB } from '~/utils/locationNames';
 import { generateScheduleFromData, isLocationOpenFromData } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
@@ -19,6 +20,7 @@ interface CoffeeShopSectionProps {
 const CoffeeShopSection = ({ locationName }: CoffeeShopSectionProps) => {
   const location = LOCATION_INFO.find((loc) => loc.name === locationName);
   const { useColloquialNames, isDarkMode } = useSettingsStore();
+  const displayName = useLocationNameFromDB(locationName, useColloquialNames);
   const [isOpen, setIsOpen] = useState(false);
   const { locationData } = useLocationDetails(locationName);
 
@@ -65,7 +67,7 @@ const CoffeeShopSection = ({ locationName }: CoffeeShopSectionProps) => {
         <View className="gap-2">
           <View className="flex-row items-center gap-x-2">
             <Text className={cn('text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
-              {getLocationName(location.name, useColloquialNames)}
+              {displayName}
             </Text>
           </View>
 

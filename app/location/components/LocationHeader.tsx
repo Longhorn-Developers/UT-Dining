@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import * as Haptics from 'expo-haptics';
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 
 import SearchBar from './SearchBar';
@@ -8,11 +8,12 @@ import TimeSchedule from './TimeSchedule';
 
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
-import { LOCATION_INFO, getLocationName } from '~/data/LocationInfo';
+import { LOCATION_INFO } from '~/data/LocationInfo';
 import { menu, location as location_schema } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
+import { useLocationNameFromDB } from '~/utils/locationNames';
 import { generateScheduleFromData, isLocationOpenFromData } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
@@ -34,6 +35,7 @@ const LocationHeader = React.memo(
     const schedule = generateScheduleFromData(locationData, true);
     const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
     const { useColloquialNames } = useSettingsStore();
+    const displayName = useLocationNameFromDB(location, useColloquialNames);
     const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
     const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
@@ -84,7 +86,7 @@ const LocationHeader = React.memo(
                     'font-sans text-3xl font-extrabold',
                     isDarkMode ? 'text-white' : 'text-black'
                   )}>
-                  {getLocationName(location, useColloquialNames)}
+                  {displayName}
                 </Text>
               </View>
               <Text className="text-lg font-semibold text-ut-burnt-orange">

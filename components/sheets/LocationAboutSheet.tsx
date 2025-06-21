@@ -4,11 +4,11 @@ import { View, Text, Image, TouchableOpacity, Linking, Platform } from 'react-na
 import ActionSheet, { SheetProps } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { getLocationName } from '~/data/LocationInfo';
 import { PAYMENT_INFO_ICONS } from '~/data/PaymentInfo';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
+import { useLocationNameFromDB } from '~/utils/locationNames';
 import { generateScheduleFromData } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
@@ -17,6 +17,7 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
   const locationName = payload?.location?.name;
   const { locationData, loading, error } = useLocationDetails(locationName || '');
   const { useColloquialNames } = useSettingsStore();
+  const displayName = useLocationNameFromDB(locationName || '', useColloquialNames);
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   // Generate schedule from database data
@@ -78,7 +79,7 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
               <InfoIcon color={COLORS['ut-burnt-orange']} />
             </View>
             <Text className={cn('text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
-              About {locationData && getLocationName(locationData.name || '', useColloquialNames)}
+              About {displayName}
             </Text>
           </View>
 
