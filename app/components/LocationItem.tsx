@@ -11,8 +11,8 @@ import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
-import { useLocationNameFromDB } from '~/utils/locationNames';
-import { getLocationTimeMessageFromData, isLocationOpenFromData } from '~/utils/time';
+import { useLocationName } from '~/utils/locations';
+import { getLocationTimeMessage, isLocationOpen } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
 type LocationItemProps = {
@@ -26,7 +26,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
   const db = useDatabase();
   const { useColloquialNames, isDarkMode, isColorBlindMode } = useSettingsStore();
   const { locationData } = useLocationDetails(location.name ?? '');
-  const displayName = useLocationNameFromDB(location.name ?? '', useColloquialNames);
+  const displayName = useLocationName(location.name ?? '', useColloquialNames);
 
   useEffect(() => {
     const checkOpen = async () => {
@@ -36,7 +36,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
 
       // For Coffee Shops, only check if there's a schedule, don't check for menus
       if (isCoffeeShop) {
-        const isOpen = isLocationOpenFromData(locationData, currentTime);
+        const isOpen = isLocationOpen(locationData, currentTime);
         setOpen(isOpen);
         return;
       }
@@ -48,7 +48,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
         return;
       }
 
-      const isOpen = isLocationOpenFromData(locationData, currentTime);
+      const isOpen = isLocationOpen(locationData, currentTime);
       setOpen(isOpen);
     };
 
@@ -163,7 +163,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
           </Text>
           <Text
             className={cn('text-xs font-medium', isDarkMode ? 'text-gray-400' : 'text-ut-grey/75')}>
-            {open ? getLocationTimeMessageFromData(locationData, currentTime) : 'Closed'}
+            {open ? getLocationTimeMessage(locationData, currentTime) : 'Closed'}
           </Text>
         </View>
       </View>

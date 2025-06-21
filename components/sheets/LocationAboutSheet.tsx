@@ -8,8 +8,8 @@ import { PAYMENT_INFO_ICONS } from '~/data/PaymentInfo';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
-import { useLocationNameFromDB } from '~/utils/locationNames';
-import { generateScheduleFromData } from '~/utils/time';
+import { useLocationName } from '~/utils/locations';
+import { generateSchedule } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
 const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) => {
@@ -17,11 +17,11 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
   const locationName = payload?.location?.name;
   const { locationData, loading, error } = useLocationDetails(locationName || '');
   const { useColloquialNames } = useSettingsStore();
-  const displayName = useLocationNameFromDB(locationName || '', useColloquialNames);
+  const displayName = useLocationName(locationName || '', useColloquialNames);
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   // Generate schedule from database data
-  const schedule = generateScheduleFromData(locationData, false);
+  const schedule = generateSchedule(locationData, false);
 
   // Get payment methods from database data - ensure it's an array
   const paymentMethods = Array.isArray(locationData?.methods_of_payment)

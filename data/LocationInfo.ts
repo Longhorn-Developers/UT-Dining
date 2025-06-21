@@ -1,24 +1,15 @@
-export type WeekDay =
-  | 'Monday'
-  | 'Tuesday'
-  | 'Wednesday'
-  | 'Thursday'
-  | 'Friday'
-  | 'Saturday'
-  | 'Sunday';
-
-export interface TimeInterval {
+interface TimeInterval {
   openTime: number; // e.g., 900 for 9:00 AM, 1630 for 4:30 PM
   closeTime: number; // e.g., 1400 for 2:00 PM, 2000 for 8:00 PM
 }
 
-export interface OpeningHours {
+interface OpeningHours {
   days: WeekDay[]; // Days these intervals apply to
   // Multiple intervals in one day.
   intervals: TimeInterval[];
 }
 
-export type LocationType = 'Dining Hall' | 'Restaurant' | 'Convenience Store' | 'Coffee Shop';
+type LocationType = 'Dining Hall' | 'Restaurant' | 'Convenience Store' | 'Coffee Shop';
 
 export interface LocationInfo {
   name: string;

@@ -7,8 +7,8 @@ import { PAYMENT_INFO_ICONS, PaymentMethod } from '~/data/PaymentInfo';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
-import { useLocationNameFromDB } from '~/utils/locationNames';
-import { generateScheduleFromData, isLocationOpenFromData } from '~/utils/time';
+import { useLocationName } from '~/utils/locations';
+import { generateSchedule, isLocationOpen } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
 const paymentMethods: PaymentMethod[] = Object.keys(PAYMENT_INFO_ICONS) as PaymentMethod[];
@@ -20,13 +20,13 @@ interface CoffeeShopSectionProps {
 const CoffeeShopSection = ({ locationName }: CoffeeShopSectionProps) => {
   const location = LOCATION_INFO.find((loc) => loc.name === locationName);
   const { useColloquialNames, isDarkMode } = useSettingsStore();
-  const displayName = useLocationNameFromDB(locationName, useColloquialNames);
+  const displayName = useLocationName(locationName, useColloquialNames);
   const [isOpen, setIsOpen] = useState(false);
   const { locationData } = useLocationDetails(locationName);
 
   useEffect(() => {
     const checkOpenStatus = () => {
-      const open = isLocationOpenFromData(locationData);
+      const open = isLocationOpen(locationData);
       setIsOpen(open);
     };
 
@@ -37,7 +37,7 @@ const CoffeeShopSection = ({ locationName }: CoffeeShopSectionProps) => {
 
   if (!location) return null;
 
-  const schedule = generateScheduleFromData(locationData, false);
+  const schedule = generateSchedule(locationData, false);
 
   return (
     <ScrollView

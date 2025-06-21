@@ -12,8 +12,8 @@ import { menu, location as location_schema } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
-import { useLocationNameFromDB, useMealTimesFromDB } from '~/utils/locationNames';
-import { generateScheduleFromData, isLocationOpenFromData } from '~/utils/time';
+import { useLocationName, useMealTimes } from '~/utils/locations';
+import { generateSchedule, isLocationOpen } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
 interface LocationHeaderProps {
@@ -31,11 +31,11 @@ const LocationHeader = React.memo(
     const db = useDatabase();
     const [timeDropdownOpen, setTimeDropdownOpen] = useState(false);
     const { locationData } = useLocationDetails(location);
-    const schedule = generateScheduleFromData(locationData, true);
+    const schedule = generateSchedule(locationData, true);
     // const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
     const { useColloquialNames } = useSettingsStore();
-    const displayName = useLocationNameFromDB(location, useColloquialNames);
-    const mealTimesFromDB = useMealTimesFromDB(location);
+    const displayName = useLocationName(location, useColloquialNames);
+    const mealTimes = useMealTimes(location);
     // const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
     const isCoffeeShop = false;
     const isDarkMode = useSettingsStore((state) => state.isDarkMode);
@@ -44,7 +44,7 @@ const LocationHeader = React.memo(
       const checkOpen = async () => {
         // For coffee shops, use database data directly
         if (isCoffeeShop) {
-          setOpen(isLocationOpenFromData(locationData));
+          setOpen(isLocationOpen(locationData));
           return;
         }
 
@@ -68,7 +68,7 @@ const LocationHeader = React.memo(
           return;
         }
 
-        setOpen(isLocationOpenFromData(locationData));
+        setOpen(isLocationOpen(locationData));
       };
 
       checkOpen();
@@ -113,7 +113,7 @@ const LocationHeader = React.memo(
                   setSelectedItem={setSelectedMenu}
                   useTimeOfDayDefault={filters.length > 1}
                   items={filters}
-                  mealTimes={mealTimesFromDB || undefined}
+                  mealTimes={mealTimes || undefined}
                   showFilterButton
                 />
               </View>

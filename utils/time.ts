@@ -1,10 +1,11 @@
 import { parseISO, format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 
-import { LocationInfo, WeekDay } from '~/data/LocationInfo';
+import { LocationInfo } from '~/data/LocationInfo';
 import * as schema from '~/db/schema';
 import { miscStorage } from '~/store/misc-storage';
 
+type WeekDay = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
 const CENTRAL_TIME_ZONE = 'America/Chicago';
 
 // Helper to determine if a requery is needed based on the last query time.
@@ -57,10 +58,7 @@ export const timeOfDay = (
 };
 
 // Database-based version of getTodaySchedule
-export function getTodayScheduleFromData(
-  locationData: schema.Location | null,
-  date: Date = new Date()
-) {
+export function getTodaySchedule(locationData: schema.Location | null, date: Date = new Date()) {
   if (!locationData || !locationData.regular_service_hours) return null;
 
   const serviceHours = locationData.regular_service_hours as any;
@@ -93,7 +91,7 @@ function convertToMinutes(time: number): number {
 }
 
 // Database-based version of isLocationOpen
-export function isLocationOpenFromData(
+export function isLocationOpen(
   locationData: schema.Location | null,
   currentTime: Date = new Date()
 ): boolean {
@@ -102,7 +100,7 @@ export function isLocationOpenFromData(
     return false;
   }
 
-  const schedule = getTodayScheduleFromData(locationData, currentTime);
+  const schedule = getTodaySchedule(locationData, currentTime);
   if (!schedule || schedule.intervals.length === 0) return false;
 
   const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
@@ -114,11 +112,11 @@ export function isLocationOpenFromData(
 }
 
 // Database-based version of getLocationTimeMessage
-export function getLocationTimeMessageFromData(
+export function getLocationTimeMessage(
   locationData: schema.Location | null,
   currentTime: Date = new Date()
 ): string {
-  const schedule = getTodayScheduleFromData(locationData, currentTime);
+  const schedule = getTodaySchedule(locationData, currentTime);
   if (!schedule || schedule.intervals.length === 0) return 'Closed';
 
   const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
@@ -189,7 +187,7 @@ const weekOrder: Record<WeekDay, number> = {
 // Generates an array of strings representing the schedule for a given location.
 // Each string is in the format "DAY-DAY: HH:MM AM - HH:MM AM/PM".
 // If the days in a schedule are not contiguous, they are joined by commas.
-export function generateScheduleFromData(
+export function generateSchedule(
   locationData: schema.Location | null,
   todayFirst: boolean = true,
   date: Date = new Date()

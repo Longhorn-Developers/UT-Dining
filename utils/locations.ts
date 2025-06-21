@@ -5,7 +5,7 @@ import * as schema from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 
 // Type definition for meal times from database
-export interface MealTimesFromDB {
+export interface MealTimes {
   breakfast?: { openTime: number; closeTime: number };
   lunch?: { openTime: number; closeTime: number };
   dinner?: { openTime: number; closeTime: number };
@@ -18,7 +18,7 @@ export interface MealTimesFromDB {
  * @param useColloquial - Whether to use colloquial name if available
  * @returns The display name for the location
  */
-export const getLocationNameFromDB = (
+export const getLocationName = (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string,
   useColloquial: boolean
@@ -52,10 +52,10 @@ export const getLocationNameFromDB = (
  * @param locationName - The location name
  * @returns The meal times for the location or null if not found
  */
-export const getMealTimesFromDB = (
+export const getMealTimes = (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string
-): MealTimesFromDB | null => {
+): MealTimes | null => {
   try {
     const locationData = db
       .select({
@@ -74,7 +74,7 @@ export const getMealTimesFromDB = (
       }[];
 
       // Convert to the expected format
-      const mealTimes: MealTimesFromDB = {};
+      const mealTimes: MealTimes = {};
 
       mealTimesArray.forEach((meal) => {
         const mealName = meal.name.toLowerCase() as 'breakfast' | 'lunch' | 'dinner';
@@ -97,15 +97,15 @@ export const getMealTimesFromDB = (
 /**
  * Hook version for React components that need reactive updates for location names
  */
-export const useLocationNameFromDB = (locationName: string, useColloquial: boolean): string => {
+export const useLocationName = (locationName: string, useColloquial: boolean): string => {
   const db = useDatabase();
-  return getLocationNameFromDB(db, locationName, useColloquial);
+  return getLocationName(db, locationName, useColloquial);
 };
 
 /**
  * Hook version for React components that need reactive updates for meal times
  */
-export const useMealTimesFromDB = (locationName: string): MealTimesFromDB | null => {
+export const useMealTimes = (locationName: string): MealTimes | null => {
   const db = useDatabase();
-  return getMealTimesFromDB(db, locationName);
+  return getMealTimes(db, locationName);
 };

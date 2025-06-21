@@ -8,7 +8,7 @@ import { FilterType } from '~/app';
 import { useFiltersStore } from '~/store/useFiltersStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
-import { MealTimesFromDB } from '~/utils/locationNames';
+import { MealTimes } from '~/utils/locations';
 import { timeOfDay } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
@@ -16,7 +16,7 @@ type FilterBarProps = {
   selectedItem: string;
   setSelectedItem: (item: FilterType) => void;
   items: { id: string; title: string }[]; // Accepts dynamic items array
-  mealTimes?: MealTimesFromDB;
+  mealTimes?: MealTimes;
   showFilterButton?: boolean;
   useTimeOfDayDefault?: boolean;
 };
