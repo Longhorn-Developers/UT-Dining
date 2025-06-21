@@ -8,7 +8,7 @@ import LocationAboutSheet from './LocationAboutSheet';
 import MicrowaveLocationSheet from './MicrowaveLocationSheet';
 import SettingsSheet from './SettingsSheet';
 
-import { LocationInfo } from '~/data/LocationInfo';
+import { Location } from '~/db/schema';
 
 registerSheet('location-about', LocationAboutSheet);
 registerSheet('food-info', FoodInfoSheet);
@@ -22,7 +22,7 @@ declare module 'react-native-actions-sheet' {
   interface Sheets {
     'location-about': SheetDefinition<{
       payload: {
-        location: LocationInfo;
+        location: Location;
       };
     }>;
     'food-info': SheetDefinition;

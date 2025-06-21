@@ -8,12 +8,11 @@ import TimeSchedule from './TimeSchedule';
 
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
-import { LOCATION_INFO } from '~/data/LocationInfo';
 import { menu, location as location_schema } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
-import { useLocationNameFromDB } from '~/utils/locationNames';
+import { useLocationNameFromDB, useMealTimesFromDB } from '~/utils/locationNames';
 import { generateScheduleFromData, isLocationOpenFromData } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
@@ -33,10 +32,12 @@ const LocationHeader = React.memo(
     const [timeDropdownOpen, setTimeDropdownOpen] = useState(false);
     const { locationData } = useLocationDetails(location);
     const schedule = generateScheduleFromData(locationData, true);
-    const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
+    // const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
     const { useColloquialNames } = useSettingsStore();
     const displayName = useLocationNameFromDB(location, useColloquialNames);
-    const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
+    const mealTimesFromDB = useMealTimesFromDB(location);
+    // const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
+    const isCoffeeShop = false;
     const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
     useEffect(() => {
@@ -112,7 +113,7 @@ const LocationHeader = React.memo(
                   setSelectedItem={setSelectedMenu}
                   useTimeOfDayDefault={filters.length > 1}
                   items={filters}
-                  mealTimes={locationInfo?.mealTimes}
+                  mealTimes={mealTimesFromDB || undefined}
                   showFilterButton
                 />
               </View>

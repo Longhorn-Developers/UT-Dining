@@ -4,6 +4,13 @@ import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import * as schema from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 
+// Type definition for meal times from database
+export interface MealTimesFromDB {
+  breakfast?: { openTime: number; closeTime: number };
+  lunch?: { openTime: number; closeTime: number };
+  dinner?: { openTime: number; closeTime: number };
+}
+
 /**
  * Get location display name from database, with optional colloquial name support
  * @param db - The database instance
@@ -40,30 +47,65 @@ export const getLocationNameFromDB = (
 };
 
 /**
- * Hook version for React components that need reactive updates
+ * Get meal times from database for a given location
+ * @param db - The database instance
+ * @param locationName - The location name
+ * @returns The meal times for the location or null if not found
  */
-export const useLocationNameFromDB = (locationName: string, useColloquial: boolean): string => {
-  const db = useDatabase();
-
-  if (!useColloquial) return locationName;
-
+export const getMealTimesFromDB = (
+  db: ExpoSQLiteDatabase<typeof schema>,
+  locationName: string
+): MealTimesFromDB | null => {
   try {
     const locationData = db
       .select({
-        name: schema.location.name,
-        colloquial_name: schema.location.colloquial_name,
+        meal_times: schema.location.meal_times,
       })
       .from(schema.location)
       .where(eq(schema.location.name, locationName))
       .get();
 
-    if (locationData?.colloquial_name) {
-      return locationData.colloquial_name;
+    if (locationData?.meal_times) {
+      // Parse the meal times array from database format
+      const mealTimesArray = locationData.meal_times as {
+        name: string;
+        start_time: number;
+        end_time: number;
+      }[];
+
+      // Convert to the expected format
+      const mealTimes: MealTimesFromDB = {};
+
+      mealTimesArray.forEach((meal) => {
+        const mealName = meal.name.toLowerCase() as 'breakfast' | 'lunch' | 'dinner';
+        mealTimes[mealName] = {
+          openTime: meal.start_time,
+          closeTime: meal.end_time,
+        };
+      });
+
+      return mealTimes;
     }
 
-    return locationName;
+    return null;
   } catch (error) {
-    console.error('Error fetching location name from database:', error);
-    return locationName; // Fallback to original name
+    console.error('Error fetching meal times from database:', error);
+    return null;
   }
+};
+
+/**
+ * Hook version for React components that need reactive updates for location names
+ */
+export const useLocationNameFromDB = (locationName: string, useColloquial: boolean): string => {
+  const db = useDatabase();
+  return getLocationNameFromDB(db, locationName, useColloquial);
+};
+
+/**
+ * Hook version for React components that need reactive updates for meal times
+ */
+export const useMealTimesFromDB = (locationName: string): MealTimesFromDB | null => {
+  const db = useDatabase();
+  return getMealTimesFromDB(db, locationName);
 };

@@ -5,10 +5,10 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 
 import { FilterType } from '~/app';
-import { LocationInfo } from '~/data/LocationInfo';
 import { useFiltersStore } from '~/store/useFiltersStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
+import { MealTimesFromDB } from '~/utils/locationNames';
 import { timeOfDay } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
@@ -16,7 +16,7 @@ type FilterBarProps = {
   selectedItem: string;
   setSelectedItem: (item: FilterType) => void;
   items: { id: string; title: string }[]; // Accepts dynamic items array
-  mealTimes?: LocationInfo['mealTimes'];
+  mealTimes?: MealTimesFromDB;
   showFilterButton?: boolean;
   useTimeOfDayDefault?: boolean;
 };

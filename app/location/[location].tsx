@@ -12,7 +12,7 @@ import LocationHeader from './components/LocationHeader';
 import ScrollToTopButton from './components/ScrollToTopButton';
 import SkeletonItem from './components/SkeletonItem';
 import { useCategoryExpansion } from '../../hooks/useCategoryExpansion';
-import { useLocationData } from '../../hooks/useLocationData';
+import { useMenuData } from '../../hooks/useMenuData';
 import { useScrollToTop } from '../../hooks/useScrollToTop';
 
 import { Container } from '~/components/Container';
@@ -135,12 +135,12 @@ const Location = () => {
   // Core state and data
   const { location } = useLocalSearchParams<{ location: string }>();
   const {
-    data,
+    menuData: data,
     loading,
     selectedMenu,
     setSelectedMenu,
     filters: menuFilters,
-  } = useLocationData(location);
+  } = useMenuData(location);
   const { toggleCategory, flattenedItems, resetExpandedCategories } = useCategoryExpansion(data);
   const db = useDatabase();
 

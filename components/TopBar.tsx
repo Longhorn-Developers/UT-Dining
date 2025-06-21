@@ -13,6 +13,8 @@ import { LOCATION_INFO } from '~/data/LocationInfo';
 import { isFavoriteItem, toggleFavorites } from '~/db/database';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useFoodData } from '~/hooks/useFoodData';
+import { useLocationDetails } from '~/hooks/useLocationDetails';
+import { useMenuData } from '~/hooks/useMenuData';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
@@ -80,12 +82,7 @@ const HomeTopBar = () => {
 const LocationTopBar = () => {
   const { location } = useLocalSearchParams<{ location: string }>();
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
-
-  const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
-
-  if (!locationInfo) {
-    return null;
-  }
+  const { locationData } = useLocationDetails(location);
 
   return (
     <View className="flex w-full flex-row items-center justify-between ">
@@ -104,10 +101,12 @@ const LocationTopBar = () => {
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
+            if (!locationData) return; // Handle loading state
+
             if (Platform.OS === 'ios') {
-              Linking.openURL(locationInfo.appleMapsLink);
+              Linking.openURL(locationData.apple_maps_link || '');
             } else {
-              Linking.openURL(locationInfo.googleMapsLink);
+              Linking.openURL(locationData.google_maps_link || '');
             }
           }}>
           <Map size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
@@ -132,9 +131,12 @@ const LocationTopBar = () => {
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+            if (!locationData) return; // Handle loading state
+
             SheetManager.show('location-about', {
               payload: {
-                location: locationInfo,
+                location: locationData,
               },
             });
           }}>
@@ -345,13 +347,13 @@ interface TopBarProps {
 }
 
 const TopBar = ({ variant = 'home' }: TopBarProps) => {
-  const { location } = useLocalSearchParams<{ location: string }>();
-  const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
-  const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
+  // const { location } = useLocalSearchParams<{ location: string }>();
+  // const { menuData: locationInfo } = useMenuData(location);
+  // const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
 
-  if (isCoffeeShop) {
-    return <CoffeeShopTopBar />;
-  }
+  // if (isCoffeeShop) {
+  //   return <CoffeeShopTopBar />;
+  // }
 
   switch (variant) {
     case 'home':

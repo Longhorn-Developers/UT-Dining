@@ -1,7 +1,7 @@
-import { parseISO, format, addDays } from 'date-fns';
+import { parseISO, format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 
-import { LOCATION_INFO, LocationInfo, WeekDay } from '~/data/LocationInfo';
+import { LocationInfo, WeekDay } from '~/data/LocationInfo';
 import * as schema from '~/db/schema';
 import { miscStorage } from '~/store/misc-storage';
 
@@ -56,15 +56,6 @@ export const timeOfDay = (
   return 'evening';
 };
 
-// Returns today's schedule for a given location
-export function getTodaySchedule(locationName: string, date: Date = new Date()) {
-  const location = LOCATION_INFO.find((loc) => loc.name === locationName);
-  if (!location) return null;
-  // Use actual weekday name
-  const day = weekdayName(date);
-  return location.schedules.find((schedule) => schedule.days.includes(day)) || null;
-}
-
 // Database-based version of getTodaySchedule
 export function getTodayScheduleFromData(
   locationData: schema.Location | null,
@@ -101,18 +92,6 @@ function convertToMinutes(time: number): number {
   return hour * 60 + minute;
 }
 
-// Determines open status using a location's schedule from LOCATION_INFO.
-export function isLocationOpen(locationName: string, currentTime: Date = new Date()): boolean {
-  const schedule = getTodaySchedule(locationName, currentTime);
-  if (!schedule || schedule.intervals.length === 0) return false;
-  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
-  return schedule.intervals.some((interval) => {
-    const openM = convertToMinutes(interval.openTime);
-    const closeM = convertToMinutes(interval.closeTime);
-    return currentMinutes >= openM && currentMinutes < closeM;
-  });
-}
-
 // Database-based version of isLocationOpen
 export function isLocationOpenFromData(
   locationData: schema.Location | null,
@@ -127,59 +106,6 @@ export function isLocationOpenFromData(
     const closeM = convertToMinutes(interval.closeTime);
     return currentMinutes >= openM && currentMinutes < closeM;
   });
-}
-
-// New helper that uses LOCATION_INFO for time message.
-export function getLocationTimeMessage(
-  locationName: string,
-  currentTime: Date = new Date()
-): string {
-  const schedule = getTodaySchedule(locationName, currentTime);
-  if (!schedule || schedule.intervals.length === 0) return 'Closed';
-
-  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
-
-  // Check if currently open and return closing time
-  for (const { openTime, closeTime } of schedule.intervals) {
-    const openM = convertToMinutes(openTime);
-    const closeM = convertToMinutes(closeTime);
-    if (currentMinutes >= openM && currentMinutes < closeM) {
-      const diffMins = closeM - currentMinutes;
-      return diffMins < 60
-        ? `Closes in ${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'}`
-        : `Closes in ${Math.ceil(diffMins / 60)} ${Math.ceil(diffMins / 60) > 1 ? 'hours' : 'hour'}`;
-    }
-  }
-
-  // Check for next opening time today
-  const nextOpening = schedule.intervals
-    .map(({ openTime }) => convertToMinutes(openTime))
-    .filter((openM) => openM > currentMinutes)
-    .sort((a, b) => a - b)[0];
-
-  if (nextOpening !== undefined) {
-    const diffMins = nextOpening - currentMinutes;
-    return diffMins < 60
-      ? `Opens in ${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'}`
-      : `Opens in ${Math.ceil(diffMins / 60)} ${Math.ceil(diffMins / 60) > 1 ? 'hours' : 'hour'}`;
-  }
-
-  // Find the next open day
-  let dayOffset = 1;
-  while (dayOffset <= 7) {
-    const nextDate = addDays(currentTime, dayOffset);
-    const nextSchedule = getTodaySchedule(locationName, nextDate);
-    if (nextSchedule && nextSchedule.intervals.length > 0) {
-      const nextOpeningMins = convertToMinutes(nextSchedule.intervals[0].openTime);
-      const totalDiffMins = dayOffset * 24 * 60 - currentMinutes + nextOpeningMins;
-      return totalDiffMins >= 1440
-        ? `Opens in ${Math.ceil(totalDiffMins / 1440)} ${Math.ceil(totalDiffMins / 1440) > 1 ? 'days' : 'day'}`
-        : `Opens in ${Math.ceil(totalDiffMins / 60)} ${Math.ceil(totalDiffMins / 60) > 1 ? 'hours' : 'hour'}`;
-    }
-    dayOffset++;
-  }
-
-  return 'Closed';
 }
 
 // Database-based version of getLocationTimeMessage
@@ -258,74 +184,6 @@ const weekOrder: Record<WeekDay, number> = {
 // Generates an array of strings representing the schedule for a given location.
 // Each string is in the format "DAY-DAY: HH:MM AM - HH:MM AM/PM".
 // If the days in a schedule are not contiguous, they are joined by commas.
-export function generateSchedule(
-  locationName: string,
-  todayFirst: boolean = true,
-  date: Date = new Date()
-): { dayRange: string; time: string }[] {
-  const location = LOCATION_INFO.find((loc) => loc.name === locationName);
-  if (!location) return [];
-
-  const currentWeekDay = weekdayName(date);
-
-  // Helper to format one schedule block and return an object.
-  const formatSchedule = (
-    schedule: (typeof location.schedules)[number]
-  ): { dayRange: string; time: string } => {
-    // Sort days in week order.
-    const daysSorted = [...schedule.days].sort((a, b) => weekOrder[a] - weekOrder[b]);
-
-    let dayRange = '';
-    if (
-      daysSorted.length > 1 &&
-      weekOrder[daysSorted[daysSorted.length - 1]] - weekOrder[daysSorted[0]] ===
-        daysSorted.length - 1
-    ) {
-      // Contiguous range, e.g., Monday through Thursday.
-      dayRange = `${dayAbbreviations[daysSorted[0]]}-${dayAbbreviations[daysSorted[daysSorted.length - 1]]}`;
-    } else {
-      // Not contiguous – join using commas.
-      dayRange = daysSorted.map((d) => dayAbbreviations[d]).join(', ');
-    }
-
-    let time = '';
-    if (schedule.intervals.length === 0) {
-      time = 'CLOSED';
-    } else {
-      // Format each interval.
-      time = schedule.intervals
-        .map((interval) => {
-          const openStr = formatTimeFromNumber(interval.openTime, date);
-          const closeStr = formatTimeFromNumber(interval.closeTime, date);
-          return `${openStr} - ${closeStr}`;
-        })
-        .join(', ');
-    }
-
-    return { dayRange, time };
-  };
-
-  const result: { dayRange: string; time: string }[] = [];
-
-  if (todayFirst) {
-    // Include all schedule blocks, but put today's schedule first.
-    const todaySchedules = location.schedules.filter((schedule) =>
-      schedule.days.includes(currentWeekDay)
-    );
-    const otherSchedules = location.schedules.filter(
-      (schedule) => !schedule.days.includes(currentWeekDay)
-    );
-    todaySchedules.forEach((schedule) => result.push(formatSchedule(schedule)));
-    otherSchedules.forEach((schedule) => result.push(formatSchedule(schedule)));
-  } else {
-    // Use original order from LOCATION_INFO.
-    location.schedules.forEach((schedule) => result.push(formatSchedule(schedule)));
-  }
-
-  return result;
-}
-
-// Database-based version of generateSchedule
 export function generateScheduleFromData(
   locationData: schema.Location | null,
   todayFirst: boolean = true,

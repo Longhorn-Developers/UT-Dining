@@ -5,10 +5,10 @@ import { useDatabase } from './useDatabase';
 import { LOCATION_INFO } from '~/data/LocationInfo';
 import { getLocationMenuNames, getLocationMenuData, Location } from '~/db/database';
 
-export function useLocationData(location: string) {
+export function useMenuData(location: string) {
   const db = useDatabase();
 
-  const [data, setData] = useState<Location | null>(null);
+  const [menuData, setMenuData] = useState<Location | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedMenu, setSelectedMenu] = useState<string | null>(null);
   const [filters, setFilters] = useState<{ title: string; id: string }[]>([]);
@@ -19,19 +19,19 @@ export function useLocationData(location: string) {
       setLoading(true);
       try {
         // Check if the location is a coffee shop
-        const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
-        const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
+        // const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
+        // const isCoffeeShop = false;
 
-        // If it's a coffee shop, don't try to load menu data
-        if (isCoffeeShop) {
-          setData({
-            location_name: location,
-            menus: [],
-          });
-          setFilters([]);
-          setLoading(false);
-          return;
-        }
+        // // If it's a coffee shop, don't try to load menu data
+        // if (isCoffeeShop) {
+        //   setData({
+        //     location_name: location,
+        //     menus: [],
+        //   });
+        //   setFilters([]);
+        //   setLoading(false);
+        //   return;
+        // }
 
         const menuNames = await getLocationMenuNames(db, location);
         const fetchedData = await getLocationMenuData(db, location, menuNames[0] as string);
@@ -41,10 +41,10 @@ export function useLocationData(location: string) {
         }
 
         setFilters(menuNames.map((menuName) => ({ title: menuName || '', id: menuName || '' })));
-        setData(fetchedData);
+        setMenuData(fetchedData);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
-        setData(null);
+        setMenuData(null);
         setFilters([]);
         console.log('⚠️', e);
       } finally {
@@ -68,7 +68,7 @@ export function useLocationData(location: string) {
       setLoading(true);
       try {
         const data = await getLocationMenuData(db, location, selectedMenu);
-        setData(data);
+        setMenuData(data);
       } catch (error) {
         console.error('❌', error);
       } finally {
@@ -79,5 +79,5 @@ export function useLocationData(location: string) {
     fetchData();
   }, [selectedMenu, db, location]);
 
-  return { data, loading, selectedMenu, setSelectedMenu, filters };
+  return { menuData, loading, selectedMenu, setSelectedMenu, filters };
 }
