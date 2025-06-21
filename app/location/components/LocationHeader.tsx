@@ -11,8 +11,9 @@ import TopBar from '~/components/TopBar';
 import { LOCATION_INFO, getLocationName } from '~/data/LocationInfo';
 import { menu, location as location_schema } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
+import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
-import { generateSchedule, isLocationOpen } from '~/utils/time';
+import { generateScheduleFromData, isLocationOpenFromData } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
 interface LocationHeaderProps {
@@ -29,7 +30,8 @@ const LocationHeader = React.memo(
     const [open, setOpen] = useState(false);
     const db = useDatabase();
     const [timeDropdownOpen, setTimeDropdownOpen] = useState(false);
-    const schedule = useMemo(() => generateSchedule(location), [location]);
+    const { locationData } = useLocationDetails(location);
+    const schedule = generateScheduleFromData(locationData, true);
     const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
     const { useColloquialNames } = useSettingsStore();
     const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
@@ -37,31 +39,37 @@ const LocationHeader = React.memo(
 
     useEffect(() => {
       const checkOpen = async () => {
-        // Checking if there are any menus for the location
+        // For coffee shops, use database data directly
+        if (isCoffeeShop) {
+          setOpen(isLocationOpenFromData(locationData));
+          return;
+        }
+
+        // For other locations, check if there are any menus
         // Get location id
-        const locationData = db
+        const locationDbData = db
           .select()
           .from(location_schema)
           .where(eq(location_schema.name, location))
           .get();
 
-        if (!locationData) {
+        if (!locationDbData) {
           setOpen(false);
           return;
         }
 
-        const res = db.select().from(menu).where(eq(menu.location_id, locationData.id)).get();
+        const res = db.select().from(menu).where(eq(menu.location_id, locationDbData.id)).get();
 
         if (!res) {
           setOpen(false);
           return;
         }
 
-        setOpen(isLocationOpen(location));
+        setOpen(isLocationOpenFromData(locationData));
       };
 
       checkOpen();
-    }, [location]);
+    }, [location, locationData, isCoffeeShop]);
 
     return (
       <View className="mx-6 mt-6 flex gap-y-5">

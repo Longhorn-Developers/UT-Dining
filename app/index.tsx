@@ -69,6 +69,7 @@ export default function Home() {
   const [locations, setLocations] = useState<schema.Location[] | null>(null);
   const [locationTypes, setLocationTypes] = useState<schema.LocationType[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
@@ -128,6 +129,7 @@ export default function Home() {
       setCurrentTime(now);
       setLastUpdated(now);
       setShowRequeryAlert(false);
+      setRefreshKey((prev) => prev + 1); // Force re-render
 
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
@@ -202,7 +204,7 @@ export default function Home() {
       <Stack.Screen options={{ title: 'Home' }} />
       <Container onLayout={onLayoutRootView}>
         <FlatList
-          extraData={[currentTime, selectedFilter]}
+          extraData={[currentTime, selectedFilter, refreshKey]}
           data={filteredLocations}
           refreshControl={
             <RefreshControl
@@ -216,7 +218,13 @@ export default function Home() {
           renderItem={({ item }) => {
             const locationInfo = LOCATION_INFO.find((info) => info.name === item.name);
             if (!locationInfo) return null;
-            return <LocationItem location={item} currentTime={currentTime} />;
+            return (
+              <LocationItem
+                key={`${item.id}-${refreshKey}`}
+                location={item}
+                currentTime={currentTime}
+              />
+            );
           }}
           keyExtractor={(item) => item.id.toString()}
           numColumns={1}

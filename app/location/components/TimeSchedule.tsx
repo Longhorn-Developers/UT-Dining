@@ -12,7 +12,7 @@ interface TimeScheduleProps {
   onToggle: () => void;
 }
 
-const TimeSchedule = React.memo(({ schedule, isOpen, onToggle }: TimeScheduleProps) => {
+const TimeSchedule = ({ schedule, isOpen, onToggle }: TimeScheduleProps) => {
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   return (
@@ -57,6 +57,6 @@ const TimeSchedule = React.memo(({ schedule, isOpen, onToggle }: TimeSchedulePro
       </View>
     </TouchableOpacity>
   );
-});
+};
 
 export default TimeSchedule;

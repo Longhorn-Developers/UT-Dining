@@ -4,9 +4,10 @@ import { View, Text, Image, TouchableOpacity, Linking, Platform, ScrollView } fr
 
 import { LOCATION_INFO, getLocationName } from '~/data/LocationInfo';
 import { PAYMENT_INFO_ICONS, PaymentMethod } from '~/data/PaymentInfo';
+import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
-import { generateSchedule, isLocationOpen } from '~/utils/time';
+import { generateScheduleFromData, isLocationOpenFromData } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
 const paymentMethods: PaymentMethod[] = Object.keys(PAYMENT_INFO_ICONS) as PaymentMethod[];
@@ -19,21 +20,22 @@ const CoffeeShopSection = ({ locationName }: CoffeeShopSectionProps) => {
   const location = LOCATION_INFO.find((loc) => loc.name === locationName);
   const { useColloquialNames, isDarkMode } = useSettingsStore();
   const [isOpen, setIsOpen] = useState(false);
+  const { locationData } = useLocationDetails(locationName);
 
   useEffect(() => {
     const checkOpenStatus = () => {
-      const open = isLocationOpen(locationName);
+      const open = isLocationOpenFromData(locationData);
       setIsOpen(open);
     };
 
     checkOpenStatus();
     const interval = setInterval(checkOpenStatus, 60000); // Update every minute
     return () => clearInterval(interval);
-  }, [locationName]);
+  }, [locationData]);
 
   if (!location) return null;
 
-  const schedule = generateSchedule(location.name, false);
+  const schedule = generateScheduleFromData(locationData, false);
 
   return (
     <ScrollView
@@ -119,7 +121,7 @@ const CoffeeShopSection = ({ locationName }: CoffeeShopSectionProps) => {
             className={cn('text-2xl font-semibold', isDarkMode ? 'text-white' : 'text-gray-800')}>
             Regular Service Hours
           </Text>
-          {schedule.map((sch, index) => (
+          {schedule.map((sch: { dayRange: string; time: string }, index: number) => (
             <View key={index + '-schedule'} className="flex-row items-start justify-between">
               <Text className={cn('font-medium', isDarkMode ? 'text-white' : 'text-gray-700')}>
                 {sch.dayRange}:

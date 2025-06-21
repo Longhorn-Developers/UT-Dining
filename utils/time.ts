@@ -182,6 +182,47 @@ export function getLocationTimeMessage(
   return 'Closed';
 }
 
+// Database-based version of getLocationTimeMessage
+export function getLocationTimeMessageFromData(
+  locationData: schema.Location | null,
+  currentTime: Date = new Date()
+): string {
+  const schedule = getTodayScheduleFromData(locationData, currentTime);
+  if (!schedule || schedule.intervals.length === 0) return 'Closed';
+
+  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+
+  // Check if currently open and return closing time
+  for (const { openTime, closeTime } of schedule.intervals) {
+    const openM = convertToMinutes(openTime);
+    const closeM = convertToMinutes(closeTime);
+    if (currentMinutes >= openM && currentMinutes < closeM) {
+      const diffMins = closeM - currentMinutes;
+      return diffMins < 60
+        ? `Closes in ${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'}`
+        : `Closes in ${Math.ceil(diffMins / 60)} ${Math.ceil(diffMins / 60) > 1 ? 'hours' : 'hour'}`;
+    }
+  }
+
+  // Check for next opening time today
+  const nextOpening = schedule.intervals
+    .map(({ openTime }: { openTime: number }) => convertToMinutes(openTime))
+    .filter((openM: number) => openM > currentMinutes)
+    .sort((a: number, b: number) => a - b)[0];
+
+  if (nextOpening !== undefined) {
+    const diffMins = nextOpening - currentMinutes;
+    return diffMins < 60
+      ? `Opens in ${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'}`
+      : `Opens in ${Math.ceil(diffMins / 60)} ${Math.ceil(diffMins / 60) > 1 ? 'hours' : 'hour'}`;
+  }
+
+  // For database version, we need to check next days differently
+  // Since we don't have a simple way to get next day schedules from database in this context,
+  // we'll fall back to a simpler message
+  return 'Closed';
+}
+
 // Helper: convert HHMM number to a formatted time string.
 // It uses the provided date as a reference.
 function formatTimeFromNumber(time: number, referenceDate: Date): string {
@@ -300,20 +341,62 @@ export function generateScheduleFromData(
     days: WeekDay[],
     intervals: { openTime: number; closeTime: number }[]
   ): { dayRange: string; time: string } => {
-    // Sort days in week order.
-    const daysSorted = [...days].sort((a, b) => weekOrder[a] - weekOrder[b]);
+    let daysSorted: WeekDay[];
+
+    if (todayFirst && days.includes(currentWeekDay)) {
+      // Sort chronologically starting from current day
+      const currentDayIndex = weekOrder[currentWeekDay];
+      daysSorted = [...days].sort((a, b) => {
+        const aIndex = weekOrder[a];
+        const bIndex = weekOrder[b];
+
+        // Calculate days from current day (0 = today, 1 = tomorrow, etc.)
+        const getDaysFromToday = (dayIndex: number) => {
+          if (dayIndex >= currentDayIndex) {
+            return dayIndex - currentDayIndex;
+          } else {
+            return 7 - currentDayIndex + dayIndex;
+          }
+        };
+
+        return getDaysFromToday(aIndex) - getDaysFromToday(bIndex);
+      });
+    } else {
+      // Sort days in standard week order (Monday-Sunday)
+      daysSorted = [...days].sort((a, b) => weekOrder[a] - weekOrder[b]);
+    }
 
     let dayRange = '';
-    if (
-      daysSorted.length > 1 &&
-      weekOrder[daysSorted[daysSorted.length - 1]] - weekOrder[daysSorted[0]] ===
-        daysSorted.length - 1
-    ) {
-      // Contiguous range, e.g., Monday through Thursday.
-      dayRange = `${dayAbbreviations[daysSorted[0]]}-${dayAbbreviations[daysSorted[daysSorted.length - 1]]}`;
+    if (daysSorted.length > 1) {
+      if (todayFirst && days.includes(currentWeekDay)) {
+        // For chronological ordering, check if days are consecutive in chronological order
+        const isChronologicallyContiguous = daysSorted.every((day, index) => {
+          if (index === 0) return true;
+          const prevIndex = weekOrder[daysSorted[index - 1]];
+          const currIndex = weekOrder[day];
+          // Check if current day is next day after previous (with week wraparound)
+          return currIndex === (prevIndex % 7) + 1;
+        });
+
+        if (isChronologicallyContiguous) {
+          dayRange = `${dayAbbreviations[daysSorted[0]]}-${dayAbbreviations[daysSorted[daysSorted.length - 1]]}`;
+        } else {
+          dayRange = daysSorted.map((d) => dayAbbreviations[d]).join(', ');
+        }
+      } else {
+        // Standard week order contiguity check
+        if (
+          weekOrder[daysSorted[daysSorted.length - 1]] - weekOrder[daysSorted[0]] ===
+          daysSorted.length - 1
+        ) {
+          dayRange = `${dayAbbreviations[daysSorted[0]]}-${dayAbbreviations[daysSorted[daysSorted.length - 1]]}`;
+        } else {
+          dayRange = daysSorted.map((d) => dayAbbreviations[d]).join(', ');
+        }
+      }
     } else {
-      // Not contiguous – join using commas.
-      dayRange = daysSorted.map((d) => dayAbbreviations[d]).join(', ');
+      // Single day
+      dayRange = dayAbbreviations[daysSorted[0]];
     }
 
     let time = '';
@@ -341,10 +424,23 @@ export function generateScheduleFromData(
     intervals: { openTime: number; closeTime: number }[];
   }[] = [];
 
+  // Define day order to ensure consistent processing
+  const dayOrder: WeekDay[] = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ];
+
   // Convert new database format to our schedule format
   // Format: {"monday": {"isClosed": false, "timeRanges": [{"open": 1030, "close": 2100}]}}
-  Object.entries(serviceHours).forEach(([day, daySchedule]: [string, any]) => {
-    const capitalizedDay = (day.charAt(0).toUpperCase() + day.slice(1)) as WeekDay;
+  // Process days in order to ensure consistent grouping
+  dayOrder.forEach((weekDay) => {
+    const dayKey = weekDay.toLowerCase();
+    const daySchedule = serviceHours[dayKey];
 
     if (
       daySchedule &&
@@ -364,10 +460,10 @@ export function generateScheduleFromData(
       );
 
       if (existingGroup) {
-        existingGroup.days.push(capitalizedDay);
+        existingGroup.days.push(weekDay);
       } else {
         scheduleGroups.push({
-          days: [capitalizedDay],
+          days: [weekDay],
           intervals,
         });
       }
@@ -375,10 +471,10 @@ export function generateScheduleFromData(
       // Closed day - group with other closed days
       const closedGroup = scheduleGroups.find((group) => group.intervals.length === 0);
       if (closedGroup) {
-        closedGroup.days.push(capitalizedDay);
+        closedGroup.days.push(weekDay);
       } else {
         scheduleGroups.push({
-          days: [capitalizedDay],
+          days: [weekDay],
           intervals: [],
         });
       }
@@ -386,13 +482,76 @@ export function generateScheduleFromData(
   });
 
   if (todayFirst) {
-    // Include all schedule blocks, but put today's schedule first.
-    const todaySchedules = scheduleGroups.filter((group) => group.days.includes(currentWeekDay));
-    const otherSchedules = scheduleGroups.filter((group) => !group.days.includes(currentWeekDay));
-    todaySchedules.forEach((group) => result.push(formatSchedule(group.days, group.intervals)));
-    otherSchedules.forEach((group) => result.push(formatSchedule(group.days, group.intervals)));
+    // When todayFirst is true, process days individually in chronological order
+    const currentDayIndex = weekOrder[currentWeekDay];
+
+    // Create chronologically ordered day list starting from today
+    const chronologicalDays: WeekDay[] = [];
+    for (let i = 0; i < 7; i++) {
+      const dayIndex = ((currentDayIndex - 1 + i) % 7) + 1;
+      const day = Object.keys(weekOrder).find(
+        (d) => weekOrder[d as WeekDay] === dayIndex
+      ) as WeekDay;
+      chronologicalDays.push(day);
+    }
+
+    // Create a map to track intervals for each day
+    const dayIntervals = new Map<WeekDay, { openTime: number; closeTime: number }[]>();
+
+    chronologicalDays.forEach((weekDay) => {
+      const dayKey = weekDay.toLowerCase();
+      const daySchedule = serviceHours[dayKey];
+
+      if (
+        daySchedule &&
+        !daySchedule.isClosed &&
+        daySchedule.timeRanges &&
+        Array.isArray(daySchedule.timeRanges) &&
+        daySchedule.timeRanges.length > 0
+      ) {
+        const intervals = daySchedule.timeRanges.map((timeRange: any) => ({
+          openTime: timeRange.open,
+          closeTime: timeRange.close,
+        }));
+        dayIntervals.set(weekDay, intervals);
+      } else {
+        dayIntervals.set(weekDay, []);
+      }
+    });
+
+    // Now group consecutive days with same intervals
+    type ScheduleGroup = {
+      days: WeekDay[];
+      intervals: { openTime: number; closeTime: number }[];
+    };
+
+    let currentGroup: ScheduleGroup | null = null;
+
+    chronologicalDays.forEach((weekDay) => {
+      const intervals = dayIntervals.get(weekDay) || [];
+
+      if (currentGroup && JSON.stringify(currentGroup.intervals) === JSON.stringify(intervals)) {
+        // Same schedule as current group, add to it
+        currentGroup.days.push(weekDay);
+      } else {
+        // Different schedule, finalize current group and start new one
+        if (currentGroup) {
+          result.push(formatSchedule(currentGroup.days, currentGroup.intervals));
+        }
+        currentGroup = {
+          days: [weekDay],
+          intervals,
+        };
+      }
+    });
+
+    // Don't forget the last group
+    if (currentGroup) {
+      // @ts-expect-error - just to satisfy TypeScript, we know currentGroup is defined here
+      result.push(formatSchedule(currentGroup.days, currentGroup.intervals));
+    }
   } else {
-    // Use original order from database.
+    // Use original grouping logic for non-todayFirst case
     scheduleGroups.forEach((group) => result.push(formatSchedule(group.days, group.intervals)));
   }
 

@@ -8,9 +8,10 @@ import { View, Text, TouchableOpacity, Animated, Easing } from 'react-native';
 import { getLocationName, LOCATION_INFO } from '~/data/LocationInfo';
 import { Location, menu } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
+import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
-import { getLocationTimeMessage, isLocationOpen } from '~/utils/time';
+import { getLocationTimeMessageFromData, isLocationOpenFromData } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
 type LocationItemProps = {
@@ -23,33 +24,34 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
   const pingAnimation = useRef(new Animated.Value(0)).current;
   const db = useDatabase();
   const { useColloquialNames, isDarkMode, isColorBlindMode } = useSettingsStore();
+  const { locationData } = useLocationDetails(location.name ?? '');
 
   useEffect(() => {
     const checkOpen = async () => {
-      // Checking if there are any menus for the location
-      const res = db.select().from(menu).where(eq(menu.location_id, location.id)).get();
-
       // Check if this location is a Coffee Shop from LOCATION_INFO
       const locationInfo = LOCATION_INFO.find((loc) => loc.name === location.name);
       const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
 
       // For Coffee Shops, only check if there's a schedule, don't check for menus
       if (isCoffeeShop) {
-        setOpen(isLocationOpen(location.name as string, currentTime));
+        const isOpen = isLocationOpenFromData(locationData, currentTime);
+        setOpen(isOpen);
         return;
       }
 
       // For other locations, check for menu presence
+      const res = db.select().from(menu).where(eq(menu.location_id, location.id)).get();
       if (!res) {
         setOpen(false);
         return;
       }
 
-      setOpen(isLocationOpen(location.name as string, currentTime));
+      const isOpen = isLocationOpenFromData(locationData, currentTime);
+      setOpen(isOpen);
     };
 
     checkOpen();
-  }, [currentTime]);
+  }, [currentTime, locationData]);
 
   useEffect(() => {
     // Stop any running animation
@@ -159,7 +161,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
           </Text>
           <Text
             className={cn('text-xs font-medium', isDarkMode ? 'text-gray-400' : 'text-ut-grey/75')}>
-            {open ? getLocationTimeMessage(location.name ?? '', currentTime) : 'Closed'}
+            {open ? getLocationTimeMessageFromData(locationData, currentTime) : 'Closed'}
           </Text>
         </View>
       </View>
