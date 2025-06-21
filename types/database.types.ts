@@ -213,18 +213,21 @@ export type Database = {
       location_type: {
         Row: {
           created_at: string | null
+          display_order: number
           id: string
           name: string
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          display_order?: number
           id?: string
           name: string
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          display_order?: number
           id?: string
           name?: string
           updated_at?: string | null
@@ -233,19 +236,25 @@ export type Database = {
       }
       menu: {
         Row: {
+          date: string
           id: number
           location_id: string | null
           name: string | null
+          updated_at: string | null
         }
         Insert: {
+          date: string
           id?: number
           location_id?: string | null
           name?: string | null
+          updated_at?: string | null
         }
         Update: {
+          date?: string
           id?: number
           location_id?: string | null
           name?: string | null
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -366,10 +375,6 @@ export type Database = {
       insert_multiple_locations_and_menus: {
         Args: { arg_data_array: Json[] }
         Returns: boolean
-      }
-      update_force_close_for_all_locations: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
       }
     }
     Enums: {

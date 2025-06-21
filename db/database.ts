@@ -34,64 +34,151 @@ export interface FoodItem {
 
 const querySupabase = async () => {
   try {
-    const [
-      locationResult,
-      locationTypeResult,
-      menuResult,
-      menuCategoryResult,
-      foodItemResult,
-      nutritionResult,
-      allergensResult,
-    ] = await Promise.all([
+    // Calculate today's date in Central Time Zone
+    const today = new Date();
+    const centralTimeOffset = -6; // Central Time Zone offset
+    const centralTime = new Date(today.getTime() + centralTimeOffset * 60 * 60 * 1000);
+    const formattedDate = centralTime.toISOString().split('T')[0];
+
+    // Fetch base data in parallel (independent queries)
+    const [locationResult, locationTypeResult, menuResult] = await Promise.all([
       supabase.from('location').select('*'),
       supabase.from('location_type').select('*'),
-      supabase.from('menu').select('*'),
-      supabase.from('menu_category').select('*'),
-      supabase.from('food_item').select('*'),
-      supabase.from('nutrition').select('*'),
-      supabase.from('allergens').select('*'),
+      supabase.from('menu').select('*').eq('date', formattedDate),
     ]);
 
-    const errors = [];
+    // Check for errors in base queries
     if (locationResult.error) {
-      errors.push(`location: ${locationResult.error.message}`);
       console.error('❌ Error fetching location:', locationResult.error);
+      throw new Error(`location: ${locationResult.error.message}`);
     }
     if (locationTypeResult.error) {
-      errors.push(`location_type: ${locationTypeResult.error.message}`);
       console.error('❌ Error fetching location_type:', locationTypeResult.error);
+      throw new Error(`location_type: ${locationTypeResult.error.message}`);
     }
     if (menuResult.error) {
-      errors.push(`menu: ${menuResult.error.message}`);
       console.error('❌ Error fetching menu:', menuResult.error);
+      throw new Error(`menu: ${menuResult.error.message}`);
     }
+
+    const locationData = locationResult.data ?? [];
+    const locationTypeData = locationTypeResult.data ?? [];
+    const menuData = menuResult.data ?? [];
+
+    // Early return if no menus for today
+    if (menuData.length === 0) {
+      console.log('ℹ️ No menus found for today:', formattedDate);
+      return {
+        location: locationData,
+        location_type: locationTypeData,
+        menu: [],
+        menu_category: [],
+        food_item: [],
+        nutrition: [],
+        allergens: [],
+      };
+    }
+
+    // Extract IDs for subsequent queries
+    const menuIds = menuData.map((menu) => menu.id);
+
+    // Fetch menu categories
+    const menuCategoryResult = await supabase
+      .from('menu_category')
+      .select('*')
+      .in('menu_id', menuIds);
+
     if (menuCategoryResult.error) {
-      errors.push(`menu_category: ${menuCategoryResult.error.message}`);
       console.error('❌ Error fetching menu_category:', menuCategoryResult.error);
+      throw new Error(`menu_category: ${menuCategoryResult.error.message}`);
     }
+
+    const menuCategoryData = menuCategoryResult.data ?? [];
+
+    // Early return if no menu categories
+    if (menuCategoryData.length === 0) {
+      console.log('ℹ️ No menu categories found for menus:', menuIds);
+      return {
+        location: locationData,
+        location_type: locationTypeData,
+        menu: menuData,
+        menu_category: [],
+        food_item: [],
+        nutrition: [],
+        allergens: [],
+      };
+    }
+
+    const menuCategoryIds = menuCategoryData.map((category) => category.id);
+
+    // Fetch food items
+    const foodItemResult = await supabase
+      .from('food_item')
+      .select('*')
+      .in('menu_category_id', menuCategoryIds);
+
     if (foodItemResult.error) {
-      errors.push(`food_item: ${foodItemResult.error.message}`);
       console.error('❌ Error fetching food_item:', foodItemResult.error);
+      throw new Error(`food_item: ${foodItemResult.error.message}`);
     }
+
+    const foodItemData = foodItemResult.data ?? [];
+
+    // Early return if no food items
+    if (foodItemData.length === 0) {
+      console.log('ℹ️ No food items found for categories:', menuCategoryIds);
+      return {
+        location: locationData,
+        location_type: locationTypeData,
+        menu: menuData,
+        menu_category: menuCategoryData,
+        food_item: [],
+        nutrition: [],
+        allergens: [],
+      };
+    }
+
+    // Extract nutrition and allergen IDs from food items
+    const nutritionIds = foodItemData
+      .map((item: any) => item.nutrition_id)
+      .filter((id) => id !== null);
+    const allergenIds = foodItemData
+      .map((item: any) => item.allergens_id)
+      .filter((id) => id !== null);
+
+    // Fetch nutrition and allergens data in parallel
+    const nutritionPromise =
+      nutritionIds.length > 0
+        ? supabase.from('nutrition').select('*').in('id', nutritionIds)
+        : Promise.resolve({ data: [], error: null });
+
+    const allergensPromise =
+      allergenIds.length > 0
+        ? supabase.from('allergens').select('*').in('id', allergenIds)
+        : Promise.resolve({ data: [], error: null });
+
+    const [nutritionResult, allergensResult] = await Promise.all([
+      nutritionPromise,
+      allergensPromise,
+    ]);
+
+    // Check for errors in nutrition and allergens queries
     if (nutritionResult.error) {
-      errors.push(`nutrition: ${nutritionResult.error.message}`);
       console.error('❌ Error fetching nutrition:', nutritionResult.error);
+      throw new Error(`nutrition: ${nutritionResult.error.message}`);
     }
     if (allergensResult.error) {
-      errors.push(`allergens: ${allergensResult.error.message}`);
       console.error('❌ Error fetching allergens:', allergensResult.error);
+      throw new Error(`allergens: ${allergensResult.error.message}`);
     }
 
-    if (errors.length > 0) {
-      throw new Error('Error(s) fetching Supabase data: ' + errors.join(', '));
-    }
-
+    console.log('✅ Successfully fetched all Supabase data');
     return {
-      location: locationResult.data ?? [],
-      location_type: locationTypeResult.data ?? [],
-      menu: menuResult.data ?? [],
-      menu_category: menuCategoryResult.data ?? [],
-      food_item: foodItemResult.data ?? [],
+      location: locationData,
+      location_type: locationTypeData,
+      menu: menuData,
+      menu_category: menuCategoryData,
+      food_item: foodItemData,
       nutrition: nutritionResult.data ?? [],
       allergens: allergensResult.data ?? [],
     };
@@ -138,16 +225,34 @@ export const insertDataIntoSQLiteDB = async (
         db.delete(allergens).execute(),
       ]);
 
-      // Insert data from Supabase
-      await Promise.all([
-        db.insert(location).values(data.location),
-        db.insert(schema.location_type).values(data.location_type),
-        db.insert(menu).values(data.menu),
-        db.insert(menu_category).values(data.menu_category),
-        db.insert(food_item).values(data.food_item),
-        db.insert(nutrition).values(data.nutrition),
-        db.insert(allergens).values(data.allergens),
-      ]);
+      // Insert data from Supabase (with proper type casting)
+      const insertPromises = [];
+
+      if (data.location.length > 0) {
+        insertPromises.push(db.insert(location).values(data.location as any));
+      }
+      if (data.location_type.length > 0) {
+        insertPromises.push(db.insert(schema.location_type).values(data.location_type as any));
+      }
+      if (data.menu.length > 0) {
+        insertPromises.push(db.insert(menu).values(data.menu as any));
+      }
+      if (data.menu_category.length > 0) {
+        insertPromises.push(db.insert(menu_category).values(data.menu_category as any));
+      }
+      if (data.food_item.length > 0) {
+        insertPromises.push(db.insert(food_item).values(data.food_item as any));
+      }
+      if (data.nutrition.length > 0) {
+        insertPromises.push(db.insert(nutrition).values(data.nutrition as any));
+      }
+      if (data.allergens.length > 0) {
+        insertPromises.push(db.insert(allergens).values(data.allergens as any));
+      }
+
+      if (insertPromises.length > 0) {
+        await Promise.all(insertPromises);
+      }
 
       console.log('✅ Data added to database');
 

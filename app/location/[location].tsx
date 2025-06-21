@@ -236,12 +236,12 @@ const Location = () => {
   const EmptyState = useCallback(() => {
     if (loading) return null;
 
-    const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
-    const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
+    // const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
+    // const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
 
-    if (isCoffeeShop) {
-      return <CoffeeShopSection locationName={location} />;
-    }
+    // if (isCoffeeShop) {
+    //   return <CoffeeShopSection locationName={location} />;
+    // }
 
     const subtitle = () => {
       if (debouncedSearchQuery) {

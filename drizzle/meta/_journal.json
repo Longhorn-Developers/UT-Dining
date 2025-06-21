@@ -50,6 +50,13 @@
       "when": 1750481485432,
       "tag": "0006_flat_iron_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1750545203121,
+      "tag": "0007_noisy_alice",
+      "breakpoints": true
     }
   ]
 }

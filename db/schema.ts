@@ -32,6 +32,7 @@ export const menu = sqliteTable('menu', {
   id: integer('id').primaryKey(),
   name: text('name'),
   location_id: text('location_id').references(() => location.id),
+  date: text('date').notNull(),
 });
 
 export const menu_category = sqliteTable('menu_category', {

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 
 import { useDatabase } from './useDatabase';
 
-import { LOCATION_INFO } from '~/data/LocationInfo';
 import { getLocationMenuNames, getLocationMenuData, Location } from '~/db/database';
 
 export function useMenuData(location: string) {
@@ -59,10 +58,10 @@ export function useMenuData(location: string) {
   useEffect(() => {
     if (!selectedMenu) return;
 
-    // Check if the location is a coffee shop - skip fetching for coffee shops
-    const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
-    const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
-    if (isCoffeeShop) return;
+    // // Check if the location is a coffee shop - skip fetching for coffee shops
+    // const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
+    // const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
+    // if (isCoffeeShop) return;
 
     const fetchData = async () => {
       setLoading(true);
