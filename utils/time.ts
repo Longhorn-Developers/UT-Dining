@@ -2,6 +2,7 @@ import { parseISO, format, addDays } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
 
 import { LOCATION_INFO, LocationInfo, WeekDay } from '~/data/LocationInfo';
+import * as schema from '~/db/schema';
 import { miscStorage } from '~/store/misc-storage';
 
 const CENTRAL_TIME_ZONE = 'America/Chicago';
@@ -64,6 +65,35 @@ export function getTodaySchedule(locationName: string, date: Date = new Date()) 
   return location.schedules.find((schedule) => schedule.days.includes(day)) || null;
 }
 
+// Database-based version of getTodaySchedule
+export function getTodayScheduleFromData(
+  locationData: schema.Location | null,
+  date: Date = new Date()
+) {
+  if (!locationData || !locationData.regular_service_hours) return null;
+
+  const serviceHours = locationData.regular_service_hours as any;
+  const day = weekdayName(date).toLowerCase();
+  const daySchedule = serviceHours[day];
+
+  if (
+    !daySchedule ||
+    daySchedule.isClosed ||
+    !daySchedule.timeRanges ||
+    !Array.isArray(daySchedule.timeRanges)
+  ) {
+    return null;
+  }
+
+  return {
+    days: [weekdayName(date)],
+    intervals: daySchedule.timeRanges.map((timeRange: any) => ({
+      openTime: timeRange.open,
+      closeTime: timeRange.close,
+    })),
+  };
+}
+
 // Helper to convert HHMM number to minutes since midnight.
 function convertToMinutes(time: number): number {
   const hour = Math.floor(time / 100);
@@ -77,6 +107,22 @@ export function isLocationOpen(locationName: string, currentTime: Date = new Dat
   if (!schedule || schedule.intervals.length === 0) return false;
   const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
   return schedule.intervals.some((interval) => {
+    const openM = convertToMinutes(interval.openTime);
+    const closeM = convertToMinutes(interval.closeTime);
+    return currentMinutes >= openM && currentMinutes < closeM;
+  });
+}
+
+// Database-based version of isLocationOpen
+export function isLocationOpenFromData(
+  locationData: schema.Location | null,
+  currentTime: Date = new Date()
+): boolean {
+  const schedule = getTodayScheduleFromData(locationData, currentTime);
+  if (!schedule || schedule.intervals.length === 0) return false;
+
+  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  return schedule.intervals.some((interval: { openTime: number; closeTime: number }) => {
     const openM = convertToMinutes(interval.openTime);
     const closeM = convertToMinutes(interval.closeTime);
     return currentMinutes >= openM && currentMinutes < closeM;
@@ -233,6 +279,121 @@ export function generateSchedule(
   } else {
     // Use original order from LOCATION_INFO.
     location.schedules.forEach((schedule) => result.push(formatSchedule(schedule)));
+  }
+
+  return result;
+}
+
+// Database-based version of generateSchedule
+export function generateScheduleFromData(
+  locationData: schema.Location | null,
+  todayFirst: boolean = true,
+  date: Date = new Date()
+): { dayRange: string; time: string }[] {
+  if (!locationData || !locationData.regular_service_hours) return [];
+
+  const serviceHours = locationData.regular_service_hours as any;
+  const currentWeekDay = weekdayName(date);
+
+  // Helper to format one schedule block and return an object.
+  const formatSchedule = (
+    days: WeekDay[],
+    intervals: { openTime: number; closeTime: number }[]
+  ): { dayRange: string; time: string } => {
+    // Sort days in week order.
+    const daysSorted = [...days].sort((a, b) => weekOrder[a] - weekOrder[b]);
+
+    let dayRange = '';
+    if (
+      daysSorted.length > 1 &&
+      weekOrder[daysSorted[daysSorted.length - 1]] - weekOrder[daysSorted[0]] ===
+        daysSorted.length - 1
+    ) {
+      // Contiguous range, e.g., Monday through Thursday.
+      dayRange = `${dayAbbreviations[daysSorted[0]]}-${dayAbbreviations[daysSorted[daysSorted.length - 1]]}`;
+    } else {
+      // Not contiguous – join using commas.
+      dayRange = daysSorted.map((d) => dayAbbreviations[d]).join(', ');
+    }
+
+    let time = '';
+    if (intervals.length === 0) {
+      time = 'CLOSED';
+    } else {
+      // Format each interval.
+      time = intervals
+        .map((interval) => {
+          const openStr = formatTimeFromNumber(interval.openTime, date);
+          const closeStr = formatTimeFromNumber(interval.closeTime, date);
+          return `${openStr} - ${closeStr}`;
+        })
+        .join(', ');
+    }
+
+    return { dayRange, time };
+  };
+
+  const result: { dayRange: string; time: string }[] = [];
+
+  // Parse service hours and group by schedule pattern
+  const scheduleGroups: {
+    days: WeekDay[];
+    intervals: { openTime: number; closeTime: number }[];
+  }[] = [];
+
+  // Convert new database format to our schedule format
+  // Format: {"monday": {"isClosed": false, "timeRanges": [{"open": 1030, "close": 2100}]}}
+  Object.entries(serviceHours).forEach(([day, daySchedule]: [string, any]) => {
+    const capitalizedDay = (day.charAt(0).toUpperCase() + day.slice(1)) as WeekDay;
+
+    if (
+      daySchedule &&
+      !daySchedule.isClosed &&
+      daySchedule.timeRanges &&
+      Array.isArray(daySchedule.timeRanges) &&
+      daySchedule.timeRanges.length > 0
+    ) {
+      const intervals = daySchedule.timeRanges.map((timeRange: any) => ({
+        openTime: timeRange.open,
+        closeTime: timeRange.close,
+      }));
+
+      // Find existing group with same intervals or create new one
+      const existingGroup = scheduleGroups.find(
+        (group) => JSON.stringify(group.intervals) === JSON.stringify(intervals)
+      );
+
+      if (existingGroup) {
+        existingGroup.days.push(capitalizedDay);
+      } else {
+        scheduleGroups.push({
+          days: [capitalizedDay],
+          intervals,
+        });
+      }
+    } else {
+      // Closed day - group with other closed days
+      const closedGroup = scheduleGroups.find((group) => group.intervals.length === 0);
+      if (closedGroup) {
+        closedGroup.days.push(capitalizedDay);
+      } else {
+        scheduleGroups.push({
+          days: [capitalizedDay],
+          intervals: [],
+        });
+      }
+    }
+  });
+
+  if (todayFirst) {
+    // Include all schedule blocks, but put today's schedule first.
+    const todaySchedules = scheduleGroups.filter((group) => group.days.includes(currentWeekDay));
+    const otherSchedules = scheduleGroups.filter((group) => !group.days.includes(currentWeekDay));
+    todaySchedules.forEach((group) => result.push(formatSchedule(group.days, group.intervals)));
+    otherSchedules.forEach((group) => result.push(formatSchedule(group.days, group.intervals)));
+  } else {
+    // Use original order from database.
+    scheduleGroups.forEach((group) => result.push(formatSchedule(group.days, group.intervals)));
   }
 
   return result;

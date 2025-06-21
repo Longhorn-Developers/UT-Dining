@@ -465,3 +465,25 @@ export const toggleFavorites = async (
 
   return true;
 };
+
+export const getLocationDetails = async (
+  db: ExpoSQLiteDatabase<typeof schema>,
+  locationName: string
+): Promise<schema.Location | null> => {
+  try {
+    const locationData = await db
+      .select()
+      .from(schema.location)
+      .where(eq(schema.location.name, locationName))
+      .execute();
+
+    if (locationData.length === 0) {
+      return null;
+    }
+
+    return locationData[0];
+  } catch (error) {
+    console.error('❌ Error fetching location details:', error);
+    return null;
+  }
+};

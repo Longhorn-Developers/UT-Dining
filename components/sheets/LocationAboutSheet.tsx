@@ -5,20 +5,63 @@ import ActionSheet, { SheetProps } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getLocationName } from '~/data/LocationInfo';
-import { PAYMENT_INFO_ICONS, PaymentMethod } from '~/data/PaymentInfo';
+import { PAYMENT_INFO_ICONS } from '~/data/PaymentInfo';
+import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
-import { generateSchedule } from '~/utils/time';
+import { generateScheduleFromData } from '~/utils/time';
 import { cn } from '~/utils/utils';
-
-const paymentMethods: PaymentMethod[] = Object.keys(PAYMENT_INFO_ICONS) as PaymentMethod[];
 
 const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) => {
   const insets = useSafeAreaInsets();
-  const location = payload?.location;
-  const schedule = generateSchedule(location?.name || '', false);
+  const locationName = payload?.location?.name;
+  const { locationData, loading, error } = useLocationDetails(locationName || '');
   const { useColloquialNames } = useSettingsStore();
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
+
+  // Generate schedule from database data
+  const schedule = generateScheduleFromData(locationData, false);
+
+  // Get payment methods from database data - ensure it's an array
+  const paymentMethods = Array.isArray(locationData?.methods_of_payment)
+    ? locationData.methods_of_payment
+    : [];
+
+  if (loading) {
+    return (
+      <ActionSheet
+        id={sheetId}
+        defaultOverlayOpacity={0.5}
+        containerStyle={{ backgroundColor: isDarkMode ? '#1F2937' : 'white' }}
+        gestureEnabled
+        safeAreaInsets={insets}
+        useBottomSafeAreaPadding>
+        <View className="flex-col gap-y-3 p-6">
+          <Text className={cn('text-center', isDarkMode ? 'text-white' : 'text-black')}>
+            Loading location details...
+          </Text>
+        </View>
+      </ActionSheet>
+    );
+  }
+
+  if (error || !locationData) {
+    return (
+      <ActionSheet
+        id={sheetId}
+        defaultOverlayOpacity={0.5}
+        containerStyle={{ backgroundColor: isDarkMode ? '#1F2937' : 'white' }}
+        gestureEnabled
+        safeAreaInsets={insets}
+        useBottomSafeAreaPadding>
+        <View className="flex-col gap-y-3 p-6">
+          <Text className={cn('text-center', isDarkMode ? 'text-white' : 'text-black')}>
+            Unable to load location details
+          </Text>
+        </View>
+      </ActionSheet>
+    );
+  }
 
   return (
     <ActionSheet
@@ -35,24 +78,24 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
               <InfoIcon color={COLORS['ut-burnt-orange']} />
             </View>
             <Text className={cn('text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
-              About {location && getLocationName(location.name, useColloquialNames)}
+              About {locationData && getLocationName(locationData.name || '', useColloquialNames)}
             </Text>
           </View>
 
           <TouchableOpacity
             onPress={() => {
-              if (location) {
+              if (locationData) {
                 if (Platform.OS === 'ios') {
-                  Linking.openURL(location.appleMapsLink);
+                  Linking.openURL(locationData.apple_maps_link || '');
                 } else {
-                  Linking.openURL(location.googleMapsLink);
+                  Linking.openURL(locationData.google_maps_link || '');
                 }
               }
             }}
             className="flex-row items-center gap-x-1">
             <MapPin size={16} color={COLORS['ut-burnt-orange']} />
             <Text className={cn('', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
-              {location?.address}
+              {locationData?.address}
             </Text>
           </TouchableOpacity>
         </View>
@@ -65,7 +108,7 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
         />
 
         <Text className={cn('text-base', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
-          {location?.description}
+          {locationData?.description}
         </Text>
 
         <View className="flex-col gap-y-2">
@@ -89,14 +132,24 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
             Methods of Payment
           </Text>
           <View className="flex-row flex-wrap items-center justify-between gap-4">
-            {paymentMethods.map((method, index) => (
-              <View key={index} className="items-center justify-center gap-0.5">
-                <Image className="size-6" source={PAYMENT_INFO_ICONS[method]} />
-                <Text className={cn('font-medium', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
-                  {method}
-                </Text>
-              </View>
-            ))}
+            {paymentMethods.map((method: string, index: number) => {
+              // Check if method exists in PAYMENT_INFO_ICONS
+              if (method in PAYMENT_INFO_ICONS) {
+                return (
+                  <View key={index} className="items-center justify-center gap-0.5">
+                    <Image
+                      className="size-6"
+                      source={PAYMENT_INFO_ICONS[method as keyof typeof PAYMENT_INFO_ICONS]}
+                    />
+                    <Text
+                      className={cn('font-medium', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
+                      {method}
+                    </Text>
+                  </View>
+                );
+              }
+              return null;
+            })}
           </View>
         </View>
       </View>
