@@ -97,6 +97,11 @@ export function isLocationOpenFromData(
   locationData: schema.Location | null,
   currentTime: Date = new Date()
 ): boolean {
+  if (locationData?.force_close) {
+    // If the location is forced closed, return false immediately
+    return false;
+  }
+
   const schedule = getTodayScheduleFromData(locationData, currentTime);
   if (!schedule || schedule.intervals.length === 0) return false;
 
