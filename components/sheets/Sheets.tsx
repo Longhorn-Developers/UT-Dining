@@ -6,14 +6,13 @@ import FiltersSheet from './FiltersSheet';
 import FoodInfoSheet from './FoodInfoSheet';
 import LocationAboutSheet from './LocationAboutSheet';
 import MicrowaveLocationSheet from './MicrowaveLocationSheet';
-import SettingsSheet from './SettingsSheet';
 
 import { Location } from '~/db/schema';
 
 registerSheet('location-about', LocationAboutSheet);
 registerSheet('food-info', FoodInfoSheet, 'food');
 registerSheet('filters', FiltersSheet);
-registerSheet('settings', SettingsSheet);
+registerSheet('filters', FiltersSheet, 'settings');
 registerSheet('microwave-location', MicrowaveLocationSheet);
 
 // We extend some of the types here to give us great intellisense

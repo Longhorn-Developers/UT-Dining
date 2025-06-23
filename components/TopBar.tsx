@@ -69,7 +69,7 @@ const HomeTopBar = () => {
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            SheetManager.show('settings');
+            router.push('/settings');
           }}>
           <Cog size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>

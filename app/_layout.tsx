@@ -69,6 +69,14 @@ export default function Layout() {
                     sheetGrabberVisible: true,
                   }}
                 />
+
+                <Stack.Screen
+                  name="settings"
+                  options={{
+                    presentation: 'modal',
+                    sheetGrabberVisible: true,
+                  }}
+                />
               </Stack>
             </SheetProvider>
           </NotifierWrapper>
