@@ -17,21 +17,6 @@ export function useMenuData(location: string) {
     const initializeData = async () => {
       setLoading(true);
       try {
-        // Check if the location is a coffee shop
-        // const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
-        // const isCoffeeShop = false;
-
-        // // If it's a coffee shop, don't try to load menu data
-        // if (isCoffeeShop) {
-        //   setData({
-        //     location_name: location,
-        //     menus: [],
-        //   });
-        //   setFilters([]);
-        //   setLoading(false);
-        //   return;
-        // }
-
         const menuNames = await getLocationMenuNames(db, location);
         const fetchedData = await getLocationMenuData(db, location, menuNames[0] as string);
 
@@ -57,11 +42,6 @@ export function useMenuData(location: string) {
   // Handle menu changes
   useEffect(() => {
     if (!selectedMenu) return;
-
-    // // Check if the location is a coffee shop - skip fetching for coffee shops
-    // const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
-    // const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
-    // if (isCoffeeShop) return;
 
     const fetchData = async () => {
       setLoading(true);

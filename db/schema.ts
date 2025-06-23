@@ -24,6 +24,7 @@ export const location = sqliteTable('location', {
   apple_maps_link: text('apple_maps_link').notNull().default(''),
   image: text('image'),
   force_close: integer('force_close', { mode: 'boolean' }).notNull().default(false),
+  has_menus: integer('has_menus', { mode: 'boolean' }).notNull().default(false),
   created_at: text('created_at').default('CURRENT_TIMESTAMP'),
   updated_at: text('updated_at').default('CURRENT_TIMESTAMP'),
 });
@@ -170,3 +171,6 @@ export type Nutrition = typeof nutrition.$inferSelect;
 export type Allergens = typeof allergens.$inferSelect;
 export type FoodItem = typeof food_item.$inferSelect;
 export type Favorite = typeof favorites.$inferSelect;
+export interface LocationWithType extends Location {
+  type: LocationType['name'];
+}

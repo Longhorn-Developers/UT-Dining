@@ -38,13 +38,13 @@ export default function Layout() {
   }, [success]);
 
   return (
-    <Suspense fallback={<ActivityIndicator size="large" />}>
+    <Suspense fallback={<ActivityIndicator size="small" />}>
       <SQLiteProvider
         databaseName={DATABASE_NAME}
         options={{ enableChangeListener: true }}
         useSuspense>
         <GestureHandlerRootView>
-          <NotifierWrapper>
+          <NotifierWrapper useRNScreensOverlay>
             <SheetProvider>
               <Stack
                 screenOptions={{
@@ -53,8 +53,36 @@ export default function Layout() {
                     backgroundColor: 'white',
                   },
                   gestureEnabled: true,
-                }}
-              />
+                }}>
+                <Stack.Screen
+                  name="location_generic/[location]"
+                  options={{
+                    presentation: 'modal',
+                    sheetGrabberVisible: true,
+                  }}
+                />
+                <Stack.Screen
+                  name="meal-plan"
+                  options={{
+                    presentation: 'modal',
+                    sheetGrabberVisible: true,
+                  }}
+                />
+                <Stack.Screen
+                  name="favorites"
+                  options={{
+                    presentation: 'modal',
+                    sheetGrabberVisible: true,
+                  }}
+                />
+                <Stack.Screen
+                  name="location/food/[food]"
+                  options={{
+                    presentation: 'modal',
+                    sheetGrabberVisible: true,
+                  }}
+                />
+              </Stack>
             </SheetProvider>
           </NotifierWrapper>
         </GestureHandlerRootView>

@@ -11,7 +11,7 @@ import SettingsSheet from './SettingsSheet';
 import { Location } from '~/db/schema';
 
 registerSheet('location-about', LocationAboutSheet);
-registerSheet('food-info', FoodInfoSheet);
+registerSheet('food-info', FoodInfoSheet, 'food');
 registerSheet('filters', FiltersSheet);
 registerSheet('settings', SettingsSheet);
 registerSheet('microwave-location', MicrowaveLocationSheet);

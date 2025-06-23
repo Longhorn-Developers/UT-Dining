@@ -189,7 +189,7 @@ const MealPlan = () => {
           title: 'Meal Plan',
         }}
       />
-      <Container className="m-0">
+      <Container disableInsets className="m-0">
         <FlatList
           keyExtractor={(item) => `${item.name}-${item.categoryName}-${item.menuName}`}
           ListHeaderComponent={

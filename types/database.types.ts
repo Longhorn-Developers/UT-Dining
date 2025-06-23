@@ -157,6 +157,7 @@ export type Database = {
           description: string
           force_close: boolean
           google_maps_link: string
+          has_menu: boolean | null
           id: string
           image: string | null
           meal_times: Json[]
@@ -174,6 +175,7 @@ export type Database = {
           description?: string
           force_close?: boolean
           google_maps_link?: string
+          has_menu?: boolean | null
           id?: string
           image?: string | null
           meal_times?: Json[]
@@ -191,6 +193,7 @@ export type Database = {
           description?: string
           force_close?: boolean
           google_maps_link?: string
+          has_menu?: boolean | null
           id?: string
           image?: string | null
           meal_times?: Json[]

@@ -1,7 +1,6 @@
 import { eq, sql } from 'drizzle-orm';
 import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 
-import { addCoffeeShopLocations } from './coffee-shops';
 import { allergens, food_item, location, menu, menu_category, nutrition } from './schema';
 import * as schema from '../db/schema';
 
@@ -204,7 +203,6 @@ export const insertDataIntoSQLiteDB = async (
 
     if (!shouldRefresh) {
       console.log('✅ Data already added to database');
-      await addCoffeeShopLocations(db);
       return;
     }
   }
@@ -255,9 +253,6 @@ export const insertDataIntoSQLiteDB = async (
       }
 
       console.log('✅ Data added to database');
-
-      // Always add coffee shop locations
-      await addCoffeeShopLocations(db);
     } catch (error) {
       console.error('❌ Error inserting data into SQLite:', error);
       return;
@@ -307,6 +302,7 @@ export const getLocationMenuData = async (
         location_created_at: schema.location.created_at,
         location_updated_at: schema.location.updated_at,
         location_type_id: schema.location.type_id,
+        location_has_menus: schema.location.has_menus,
 
         // Menu and food data
         menu_id: schema.menu.id,
@@ -375,6 +371,7 @@ export const getLocationMenuData = async (
       apple_maps_link: data[0]?.location_apple_maps_link || '',
       image: data[0]?.location_image || null,
       force_close: data[0]?.location_force_close || false,
+      has_menus: data[0]?.location_has_menus || false,
     };
 
     // Create a menu entry for the selected menu
@@ -610,11 +607,30 @@ export const toggleFavorites = async (
 export const getLocationDetails = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string
-): Promise<schema.Location | null> => {
+): Promise<schema.LocationWithType | null> => {
   try {
     const locationData = await db
-      .select()
+      .select({
+        id: schema.location.id,
+        name: schema.location.name,
+        created_at: schema.location.created_at,
+        updated_at: schema.location.updated_at,
+        colloquial_name: schema.location.colloquial_name,
+        description: schema.location.description,
+        address: schema.location.address,
+        type_id: schema.location.type_id,
+        regular_service_hours: schema.location.regular_service_hours,
+        methods_of_payment: schema.location.methods_of_payment,
+        meal_times: schema.location.meal_times,
+        google_maps_link: schema.location.google_maps_link,
+        apple_maps_link: schema.location.apple_maps_link,
+        image: schema.location.image,
+        force_close: schema.location.force_close,
+        has_menus: schema.location.has_menus,
+        type: schema.location_type.name,
+      })
       .from(schema.location)
+      .leftJoin(schema.location_type, eq(schema.location.type_id, schema.location_type.id))
       .where(eq(schema.location.name, locationName))
       .execute();
 
@@ -622,7 +638,10 @@ export const getLocationDetails = async (
       return null;
     }
 
-    return locationData[0];
+    return {
+      ...locationData[0],
+      type: locationData[0].type || '',
+    };
   } catch (error) {
     console.error('❌ Error fetching location details:', error);
     return null;
@@ -652,6 +671,7 @@ export const getCompleteLocationData = async (
         location_created_at: schema.location.created_at,
         location_updated_at: schema.location.updated_at,
         location_type_id: schema.location.type_id,
+        location_has_menus: schema.location.has_menus,
 
         // Menu and food data (optional)
         menu_id: schema.menu.id,
@@ -721,6 +741,7 @@ export const getCompleteLocationData = async (
       apple_maps_link: data[0]?.location_apple_maps_link || '',
       image: data[0]?.location_image || null,
       force_close: data[0]?.location_force_close || false,
+      has_menus: data[0]?.location_has_menus || false,
     };
 
     // Group menus and their categories

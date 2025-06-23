@@ -46,8 +46,8 @@ const Favorites = () => {
           headerShown: false,
         }}
       />
-      <Container>
-        <View className="my-6 flex gap-y-5">
+      <Container disableInsets className="mx-0 mb-12 mt-6">
+        <View className="lex gap-y-5 px-6">
           <TopBar variant="back" />
           <View>
             <View className="flex-row items-center gap-x-2">
@@ -74,7 +74,7 @@ const Favorites = () => {
           estimatedItemSize={100}
           data={sortedFavorites}
           renderItem={({ item }) => (
-            <View>
+            <View className="px-6">
               <FoodComponent
                 categoryName={item.category_name}
                 food={{

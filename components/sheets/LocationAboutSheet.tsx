@@ -33,7 +33,7 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
       <ActionSheet
         id={sheetId}
         defaultOverlayOpacity={0.5}
-        containerStyle={{ backgroundColor: isDarkMode ? '#1F2937' : 'white' }}
+        containerStyle={{ backgroundColor: isDarkMode ? '#111827' : 'white' }}
         gestureEnabled
         safeAreaInsets={insets}
         useBottomSafeAreaPadding>
@@ -51,7 +51,7 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
       <ActionSheet
         id={sheetId}
         defaultOverlayOpacity={0.5}
-        containerStyle={{ backgroundColor: isDarkMode ? '#1F2937' : 'white' }}
+        containerStyle={{ backgroundColor: isDarkMode ? '#111827' : 'white' }}
         gestureEnabled
         safeAreaInsets={insets}
         useBottomSafeAreaPadding>
@@ -68,7 +68,7 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
     <ActionSheet
       id={sheetId}
       defaultOverlayOpacity={0.5}
-      containerStyle={{ backgroundColor: isDarkMode ? '#1F2937' : 'white' }}
+      containerStyle={{ backgroundColor: isDarkMode ? '#111827' : 'white' }}
       gestureEnabled
       safeAreaInsets={insets}
       useBottomSafeAreaPadding>

@@ -5,8 +5,7 @@ import { ChevronRight } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, Animated, Easing } from 'react-native';
 
-import { LOCATION_INFO } from '~/data/LocationInfo';
-import { Location, menu } from '~/db/schema';
+import { LocationWithType, menu } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
@@ -16,7 +15,7 @@ import { getLocationTimeMessage, isLocationOpen } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
 type LocationItemProps = {
-  location: Location;
+  location: LocationWithType;
   currentTime: Date;
 };
 
@@ -30,18 +29,6 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
 
   useEffect(() => {
     const checkOpen = async () => {
-      // Check if this location is a Coffee Shop from LOCATION_INFO
-      const locationInfo = LOCATION_INFO.find((loc) => loc.name === location.name);
-      const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
-
-      // For Coffee Shops, only check if there's a schedule, don't check for menus
-      if (isCoffeeShop) {
-        const isOpen = isLocationOpen(locationData, currentTime);
-        setOpen(isOpen);
-        return;
-      }
-
-      // For other locations, check for menu presence
       const res = db.select().from(menu).where(eq(menu.location_id, location.id)).get();
       if (!res) {
         setOpen(false);
@@ -93,7 +80,11 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
   return (
     <TouchableOpacity
       onPress={async () => {
-        router.push(`/location/${location.name}`);
+        if (locationData?.has_menus) {
+          router.push(`/location/${location.name}`);
+        } else {
+          router.push(`/location_generic/${location.name}`);
+        }
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       }}
       className={cn(

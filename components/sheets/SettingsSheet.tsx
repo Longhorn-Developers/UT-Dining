@@ -210,7 +210,7 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
     <ActionSheet
       id={sheetId}
       defaultOverlayOpacity={0.5}
-      containerStyle={{ backgroundColor: isDarkMode ? '#1f2937' : 'white' }}
+      containerStyle={{ backgroundColor: isDarkMode ? '#111827' : 'white' }}
       gestureEnabled
       safeAreaInsets={insets}
       useBottomSafeAreaPadding>

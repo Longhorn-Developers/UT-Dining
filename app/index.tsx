@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import * as Haptics from 'expo-haptics';
@@ -10,8 +11,8 @@ import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native'
 import { Notifier } from 'react-native-notifier';
 
 import * as schema from '../db/schema';
-import HomeHeader from './components/HomeHeader';
-import LocationItem from './components/LocationItem';
+import HomeHeader from './_components/HomeHeader';
+import LocationItem from './_components/LocationItem';
 
 import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
@@ -38,7 +39,9 @@ SplashScreen.setOptions({
 export type FilterType = 'all' | string;
 
 // Utility functions
-const sortLocations = (data: schema.Location[]): schema.Location[] => {
+
+// TODO: gotta fix.
+const sortLocations = (data: schema.LocationWithType[]) => {
   return [...data].sort((a, b) => {
     const indexA = LOCATION_INFO.findIndex((info) => info.name === a.name);
     const indexB = LOCATION_INFO.findIndex((info) => info.name === b.name);
@@ -47,10 +50,10 @@ const sortLocations = (data: schema.Location[]): schema.Location[] => {
 };
 
 const filterLocationsByType = (
-  locations: schema.Location[],
+  locations: schema.LocationWithType[],
   locationTypes: schema.LocationType[],
   filter: FilterType
-): schema.Location[] => {
+) => {
   if (filter === 'all') return locations;
 
   // Find the location type that matches the filter
@@ -67,7 +70,7 @@ export default function Home() {
   const [refreshing, setRefreshing] = useState(false);
   const [appIsReady, setAppIsReady] = useState(false);
   const [showRequeryAlert, setShowRequeryAlert] = useState(false);
-  const [locations, setLocations] = useState<schema.Location[] | null>(null);
+  const [locations, setLocations] = useState<schema.LocationWithType[] | null>(null);
   const [locationTypes, setLocationTypes] = useState<schema.LocationType[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -103,7 +106,16 @@ export default function Home() {
 
       // Fetch locations and location types concurrently
       const [data, types] = await Promise.all([
-        drizzleDb.select().from(schema.location),
+        drizzleDb
+          .select()
+          .from(schema.location)
+          .innerJoin(schema.location_type, eq(schema.location.type_id, schema.location_type.id))
+          .then((joinedData) =>
+            joinedData.map(({ location, location_type }) => ({
+              ...location,
+              type: location_type.name,
+            }))
+          ),
         drizzleDb.select().from(schema.location_type).orderBy(schema.location_type.display_order),
       ]);
 
@@ -135,7 +147,16 @@ export default function Home() {
 
       // Refresh both locations and location types concurrently
       const [data, types] = await Promise.all([
-        drizzleDb.select().from(schema.location),
+        drizzleDb
+          .select()
+          .from(schema.location)
+          .innerJoin(schema.location_type, eq(schema.location.type_id, schema.location_type.id))
+          .then((joinedData) =>
+            joinedData.map(({ location, location_type }) => ({
+              ...location,
+              type: location_type.name,
+            }))
+          ),
         drizzleDb.select().from(schema.location_type).orderBy(schema.location_type.display_order),
       ]);
 
@@ -233,8 +254,6 @@ export default function Home() {
           }
           contentContainerClassName="flex gap-y-3"
           renderItem={({ item }) => {
-            const locationInfo = LOCATION_INFO.find((info) => info.name === item.name);
-            if (!locationInfo) return null;
             return (
               <LocationItem
                 key={`${item.id}-${refreshKey}`}
