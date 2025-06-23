@@ -71,7 +71,6 @@ const Favorites = () => {
           />
         </View>
         <FlashList
-          estimatedItemSize={100}
           data={sortedFavorites}
           renderItem={({ item }) => (
             <View className="px-6">

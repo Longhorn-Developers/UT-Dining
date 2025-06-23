@@ -268,7 +268,6 @@ const Location = () => {
           onScroll={handleScroll}
           scrollEventThrottle={16}
           showsVerticalScrollIndicator
-          estimatedItemSize={80}
           data={getDisplayedItems()}
           ListHeaderComponent={
             <LocationHeader

@@ -45,7 +45,6 @@ const FoodScreen = () => {
         <Stack.Screen options={{ title: 'Food' }} />
         <Container disableInsets className="mx-0 mt-2">
           <FlashList
-            estimatedItemSize={14}
             data={nutritionDataFiltered}
             renderItem={({ item }) => <NutritionRow item={item} isDarkMode={isDarkMode} />}
             ListHeaderComponent={
