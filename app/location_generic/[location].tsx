@@ -63,7 +63,24 @@ const GenericLocation = () => {
           headerShown: false,
         }}
       />
-      <Container disableInsets className="mx-0 mb-12 mt-6">
+      {/* Pull Down Indicator (outside FlatList) */}
+      <View
+        style={{
+          alignItems: 'center',
+          paddingTop: 8,
+          paddingBottom: 8,
+          backgroundColor: isDarkMode ? '#111827' : '#fff',
+        }}>
+        <View
+          style={{
+            width: 40,
+            height: 5,
+            borderRadius: 2.5,
+            backgroundColor: isDarkMode ? '#fff' : '#F0F0F0',
+          }}
+        />
+      </View>
+      <Container disableInsets className="mx-0 mb-12">
         <FlatList
           data={[{}]} // dummy item just to satisfy FlatList
           keyExtractor={(_, index) => `main-content-${index}`}
@@ -71,15 +88,13 @@ const GenericLocation = () => {
           contentContainerStyle={{
             padding: 0,
             alignItems: 'center',
-            width: '100%', // now this 100% is relative to the FlatList’s real width
+            width: '100%', // now this 100% is relative to the FlatList's real width
           }}
-          stickyHeaderIndices={[0]}
-          ListHeaderComponent={<TopBar variant="generic-location" />}
           renderItem={() => (
             <View className="mb-6 flex-1 flex-col gap-y-4">
               {locationData.image && (
                 <Image
-                  className="my-6 aspect-[16/9] w-full rounded-3xl shadow-lg"
+                  className="mb-6 aspect-[16/9] w-full rounded-3xl shadow-lg"
                   source={{ uri: locationData.image }}
                   resizeMode="cover"
                 />
