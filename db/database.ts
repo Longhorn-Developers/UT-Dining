@@ -4,9 +4,7 @@ import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import { allergens, food_item, location, menu, menu_category, nutrition } from './schema';
 import * as schema from '../db/schema';
 
-import { miscStorage } from '~/store/misc-storage';
 import { supabase } from '~/utils/supabase';
-import { shouldRequery } from '~/utils/time';
 
 export interface Location extends schema.Location {
   location_name: schema.Location['name'];
@@ -197,16 +195,7 @@ export const insertDataIntoSQLiteDB = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   force = false
 ) => {
-  if (!force) {
-    const shouldRefresh = await shouldRequery();
-    console.log('🔄 Should refresh data:', shouldRefresh);
-
-    if (!shouldRefresh) {
-      console.log('✅ Data already added to database');
-      return;
-    }
-  }
-
+  // Always fetch and insert data when called (TanStack Query will control when this runs)
   console.log('📡 Fetching fresh data from Supabase...');
   const data = await querySupabase();
 
@@ -255,10 +244,7 @@ export const insertDataIntoSQLiteDB = async (
       console.log('✅ Data added to database');
     } catch (error) {
       console.error('❌ Error inserting data into SQLite:', error);
-      return;
     }
-
-    miscStorage.set('lastQueryTime', new Date().toISOString());
   } else {
     console.error('❌ Error fetching data from Supabase');
   }

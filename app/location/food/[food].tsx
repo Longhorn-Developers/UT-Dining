@@ -43,8 +43,26 @@ const FoodScreen = () => {
     <SheetProvider context="food">
       <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
         <Stack.Screen options={{ title: 'Food' }} />
+        {/* Pull Down Indicator (outside FlashList) */}
+        <View
+          style={{
+            alignItems: 'center',
+            paddingTop: 8,
+            paddingBottom: 8,
+            backgroundColor: isDarkMode ? '#111827' : '#fff',
+          }}>
+          <View
+            style={{
+              width: 40,
+              height: 5,
+              borderRadius: 2.5,
+              backgroundColor: isDarkMode ? '#fff' : '#F0F0F0',
+            }}
+          />
+        </View>
         <Container disableInsets className="mx-0 mt-2">
           <FlashList
+            estimatedItemSize={32}
             data={nutritionDataFiltered}
             renderItem={({ item }) => <NutritionRow item={item} isDarkMode={isDarkMode} />}
             ListHeaderComponent={

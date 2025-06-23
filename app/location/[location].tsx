@@ -263,6 +263,7 @@ const Location = () => {
       <Stack.Screen options={{ title: 'Location' }} />
       <Container className="relative mx-0 w-full flex-1">
         <FlashList
+          estimatedItemSize={60}
           extraData={favorites}
           ref={listRef}
           onScroll={handleScroll}

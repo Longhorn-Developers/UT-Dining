@@ -1,32 +1,17 @@
-import { parseISO, format } from 'date-fns';
-import { toZonedTime } from 'date-fns-tz';
+import { format } from 'date-fns';
 
-import { LocationInfo } from '~/data/LocationInfo';
 import * as schema from '~/db/schema';
-import { miscStorage } from '~/store/misc-storage';
 
 type WeekDay = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
-const CENTRAL_TIME_ZONE = 'America/Chicago';
 
-// Helper to determine if a requery is needed based on the last query time.
-export const shouldRequery = async (): Promise<boolean> => {
-  const lastQueryTime = miscStorage.getString('lastQueryTime');
-  if (!lastQueryTime) return true;
-  const lastQueryDate = parseISO(lastQueryTime);
-  const now = new Date();
-  const nowCentral = toZonedTime(now, CENTRAL_TIME_ZONE);
-  const lastQueryCentral = toZonedTime(lastQueryDate, CENTRAL_TIME_ZONE);
-
-  // Prevent requerying before 3:00 AM CST
-  if (nowCentral.getHours() < 3) {
-    return false;
-  }
-
-  const nowDate = format(nowCentral, 'yyyy-MM-dd');
-  const lastQueryDateFormatted = format(lastQueryCentral, 'yyyy-MM-dd');
-
-  return nowDate !== lastQueryDateFormatted;
+// Define the meal times structure
+type MealTime = {
+  name: string;
+  start_time: number;
+  end_time: number;
 };
+
+type MealTimes = MealTime[];
 
 // Returns weekday name, e.g., 'Monday'
 const weekdayName = (date: Date): WeekDay => format(date, 'EEEE') as WeekDay;
@@ -34,7 +19,7 @@ const weekdayName = (date: Date): WeekDay => format(date, 'EEEE') as WeekDay;
 // Returns time of day: 'morning', 'afternoon', or 'evening'
 export const timeOfDay = (
   date: Date,
-  mealTimes?: LocationInfo['mealTimes']
+  mealTimes?: MealTimes
 ): 'morning' | 'afternoon' | 'evening' => {
   const hour = date.getHours();
   const minutes = date.getMinutes();
@@ -42,9 +27,12 @@ export const timeOfDay = (
   const currentTime = hour * 100 + minutes;
 
   // If mealTimes is provided, use it to determine time of day
-  if (mealTimes) {
-    const breakfastEnd = mealTimes.breakfast?.closeTime ? mealTimes.breakfast.closeTime : 1100;
-    const lunchEnd = mealTimes.lunch?.closeTime ? mealTimes.lunch.closeTime : 1700;
+  if (mealTimes && mealTimes.length > 0) {
+    const breakfast = mealTimes.find((meal) => meal.name === 'Breakfast');
+    const lunch = mealTimes.find((meal) => meal.name === 'Lunch');
+
+    const breakfastEnd = breakfast?.end_time ?? 1100;
+    const lunchEnd = lunch?.end_time ?? 1700;
 
     if (currentTime < breakfastEnd) return 'morning';
     if (currentTime < lunchEnd) return 'afternoon';
@@ -53,7 +41,7 @@ export const timeOfDay = (
 
   // Fall back to default logic if mealTimes not provided
   if (hour < 11) return 'morning';
-  if (hour < 17) return 'afternoon';
+  if (hour < 1) return 'afternoon';
   return 'evening';
 };
 

@@ -33,7 +33,6 @@ interface MealPlanState {
   clearMealPlan: () => void;
   isMealPlanItem: (name: string) => boolean;
   getMealPlanItem: (name: string) => MealPlanItem | null;
-  checkAndClearIfStale: () => Promise<void>;
 }
 
 /**
@@ -114,19 +113,6 @@ export const useMealPlanStore = create<MealPlanState>()(
       getMealPlanItem: (name) => {
         return get().mealPlanItems.find((item) => item.name === name) || null;
       },
-
-      // Check if data is stale and clear meal plan if needed
-      checkAndClearIfStale: async () => {
-        try {
-          // If data should be requeried (e.g., it's a new day), clear the meal plan
-          if (await shouldRequery()) {
-            console.log('🗑️ Menu data is stale, clearing meal plan');
-            get().clearMealPlan();
-          }
-        } catch (error) {
-          console.error('❌ Error checking meal plan staleness:', error);
-        }
-      },
     }),
     {
       name: STORAGE_KEY_MEALPLAN,
@@ -134,11 +120,6 @@ export const useMealPlanStore = create<MealPlanState>()(
       onRehydrateStorage: () => (state) => {
         if (state) {
           state.initialized = true;
-
-          // Check if we need to clear the meal plan on rehydration
-          setTimeout(() => {
-            useMealPlanStore.getState().checkAndClearIfStale();
-          }, 100);
         }
       },
     }
