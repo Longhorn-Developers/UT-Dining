@@ -46,8 +46,8 @@ const Favorites = () => {
           headerShown: false,
         }}
       />
-      <Container disableInsets className="mx-0 mb-12 mt-6">
-        <View className="lex gap-y-5 px-6">
+      <Container className="mx-0 mb-12">
+        <View className="mt-6 flex gap-y-5 px-6">
           <TopBar variant="back" />
           <View>
             <View className="flex-row items-center gap-x-2">

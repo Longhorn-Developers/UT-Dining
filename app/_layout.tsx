@@ -61,20 +61,7 @@ export default function Layout() {
                     sheetGrabberVisible: true,
                   }}
                 />
-                <Stack.Screen
-                  name="meal-plan"
-                  options={{
-                    presentation: 'modal',
-                    sheetGrabberVisible: true,
-                  }}
-                />
-                <Stack.Screen
-                  name="favorites"
-                  options={{
-                    presentation: 'modal',
-                    sheetGrabberVisible: true,
-                  }}
-                />
+
                 <Stack.Screen
                   name="location/food/[food]"
                   options={{
