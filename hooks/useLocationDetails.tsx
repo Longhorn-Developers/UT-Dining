@@ -7,7 +7,7 @@ import * as schema from '~/db/schema';
 
 export function useLocationDetails(locationName: string) {
   const db = useDatabase();
-  const [locationData, setLocationData] = useState<schema.Location | null>(null);
+  const [locationData, setLocationData] = useState<schema.LocationWithType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

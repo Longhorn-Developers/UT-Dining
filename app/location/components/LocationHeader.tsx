@@ -81,7 +81,7 @@ const LocationHeader = React.memo(
           )}
 
           <View>
-            <View className="w-full flex-row items-center justify-between">
+            <View className="w-full flex-row flex-wrap items-center  gap-x-3 gap-y-1">
               <Text
                 className={cn(
                   'font-sans text-3xl font-extrabold',
@@ -89,10 +89,33 @@ const LocationHeader = React.memo(
                 )}>
                 {displayName}
               </Text>
+
+              {/* Location Type Pill */}
+              {locationData && locationData.type && (
+                <>
+                  <View>
+                    <View
+                      className={cn(
+                        'self-start rounded-full px-3 py-1  ',
+                        isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-ut-grey/5'
+                      )}>
+                      <Text
+                        className={cn(
+                          'text-xs font-bold uppercase',
+                          isDarkMode ? 'text-white' : 'text-black/75'
+                        )}>
+                        {locationData.type}
+                      </Text>
+                    </View>
+                  </View>
+                </>
+              )}
             </View>
-            <Text className="text-lg font-semibold text-ut-burnt-orange">
-              {open ? 'Open' : 'Closed'}
-            </Text>
+            <View className="flex-row items-center gap-x-3">
+              <Text className="text-lg font-semibold text-ut-burnt-orange">
+                {open ? 'Open' : 'Closed'}
+              </Text>
+            </View>
           </View>
 
           <TimeSchedule

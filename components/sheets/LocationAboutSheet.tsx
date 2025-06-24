@@ -117,9 +117,13 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
             {locationData?.description}
           </Text>
 
-          <View className="flex-col gap-y-2">
+          <View
+            className={cn(
+              'flex-col gap-y-3 rounded-xl p-4',
+              isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50'
+            )}>
             <Text
-              className={cn('text-2xl font-semibold', isDarkMode ? 'text-white' : 'text-black')}>
+              className={cn('text-2xl font-semibold', isDarkMode ? 'text-white ' : 'text-black')}>
               Regular Service Hours
             </Text>
             {schedule.map((schedule, index) => (

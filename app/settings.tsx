@@ -99,7 +99,8 @@ const SettingsPage = () => {
   );
 
   const AboutSection = () => (
-    <View className={cn('mt-2 rounded-lg p-4', isDarkMode ? 'bg-gray-800' : 'bg-gray-50')}>
+    <View
+      className={cn('mt-2 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50')}>
       <Text
         className={cn(
           'mb-2 text-lg font-semibold',
@@ -115,7 +116,8 @@ const SettingsPage = () => {
   );
 
   const HelpSupportSection = (): JSX.Element => (
-    <View className={cn('mt-4 rounded-lg p-4', isDarkMode ? 'bg-gray-800' : 'bg-gray-50')}>
+    <View
+      className={cn('mt-4 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50')}>
       <Text
         className={cn(
           'mb-2 text-lg font-semibold',
@@ -157,7 +159,11 @@ const SettingsPage = () => {
   );
 
   const CreditsSection = (): JSX.Element => (
-    <View className={cn('mt-4 gap-y-2 rounded-lg p-4', isDarkMode ? 'bg-gray-800' : 'bg-gray-50')}>
+    <View
+      className={cn(
+        'mt-4 gap-y-2 rounded-lg p-4',
+        isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50'
+      )}>
       <Text className={cn('text-lg font-semibold', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
         Credits
       </Text>

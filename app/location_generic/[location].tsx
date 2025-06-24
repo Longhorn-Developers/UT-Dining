@@ -1,10 +1,18 @@
-import { Link, Stack, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Clock, MapPin } from 'lucide-react-native';
-import React from 'react';
-import { View, Text, TouchableOpacity, Platform, Linking, FlatList, Image } from 'react-native';
+import React, { useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Platform,
+  Linking,
+  FlatList,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
 
 import { Container } from '~/components/Container';
-import TopBar from '~/components/TopBar';
 import { PAYMENT_INFO_ICONS } from '~/data/PaymentInfo';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
@@ -31,26 +39,23 @@ const GenericLocation = () => {
     ? locationData.methods_of_payment
     : [];
 
-  if (!locationData) {
-    return (
-      <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
-        <Stack.Screen
-          options={{
-            title: 'Location Not Found',
-            headerShown: false,
-          }}
-        />
-        <Container disableInsets>
-          <View className="my-6 flex gap-y-5">
-            <TopBar variant="back" />
-            <Text
-              className={cn('text-3xl font-extrabold', isDarkMode ? 'text-white' : 'text-black')}>
-              Location Not Found
-            </Text>
+  useEffect(() => {
+    if (!location) {
+      // If hot refresh wipes the param, navigate back
+      router.back();
+    }
+  }, [location]);
 
-            <Link href="/">Go Home</Link>
-          </View>
-        </Container>
+  if (!location || !locationData) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: isDarkMode ? '#111827' : '#fff',
+        }}>
+        <ActivityIndicator size="small" />
       </View>
     );
   }
@@ -110,19 +115,49 @@ const GenericLocation = () => {
 
               <View className="gap-2">
                 <View className="flex-row items-center gap-x-2">
-                  <Text
-                    className={cn('text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
-                    {displayName}
-                  </Text>
+                  <View>
+                    <Text
+                      className={cn(
+                        'text-3xl font-bold',
+                        isDarkMode ? 'text-white' : 'text-black'
+                      )}>
+                      {displayName}
+                    </Text>
+                  </View>
                 </View>
 
-                <View className="flex-row items-center gap-x-2">
+                <View className="flex-row items-center gap-x-3">
                   <View className="flex-row items-center gap-x-1">
                     <Clock size={16} color={COLORS['ut-burnt-orange']} />
                     <Text className="text-lg font-semibold text-ut-burnt-orange">
                       {isOpen ? 'Open' : 'Closed'}
                     </Text>
                   </View>
+                  <View
+                    className={cn(
+                      'size-1 rounded-full',
+                      isDarkMode ? 'bg-ut-grey-dark-mode' : 'bg-ut-burnt-orange'
+                    )}
+                  />
+
+                  {/* Location Type Pill */}
+                  {locationData.type && (
+                    <View>
+                      <View
+                        className={cn(
+                          'self-start rounded-full px-3 py-1  ',
+                          isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-ut-grey/5'
+                        )}>
+                        <Text
+                          className={cn(
+                            'text-xs font-bold uppercase',
+                            isDarkMode ? 'text-white' : 'text-black/75'
+                          )}>
+                          {locationData.type}
+                        </Text>
+                      </View>
+                    </View>
+                  )}
                 </View>
 
                 <TouchableOpacity
@@ -134,8 +169,11 @@ const GenericLocation = () => {
                     Linking.openURL(url);
                   }}
                   className="flex-row items-center gap-x-1">
-                  <MapPin size={16} color={COLORS['ut-burnt-orange']} />
-                  <Text className={cn('', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
+                  <MapPin
+                    size={16}
+                    color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']}
+                  />
+                  <Text className={cn(isDarkMode ? 'text-ut-grey-dark-mode' : 'text-ut-grey')}>
                     {locationData.address}
                   </Text>
                 </TouchableOpacity>
@@ -159,7 +197,7 @@ const GenericLocation = () => {
               <View
                 className={cn(
                   'flex-col gap-y-3 rounded-xl p-4',
-                  isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
+                  isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50'
                 )}>
                 <Text
                   className={cn(
