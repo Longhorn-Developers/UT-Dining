@@ -1,6 +1,6 @@
-import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { Clock, MapPin } from 'lucide-react-native';
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -27,6 +27,7 @@ const GenericLocation = () => {
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   const useColloquialNames = useSettingsStore((state) => state.useColloquialNames);
   const db = useDatabase();
+  const [imageLoading, setImageLoading] = useState(true);
 
   const { locationData } = useLocationDetails(location || '');
   const displayName = getLocationName(db, location || '', useColloquialNames);
@@ -38,13 +39,6 @@ const GenericLocation = () => {
   const paymentMethods = Array.isArray(locationData?.methods_of_payment)
     ? locationData.methods_of_payment
     : [];
-
-  useEffect(() => {
-    if (!location) {
-      // If hot refresh wipes the param, navigate back
-      router.back();
-    }
-  }, [location]);
 
   if (!location || !locationData) {
     return (
@@ -98,11 +92,23 @@ const GenericLocation = () => {
           renderItem={() => (
             <View className="mb-6 mt-3 flex-1 flex-col gap-y-4">
               {locationData.image && (
-                <Image
-                  className="mb-3 aspect-[16/9] w-full rounded-3xl shadow-lg"
-                  source={{ uri: locationData.image }}
-                  resizeMode="cover"
-                />
+                <View className="mb-3 aspect-[16/9] w-full overflow-hidden rounded-3xl shadow-lg">
+                  {imageLoading && (
+                    <View
+                      className={cn(
+                        'absolute inset-0 rounded-3xl',
+                        isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+                      )}
+                    />
+                  )}
+                  <Image
+                    className="aspect-[16/9] w-full rounded-3xl"
+                    source={{ uri: locationData.image }}
+                    resizeMode="cover"
+                    onLoadStart={() => setImageLoading(true)}
+                    onLoadEnd={() => setImageLoading(false)}
+                  />
+                </View>
               )}
 
               {locationData.force_close && (
@@ -232,7 +238,7 @@ const GenericLocation = () => {
                   )}>
                   Methods of Payment
                 </Text>
-                <View className="flex-row flex-wrap items-center justify-between gap-4">
+                <View className={cn('flex-row flex-wrap items-center justify-around gap-4')}>
                   {paymentMethods.map((method: string, index: number) => {
                     if (method in PAYMENT_INFO_ICONS) {
                       return (

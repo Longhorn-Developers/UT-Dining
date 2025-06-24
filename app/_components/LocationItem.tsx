@@ -29,18 +29,20 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
 
   useEffect(() => {
     const checkOpen = async () => {
-      const res = db.select().from(menu).where(eq(menu.location_id, location.id)).get();
-      if (!res) {
-        setOpen(false);
-        return;
+      if (location.has_menus) {
+        const res = db.select().from(menu).where(eq(menu.location_id, location.id)).get();
+        if (!res) {
+          setOpen(false);
+          return;
+        }
       }
 
-      const isOpen = isLocationOpen(locationData, currentTime);
+      const isOpen = isLocationOpen(locationData);
       setOpen(isOpen);
     };
 
     checkOpen();
-  }, [currentTime, locationData]);
+  }, [locationData, currentTime]);
 
   useEffect(() => {
     // Stop any running animation
@@ -81,6 +83,9 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
     <TouchableOpacity
       onPress={async () => {
         if (locationData?.has_menus) {
+          if (router.canDismiss()) {
+            router.dismissAll();
+          }
           router.push(`/location/${location.name}`);
         } else {
           router.push(`/location_generic/${location.name}`);
