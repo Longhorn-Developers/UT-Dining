@@ -1,8 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
-import * as Haptics from 'expo-haptics';
 import * as Network from 'expo-network';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -17,15 +15,11 @@ import LocationItem from './_components/LocationItem';
 
 import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
-import { LOCATION_INFO } from '~/data/LocationInfo';
-import { insertDataIntoSQLiteDB } from '~/db/database';
-import { miscStorage } from '~/store/misc-storage';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { fetchMenuData } from '~/utils/queries';
 
 // Constants
-const TIME_UPDATE_INTERVAL = 10000;
 const SPLASH_SCREEN_DURATION = 1000;
 const NOTIFICATION_DURATION = 3000;
 
@@ -42,13 +36,6 @@ export type FilterType = 'all' | string;
 // Utility functions
 
 // TODO: gotta fix.
-const sortLocations = (data: schema.LocationWithType[]) => {
-  return [...data].sort((a, b) => {
-    const indexA = LOCATION_INFO.findIndex((info) => info.name === a.name);
-    const indexB = LOCATION_INFO.findIndex((info) => info.name === b.name);
-    return indexA - indexB;
-  });
-};
 
 const filterLocationsByType = (
   locations: schema.LocationWithType[],
@@ -77,12 +64,19 @@ export default function Home() {
 
   useDrizzleStudio(db);
 
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // 1 minute
+    return () => clearInterval(interval);
+  }, []);
+
   // Use TanStack Query for menu/location data
   const { data, isLoading, isError, refetch, isFetching } = useQuery({
     queryKey: ['menuData'],
     queryFn: () => fetchMenuData(drizzleDb),
     staleTime: 3 * 60 * 60 * 1000, // 3 hour
-    refetchInterval: 1000 * 60 * 5, // 5 minutes polling while in app
+    refetchInterval: 1000 * 60 * 3, // 3 minutes polling while in app
     refetchOnMount: false,
     refetchOnWindowFocus: true,
   });
@@ -151,7 +145,7 @@ export default function Home() {
           alignItems: 'center',
           backgroundColor: isDarkMode ? '#111827' : '#fff',
         }}>
-        <ActivityIndicator size="large" color={COLORS['ut-burnt-orange']} />
+        <ActivityIndicator size="small" />
       </View>
     );
   }
@@ -175,9 +169,7 @@ export default function Home() {
   const locations = data?.locations || [];
   const locationTypes = data?.locationTypes || [];
 
-  // Prepare data
-  const sortedLocations = sortLocations(locations);
-  const filteredLocations = filterLocationsByType(sortedLocations, locationTypes, selectedFilter);
+  const filteredLocations = filterLocationsByType(locations, locationTypes, selectedFilter);
 
   return (
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
@@ -186,7 +178,13 @@ export default function Home() {
         <FlatList
           extraData={[currentTime, selectedFilter, refreshKey]}
           data={filteredLocations}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={handleRefresh}
+              tintColor={isDarkMode ? COLORS['ut-grey-dark-mode'] : '#8E8E93'}
+            />
+          }
           contentContainerClassName="flex gap-y-3"
           renderItem={({ item }) => {
             return (

@@ -14,6 +14,7 @@ export const location = sqliteTable('location', {
   colloquial_name: text('colloquial_name'),
   description: text('description').notNull().default(''),
   address: text('address').notNull().default(''),
+  display_order: integer('display_order').notNull().default(0),
   type_id: text('type_id')
     .notNull()
     .references(() => location_type.id),

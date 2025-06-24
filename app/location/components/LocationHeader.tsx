@@ -71,6 +71,15 @@ const LocationHeader = React.memo(
         <TopBar variant="location" />
 
         <View className="gap-y-4">
+          {/* TEMPORARILY CLOSED Banner */}
+          {locationData?.force_close && (
+            <View className="rounded-lg bg-red-600 px-4 py-2">
+              <Text className="text-center text-lg font-extrabold tracking-wider text-white">
+                TEMPORARILY CLOSED
+              </Text>
+            </View>
+          )}
+
           <View>
             <View className="w-full flex-row items-center justify-between">
               <Text
@@ -114,7 +123,7 @@ const LocationHeader = React.memo(
               />
             </View>
 
-            {filters && filters.length > 1 && <SearchBar query={query} setQuery={setQuery} />}
+            {filters && filters.length >= 1 && <SearchBar query={query} setQuery={setQuery} />}
           </View>
         </View>
       </View>

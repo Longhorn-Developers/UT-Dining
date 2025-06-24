@@ -271,17 +271,19 @@ const Location = () => {
           showsVerticalScrollIndicator
           data={getDisplayedItems()}
           ListHeaderComponent={
-            <LocationHeader
-              location={location}
-              selectedMenu={selectedMenu}
-              setSelectedMenu={setSelectedMenu}
-              filters={menuFilters}
-              query={searchQuery}
-              setQuery={(query) => {
-                resetExpandedCategories();
-                setSearchQuery(query);
-              }}
-            />
+            <>
+              <LocationHeader
+                location={location}
+                selectedMenu={selectedMenu}
+                setSelectedMenu={setSelectedMenu}
+                filters={menuFilters}
+                query={searchQuery}
+                setQuery={(query) => {
+                  resetExpandedCategories();
+                  setSearchQuery(query);
+                }}
+              />
+            </>
           }
           ListEmptyComponent={<EmptyState />}
           renderItem={renderItem}

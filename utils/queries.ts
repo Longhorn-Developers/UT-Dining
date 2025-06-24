@@ -20,6 +20,7 @@ export const fetchMenuData = async (drizzleDb: ExpoSQLiteDatabase<typeof schema>
       .select()
       .from(schema.location)
       .innerJoin(schema.location_type, eq(schema.location.type_id, schema.location_type.id))
+      .orderBy(schema.location.display_order)
       .then((joinedData) =>
         joinedData.map(({ location, location_type }) => ({
           ...location,

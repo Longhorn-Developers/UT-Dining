@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import * as Linking from 'expo-linking';
-import { Link, router, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ChefHat, ChevronLeft, Cog, Heart, Info, Map, Microwave } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { View, Image, TouchableOpacity, Text, Platform } from 'react-native';

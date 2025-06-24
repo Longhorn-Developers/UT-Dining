@@ -91,13 +91,21 @@ const GenericLocation = () => {
             width: '100%', // now this 100% is relative to the FlatList's real width
           }}
           renderItem={() => (
-            <View className="mb-6 flex-1 flex-col gap-y-4">
+            <View className="mb-6 mt-3 flex-1 flex-col gap-y-4">
               {locationData.image && (
                 <Image
-                  className="mb-6 aspect-[16/9] w-full rounded-3xl shadow-lg"
+                  className="mb-3 aspect-[16/9] w-full rounded-3xl shadow-lg"
                   source={{ uri: locationData.image }}
                   resizeMode="cover"
                 />
+              )}
+
+              {locationData.force_close && (
+                <View className="mb-3 rounded-lg bg-red-600 px-4 py-2">
+                  <Text className="text-center text-lg font-extrabold tracking-wider text-white">
+                    TEMPORARILY CLOSED
+                  </Text>
+                </View>
               )}
 
               <View className="gap-2">

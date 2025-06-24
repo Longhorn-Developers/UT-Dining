@@ -25,7 +25,7 @@ export function useMenuData(location: string) {
         }
 
         setFilters(menuNames.map((menuName) => ({ title: menuName || '', id: menuName || '' })));
-        setMenuData(fetchedData);
+        setMenuData(fetchedData as Location);
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
         setMenuData(null);
@@ -47,7 +47,7 @@ export function useMenuData(location: string) {
       setLoading(true);
       try {
         const data = await getLocationMenuData(db, location, selectedMenu);
-        setMenuData(data);
+        setMenuData(data as Location);
       } catch (error) {
         console.error('❌', error);
       } finally {

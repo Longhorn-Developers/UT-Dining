@@ -1,17 +1,9 @@
 import { format } from 'date-fns';
 
 import * as schema from '~/db/schema';
+import type { MealTimes } from '~/utils/locations';
 
 type WeekDay = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
-
-// Define the meal times structure
-type MealTime = {
-  name: string;
-  start_time: number;
-  end_time: number;
-};
-
-type MealTimes = MealTime[];
 
 // Returns weekday name, e.g., 'Monday'
 const weekdayName = (date: Date): WeekDay => format(date, 'EEEE') as WeekDay;
@@ -27,12 +19,9 @@ export const timeOfDay = (
   const currentTime = hour * 100 + minutes;
 
   // If mealTimes is provided, use it to determine time of day
-  if (mealTimes && mealTimes.length > 0) {
-    const breakfast = mealTimes.find((meal) => meal.name === 'Breakfast');
-    const lunch = mealTimes.find((meal) => meal.name === 'Lunch');
-
-    const breakfastEnd = breakfast?.end_time ?? 1100;
-    const lunchEnd = lunch?.end_time ?? 1700;
+  if (mealTimes && (mealTimes.breakfast || mealTimes.lunch || mealTimes.dinner)) {
+    const breakfastEnd = mealTimes.breakfast?.closeTime ?? 1100;
+    const lunchEnd = mealTimes.lunch?.closeTime ?? 1700;
 
     if (currentTime < breakfastEnd) return 'morning';
     if (currentTime < lunchEnd) return 'afternoon';
@@ -41,7 +30,7 @@ export const timeOfDay = (
 
   // Fall back to default logic if mealTimes not provided
   if (hour < 11) return 'morning';
-  if (hour < 1) return 'afternoon';
+  if (hour < 17) return 'afternoon';
   return 'evening';
 };
 
@@ -161,17 +150,6 @@ const dayAbbreviations: Record<WeekDay, string> = {
   Sunday: 'Sun',
 };
 
-// Order value for each weekday to check contiguity.
-const weekOrder: Record<WeekDay, number> = {
-  Monday: 1,
-  Tuesday: 2,
-  Wednesday: 3,
-  Thursday: 4,
-  Friday: 5,
-  Saturday: 6,
-  Sunday: 7,
-};
-
 // Generates an array of strings representing the schedule for a given location.
 // Each string is in the format "DAY-DAY: HH:MM AM - HH:MM AM/PM".
 // If the days in a schedule are not contiguous, they are joined by commas.
@@ -183,97 +161,6 @@ export function generateSchedule(
   if (!locationData || !locationData.regular_service_hours) return [];
 
   const serviceHours = locationData.regular_service_hours as any;
-  const currentWeekDay = weekdayName(date);
-
-  // Helper to format one schedule block and return an object.
-  const formatSchedule = (
-    days: WeekDay[],
-    intervals: { openTime: number; closeTime: number }[]
-  ): { dayRange: string; time: string } => {
-    let daysSorted: WeekDay[];
-
-    if (todayFirst && days.includes(currentWeekDay)) {
-      // Sort chronologically starting from current day
-      const currentDayIndex = weekOrder[currentWeekDay];
-      daysSorted = [...days].sort((a, b) => {
-        const aIndex = weekOrder[a];
-        const bIndex = weekOrder[b];
-
-        // Calculate days from current day (0 = today, 1 = tomorrow, etc.)
-        const getDaysFromToday = (dayIndex: number) => {
-          if (dayIndex >= currentDayIndex) {
-            return dayIndex - currentDayIndex;
-          } else {
-            return 7 - currentDayIndex + dayIndex;
-          }
-        };
-
-        return getDaysFromToday(aIndex) - getDaysFromToday(bIndex);
-      });
-    } else {
-      // Sort days in standard week order (Monday-Sunday)
-      daysSorted = [...days].sort((a, b) => weekOrder[a] - weekOrder[b]);
-    }
-
-    let dayRange = '';
-    if (daysSorted.length > 1) {
-      if (todayFirst && days.includes(currentWeekDay)) {
-        // For chronological ordering, check if days are consecutive in chronological order
-        const isChronologicallyContiguous = daysSorted.every((day, index) => {
-          if (index === 0) return true;
-          const prevIndex = weekOrder[daysSorted[index - 1]];
-          const currIndex = weekOrder[day];
-          // Check if current day is next day after previous (with week wraparound)
-          return currIndex === (prevIndex % 7) + 1;
-        });
-
-        if (isChronologicallyContiguous) {
-          dayRange = `${dayAbbreviations[daysSorted[0]]}-${dayAbbreviations[daysSorted[daysSorted.length - 1]]}`;
-        } else {
-          dayRange = daysSorted.map((d) => dayAbbreviations[d]).join(', ');
-        }
-      } else {
-        // Standard week order contiguity check
-        if (
-          weekOrder[daysSorted[daysSorted.length - 1]] - weekOrder[daysSorted[0]] ===
-          daysSorted.length - 1
-        ) {
-          dayRange = `${dayAbbreviations[daysSorted[0]]}-${dayAbbreviations[daysSorted[daysSorted.length - 1]]}`;
-        } else {
-          dayRange = daysSorted.map((d) => dayAbbreviations[d]).join(', ');
-        }
-      }
-    } else {
-      // Single day
-      dayRange = dayAbbreviations[daysSorted[0]];
-    }
-
-    let time = '';
-    if (intervals.length === 0) {
-      time = 'CLOSED';
-    } else {
-      // Format each interval.
-      time = intervals
-        .map((interval) => {
-          const openStr = formatTimeFromNumber(interval.openTime, date);
-          const closeStr = formatTimeFromNumber(interval.closeTime, date);
-          return `${openStr} - ${closeStr}`;
-        })
-        .join(', ');
-    }
-
-    return { dayRange, time };
-  };
-
-  const result: { dayRange: string; time: string }[] = [];
-
-  // Parse service hours and group by schedule pattern
-  const scheduleGroups: {
-    days: WeekDay[];
-    intervals: { openTime: number; closeTime: number }[];
-  }[] = [];
-
-  // Define day order to ensure consistent processing
   const dayOrder: WeekDay[] = [
     'Monday',
     'Tuesday',
@@ -284,13 +171,10 @@ export function generateSchedule(
     'Sunday',
   ];
 
-  // Convert new database format to our schedule format
-  // Format: {"monday": {"isClosed": false, "timeRanges": [{"open": 1030, "close": 2100}]}}
-  // Process days in order to ensure consistent grouping
-  dayOrder.forEach((weekDay) => {
+  // Helper to get intervals or closed status for a day
+  const getDayKey = (weekDay: WeekDay) => {
     const dayKey = weekDay.toLowerCase();
     const daySchedule = serviceHours[dayKey];
-
     if (
       daySchedule &&
       !daySchedule.isClosed &&
@@ -298,110 +182,60 @@ export function generateSchedule(
       Array.isArray(daySchedule.timeRanges) &&
       daySchedule.timeRanges.length > 0
     ) {
-      const intervals = daySchedule.timeRanges.map((timeRange: any) => ({
-        openTime: timeRange.open,
-        closeTime: timeRange.close,
-      }));
-
-      // Find existing group with same intervals or create new one
-      const existingGroup = scheduleGroups.find(
-        (group) => JSON.stringify(group.intervals) === JSON.stringify(intervals)
-      );
-
-      if (existingGroup) {
-        existingGroup.days.push(weekDay);
-      } else {
-        scheduleGroups.push({
-          days: [weekDay],
-          intervals,
-        });
-      }
+      return JSON.stringify(daySchedule.timeRanges);
     } else {
-      // Closed day - group with other closed days
-      const closedGroup = scheduleGroups.find((group) => group.intervals.length === 0);
-      if (closedGroup) {
-        closedGroup.days.push(weekDay);
-      } else {
-        scheduleGroups.push({
-          days: [weekDay],
-          intervals: [],
-        });
-      }
+      return 'CLOSED';
     }
-  });
+  };
 
-  if (todayFirst) {
-    // When todayFirst is true, process days individually in chronological order
-    const currentDayIndex = weekOrder[currentWeekDay];
-
-    // Create chronologically ordered day list starting from today
-    const chronologicalDays: WeekDay[] = [];
-    for (let i = 0; i < 7; i++) {
-      const dayIndex = ((currentDayIndex - 1 + i) % 7) + 1;
-      const day = Object.keys(weekOrder).find(
-        (d) => weekOrder[d as WeekDay] === dayIndex
-      ) as WeekDay;
-      chronologicalDays.push(day);
-    }
-
-    // Create a map to track intervals for each day
-    const dayIntervals = new Map<WeekDay, { openTime: number; closeTime: number }[]>();
-
-    chronologicalDays.forEach((weekDay) => {
-      const dayKey = weekDay.toLowerCase();
-      const daySchedule = serviceHours[dayKey];
-
-      if (
-        daySchedule &&
-        !daySchedule.isClosed &&
-        daySchedule.timeRanges &&
-        Array.isArray(daySchedule.timeRanges) &&
-        daySchedule.timeRanges.length > 0
-      ) {
-        const intervals = daySchedule.timeRanges.map((timeRange: any) => ({
-          openTime: timeRange.open,
-          closeTime: timeRange.close,
-        }));
-        dayIntervals.set(weekDay, intervals);
-      } else {
-        dayIntervals.set(weekDay, []);
+  // Helper to format intervals or closed
+  const formatTime = (weekDay: WeekDay) => {
+    const dayKey = weekDay.toLowerCase();
+    const daySchedule = serviceHours[dayKey];
+    if (
+      daySchedule &&
+      !daySchedule.isClosed &&
+      daySchedule.timeRanges &&
+      Array.isArray(daySchedule.timeRanges) &&
+      daySchedule.timeRanges.length > 0
+    ) {
+      const intervals = daySchedule.timeRanges.map((interval: any) => {
+        const openStr = formatTimeFromNumber(interval.open, date);
+        const closeStr = formatTimeFromNumber(interval.close, date);
+        return `${openStr} - ${closeStr}`;
+      });
+      // Group intervals in pairs, join with comma, then new line for next pair
+      const lines: string[] = [];
+      for (let i = 0; i < intervals.length; i += 2) {
+        lines.push(intervals.slice(i, i + 2).join(', '));
       }
-    });
-
-    // Now group consecutive days with same intervals
-    type ScheduleGroup = {
-      days: WeekDay[];
-      intervals: { openTime: number; closeTime: number }[];
-    };
-
-    let currentGroup: ScheduleGroup | null = null;
-
-    chronologicalDays.forEach((weekDay) => {
-      const intervals = dayIntervals.get(weekDay) || [];
-
-      if (currentGroup && JSON.stringify(currentGroup.intervals) === JSON.stringify(intervals)) {
-        // Same schedule as current group, add to it
-        currentGroup.days.push(weekDay);
-      } else {
-        // Different schedule, finalize current group and start new one
-        if (currentGroup) {
-          result.push(formatSchedule(currentGroup.days, currentGroup.intervals));
-        }
-        currentGroup = {
-          days: [weekDay],
-          intervals,
-        };
-      }
-    });
-
-    // Don't forget the last group
-    if (currentGroup) {
-      // @ts-expect-error - just to satisfy TypeScript, we know currentGroup is defined here
-      result.push(formatSchedule(currentGroup.days, currentGroup.intervals));
+      return lines.join('\n');
+    } else {
+      return 'Closed';
     }
-  } else {
-    // Use original grouping logic for non-todayFirst case
-    scheduleGroups.forEach((group) => result.push(formatSchedule(group.days, group.intervals)));
+  };
+
+  // Group consecutive days with the same intervals/closed status
+  const result: { dayRange: string; time: string }[] = [];
+  let groupStart = 0;
+  let prevKey = getDayKey(dayOrder[0]);
+
+  for (let i = 1; i <= dayOrder.length; i++) {
+    // Use a sentinel string for the end of the loop
+    const currentKey = i < dayOrder.length ? getDayKey(dayOrder[i]) : '__END__';
+    if (currentKey !== prevKey) {
+      // Group from groupStart to i-1
+      const daysInGroup = dayOrder.slice(groupStart, i);
+      let dayRange = '';
+      if (daysInGroup.length === 1) {
+        dayRange = dayAbbreviations[daysInGroup[0]];
+      } else {
+        dayRange = `${dayAbbreviations[daysInGroup[0]]}-${dayAbbreviations[daysInGroup[daysInGroup.length - 1]]}`;
+      }
+      result.push({ dayRange, time: formatTime(daysInGroup[0]) });
+      groupStart = i;
+      prevKey = currentKey;
+    }
   }
 
   return result;

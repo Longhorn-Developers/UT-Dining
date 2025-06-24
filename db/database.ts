@@ -261,7 +261,7 @@ export const getLocationMenuNames = async (
     .where(eq(schema.location.name, locationName))
     .execute();
 
-  return data.map((row) => row.menu?.name);
+  return data.map((row) => row.menu?.name).filter((name) => name !== undefined);
 };
 
 export const getLocationMenuData = async (
@@ -289,7 +289,7 @@ export const getLocationMenuData = async (
         location_updated_at: schema.location.updated_at,
         location_type_id: schema.location.type_id,
         location_has_menus: schema.location.has_menus,
-
+        location_display_order: schema.location.display_order,
         // Menu and food data
         menu_id: schema.menu.id,
         menu_name: schema.menu.name,
@@ -358,6 +358,7 @@ export const getLocationMenuData = async (
       image: data[0]?.location_image || null,
       force_close: data[0]?.location_force_close || false,
       has_menus: data[0]?.location_has_menus || false,
+      display_order: data[0]?.location_display_order || 1000,
     };
 
     // Create a menu entry for the selected menu
@@ -404,10 +405,65 @@ export const getLocationMenuData = async (
     }
 
     return structuredData;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     console.warn('⚠️ Error fetching location menu data:', e);
-    return null;
+    // Try to fetch just the location info as a fallback
+    try {
+      const locationOnly = await db
+        .select({
+          location_id: schema.location.id,
+          location_name: schema.location.name,
+          location_colloquial_name: schema.location.colloquial_name,
+          location_description: schema.location.description,
+          location_address: schema.location.address,
+          location_regular_service_hours: schema.location.regular_service_hours,
+          location_methods_of_payment: schema.location.methods_of_payment,
+          location_meal_times: schema.location.meal_times,
+          location_google_maps_link: schema.location.google_maps_link,
+          location_apple_maps_link: schema.location.apple_maps_link,
+          location_image: schema.location.image,
+          location_force_close: schema.location.force_close,
+          location_created_at: schema.location.created_at,
+          location_updated_at: schema.location.updated_at,
+          location_type_id: schema.location.type_id,
+          location_has_menus: schema.location.has_menus,
+          location_display_order: schema.location.display_order,
+        })
+        .from(schema.location)
+        .where(eq(schema.location.name, locationName))
+        .execute();
+
+      if (!locationOnly || locationOnly.length === 0) {
+        return null;
+      }
+
+      // Return basic location info with empty menus array
+      return {
+        location_name: locationName,
+        menus: [],
+        type: locationOnly[0]?.type || '',
+        id: locationOnly[0]?.location_id || '',
+        name: locationOnly[0]?.location_name || null,
+        colloquial_name: locationOnly[0]?.location_colloquial_name || null,
+        description: locationOnly[0]?.location_description || '',
+        address: locationOnly[0]?.location_address || '',
+        type_id: locationOnly[0]?.location_type_id || '',
+        created_at: locationOnly[0]?.location_created_at || null,
+        updated_at: locationOnly[0]?.location_updated_at || null,
+        regular_service_hours: locationOnly[0]?.location_regular_service_hours || undefined,
+        methods_of_payment: locationOnly[0]?.location_methods_of_payment || undefined,
+        meal_times: locationOnly[0]?.location_meal_times || undefined,
+        google_maps_link: locationOnly[0]?.location_google_maps_link || '',
+        apple_maps_link: locationOnly[0]?.location_apple_maps_link || '',
+        image: locationOnly[0]?.location_image || null,
+        force_close: locationOnly[0]?.location_force_close || false,
+        has_menus: locationOnly[0]?.location_has_menus || false,
+        display_order: locationOnly[0]?.location_display_order || 1000,
+      };
+    } catch (fallbackError) {
+      console.warn('⚠️ Error fetching fallback location info:', fallbackError);
+      return null;
+    }
   }
 };
 
@@ -614,6 +670,7 @@ export const getLocationDetails = async (
         force_close: schema.location.force_close,
         has_menus: schema.location.has_menus,
         type: schema.location_type.name,
+        display_order: schema.location.display_order,
       })
       .from(schema.location)
       .leftJoin(schema.location_type, eq(schema.location.type_id, schema.location_type.id))
@@ -627,6 +684,7 @@ export const getLocationDetails = async (
     return {
       ...locationData[0],
       type: locationData[0].type || '',
+      display_order: locationData[0].display_order || 1000,
     };
   } catch (error) {
     console.error('❌ Error fetching location details:', error);
@@ -658,6 +716,7 @@ export const getCompleteLocationData = async (
         location_updated_at: schema.location.updated_at,
         location_type_id: schema.location.type_id,
         location_has_menus: schema.location.has_menus,
+        location_display_order: schema.location.display_order,
 
         // Menu and food data (optional)
         menu_id: schema.menu.id,
@@ -728,6 +787,7 @@ export const getCompleteLocationData = async (
       image: data[0]?.location_image || null,
       force_close: data[0]?.location_force_close || false,
       has_menus: data[0]?.location_has_menus || false,
+      display_order: data[0]?.location_display_order || 1000,
     };
 
     // Group menus and their categories
