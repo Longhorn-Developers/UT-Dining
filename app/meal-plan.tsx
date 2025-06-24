@@ -279,7 +279,13 @@ const MealPlan = () => {
           )}
           ListEmptyComponent={
             <View className="mt-12 flex items-center justify-center">
-              <Text className="text-lg font-bold text-ut-burnt-orange">Empty Meal Plan!</Text>
+              <Text
+                className={cn(
+                  'text-lg font-bold',
+                  isDarkMode ? 'text-white' : 'text-ut-burnt-orange'
+                )}>
+                Empty Meal Plan!
+              </Text>
               <Text
                 className={cn(
                   'max-w-64 text-center',
