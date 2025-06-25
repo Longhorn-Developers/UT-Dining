@@ -1,8 +1,9 @@
 import * as Haptics from 'expo-haptics';
+import * as Location from 'expo-location';
 import { Stack, useRouter } from 'expo-router';
-import { ChevronLeft, Microwave } from 'lucide-react-native';
-import { useRef } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { ChevronLeft, Microwave, Locate } from 'lucide-react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TouchableOpacity, Alert, Pressable } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import type { Region } from 'react-native-maps';
@@ -89,6 +90,44 @@ const MapMarkers = ({
 const MicrowaveMap = () => {
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   const mapRef = useRef<MapView>(null);
+  const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
+  const [hasLocationPermission, setHasLocationPermission] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Location Permission Denied',
+          'Enable location services to see your position on the map.',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+      setHasLocationPermission(true);
+
+      // Get initial location
+      const location = await Location.getCurrentPositionAsync({});
+      setUserLocation(location);
+
+      // Watch for location updates
+      const locationSubscription = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 10000, // Update every 10 seconds
+          distanceInterval: 10, // Update every 10 meters
+        },
+        (newLocation: Location.LocationObject) => {
+          setUserLocation(newLocation);
+        }
+      );
+
+      return () => {
+        locationSubscription.remove();
+      };
+    })();
+  }, []);
+
   const allowedBounds = {
     north: 30.31,
     south: 30.26,
@@ -130,8 +169,6 @@ const MicrowaveMap = () => {
   const insets = useSafeAreaInsets();
 
   const handleMarkerPress = (coordinates: { latitude: number; longitude: number }) => {
-    // Just animate to the region without setting the state directly
-    // This creates a smoother animation
     mapRef.current?.animateToRegion(
       {
         latitude: coordinates.latitude,
@@ -143,12 +180,39 @@ const MicrowaveMap = () => {
     );
   };
 
+  const centerOnUser = () => {
+    if (userLocation && mapRef.current) {
+      const userLat = userLocation.coords.latitude;
+      const userLong = userLocation.coords.longitude;
+
+      // Check if user is within bounds
+      if (
+        userLat <= allowedBounds.north &&
+        userLat >= allowedBounds.south &&
+        userLong <= allowedBounds.east &&
+        userLong >= allowedBounds.west
+      ) {
+        mapRef.current.animateToRegion({
+          latitude: userLat,
+          longitude: userLong,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        });
+      } else {
+        // Alert user they're outside the viewable area
+        Alert.alert('Out of Range', 'You’re currently outside the UT campus area.', [
+          { text: 'OK' },
+        ]);
+      }
+    }
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       {/* Header Bar with Back Button and Title */}
       <View
         className={cn(
-          'absolute z-10 flex w-full flex-row items-center px-5',
+          'absolute z-10 w-full flex-row items-center px-5',
           isDarkMode ? 'bg-gray-900' : 'bg-white'
         )}
         style={{
@@ -163,7 +227,7 @@ const MicrowaveMap = () => {
         }}>
         <TouchableOpacity
           className={cn(
-            'flex h-10 w-10 items-center justify-center rounded-full',
+            'h-10 w-10 items-center justify-center rounded-full',
             isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
           )}
           onPress={() => {
@@ -201,10 +265,34 @@ const MicrowaveMap = () => {
           }}
           provider={PROVIDER_DEFAULT}
           initialRegion={initialRegion}
+          showsUserLocation={hasLocationPermission}
+          followsUserLocation={Boolean(
+            userLocation &&
+              userLocation.coords.latitude <= allowedBounds.north &&
+              userLocation.coords.latitude >= allowedBounds.south &&
+              userLocation.coords.longitude <= allowedBounds.east &&
+              userLocation.coords.longitude >= allowedBounds.west
+          )}
           onRegionChangeComplete={handleRegionChangeComplete}
           userInterfaceStyle={isDarkMode ? 'dark' : 'light'}>
           <MapMarkers onMarkerPress={handleMarkerPress} />
         </MapView>
+
+        {/* Location Button */}
+        {hasLocationPermission && (
+          <TouchableOpacity
+            activeOpacity={0.5}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              centerOnUser();
+            }}
+            className={cn(
+              'absolute bottom-12 right-12 rounded-full p-4 shadow-lg',
+              isDarkMode ? 'bg-gray-700' : 'bg-white'
+            )}>
+            <Locate size={24} color={COLORS['ut-burnt-orange']} />
+          </TouchableOpacity>
+        )}
       </Container>
     </View>
   );

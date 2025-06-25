@@ -37,6 +37,12 @@ export default {
         },
       ],
       'expo-font',
+      [
+        'expo-location',
+        {
+          locationAlwaysAndWhenInUsePermission: 'Allow $(PRODUCT_NAME) to use your location.',
+        },
+      ],
     ],
     experiments: {
       typedRoutes: true,
@@ -61,6 +67,12 @@ export default {
       bundleIdentifier: IS_DEV ? 'com.ethanl06.ut-dining.dev' : 'com.ethanl06.ut-dining',
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
+        NSLocationWhenInUseUsageDescription:
+          'UT Dining needs your location to show your location on the map.',
+        NSLocationAlwaysAndWhenInUseUsageDescription:
+          'UT Dining needs your location to show your location on the map.',
+        NSLocationUsageDescription:
+          'UT Dining needs your location to show your location on the map.',
       },
     },
     android: {
