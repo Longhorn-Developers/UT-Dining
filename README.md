@@ -24,8 +24,9 @@ Browse menus, check dining hours, and find the perfect meal on campus.
    - [Installation](#installation)
 5. [Project Structure](#project-structure)
 6. [Contributing](#contributing)
-7. [Related Repositories](#related-repositories)
-8. [License](#license)
+7. [Frequently Asked Questions](#frequently-asked-questions)
+8. [Related Repositories](#related-repositories)
+9. [License](#license)
 
 ## Features
 
