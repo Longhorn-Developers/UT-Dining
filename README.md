@@ -2,10 +2,10 @@
 
 # UT Dining
 
-UT Dining is your companion app for exploring dining options at the University of Texas.
+UT Dining is your companion app for exploring dining options at the University of Texas at Austin.
 Browse menus, check dining hours, and find the perfect meal on campus.
 
-> This project has been adopted by [Longhorn Developers](https://github.com/Longhorn-Developers). Huge thanks to Ethan Lanting (@EthanL06) for creating it!
+> This project has been adopted by [Longhorn Developers](https://github.com/Longhorn-Developers). Originally created by [Ethan Lanting](https://github.com/EthanL06).
 
 <a href="https://apps.apple.com/us/app/ut-dining/id6743042002">
    <img alt="Download on the app store" src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" height="48">
@@ -24,8 +24,9 @@ Browse menus, check dining hours, and find the perfect meal on campus.
    - [Installation](#installation)
 5. [Project Structure](#project-structure)
 6. [Contributing](#contributing)
-7. [Related Repositories](#related-repositories)
-8. [License](#license)
+7. [Frequently Asked Questions](#frequently-asked-questions)
+8. [Related Repositories](#related-repositories)
+9. [License](#license)
 
 ## Features
 
@@ -34,6 +35,7 @@ Browse menus, check dining hours, and find the perfect meal on campus.
 - **Meal Planning**: Create daily meal plans with nutrition tracking
 - **Allergen Information**: Filter food items based on dietary restrictions and allergens
 - **Location Information**: Check operating hours, location details, and whether dining halls are currently open
+- **Microwave Map**: Find microwaves on campus to heat up your food
 
 ## Tech Stack
 
@@ -60,6 +62,7 @@ Every 24 hours, the **Expo** mobile application fetches the latest menu data fro
 
 - [Node.js](https://nodejs.org/) (LTS version recommended)
 - [pnpm](https://pnpm.io/installation)
+- [Docker Desktop](https://docs.docker.com/desktop/)
 - [Expo CLI](https://docs.expo.dev/get-started/installation/)
 - An iOS or Android emulator. Follow the guide [here](https://docs.expo.dev/workflow/android-studio-emulator/) to set up an Android emulator or [here](https://docs.expo.dev/workflow/ios-simulator/) for an iOS simulator.
 
@@ -88,10 +91,9 @@ We recommend using the following VSCode extensions to improve your development e
 
    ```sh
     pnpm install
-
    ```
 
-3. **Run Local Supabase Instance (OPTIONAL)**
+3. **Run Local Supabase Instance**
 
    For this step, you need [Docker Desktop](https://docs.docker.com/desktop/) installed on your machine. Follow the guide to install it on your system.
 
@@ -118,6 +120,13 @@ We recommend using the following VSCode extensions to improve your development e
 
    The `API URL` and `anon key` are the environment variables you need to configure in the next step.
 
+   **Optional: Setting up Related Services**
+
+   If you want to work with the complete UT Dining ecosystem, you can also set up:
+
+   - **[UT Dining Scraper](https://github.com/EthanL06/ut-dining-scraper)**: To seed your local Supabase database with menu data, clone the scraper repository in a separate directory and use the same `API_URL` and `anon key` from your local Supabase instance in the `.env` file.
+   - **[UT Dining Dashboard](https://github.com/EthanL06/ut-dining-dashboard)**: To manage location information and other admin features through a web interface, clone the dashboard repository in a separate directory and use the same Supabase credentials in the `.env` file.
+
 4. **Configure Environment Variables**
 
    Copy the `.env-example` file to create a `.env` file:
@@ -132,8 +141,6 @@ We recommend using the following VSCode extensions to improve your development e
     EXPO_PUBLIC_SUPABASE_URL=<supabase-url>
     EXPO_PUBLIC_SUPABASE_ANON_KEY=<supabase-anon-key>
    ```
-
-   > If not running Supabase locally, ask [@EthanL06](https://github.com/EthanL06) for environment variables.
 
 5. **Create an Expo Account**
 
@@ -161,7 +168,7 @@ We recommend using the following VSCode extensions to improve your development e
      pnpm run android
      ```
 
-   If you’re developing for both platforms, run both commands.
+   If you're developing for both platforms, run both commands.
 
    > **Note**: The build process may take some time. Please wait until it completes.
 
@@ -202,7 +209,7 @@ We recommend using the following VSCode extensions to improve your development e
    pnpm run start --tunnel
    ```
 
-   > Note: Tunneling may have limitations with Supabase connections. Using an emulator is recommended for full functionality.
+   > Note: Tunneling may have limitations with Supabase connections. Using an emulator or development build is recommended for full functionality.
 
    **Debugging Drizzle with Drizzle Studio**
 
@@ -212,8 +219,8 @@ We recommend using the following VSCode extensions to improve your development e
 
    To open the app on an emulator, press either of the following keys in the terminal:
 
-   - `a` to open on Android emulator
    - `i` to open on iOS simulator
+   - `a` to open on Android emulator
 
 ## Project Structure
 
@@ -227,9 +234,55 @@ ut-dining/
 ├── drizzle/           # Drizzle ORM migrations and metadata
 ├── hooks/             # Custom React hooks
 ├── store/             # Zustand state management
+├── supabase/          # Supabase local client and utilities
 ├── types/             # TypeScript type definitions
 └── utils/             # Helper functions and utilities
 ```
+
+## Frequently Asked Questions
+
+### General
+
+**Q: Is this app officially affiliated with UT Austin?**  
+A: No, this is a student-created project that aims to improve the dining experience at UT Austin. While we use publicly available data from UT's University Housing and Dining, we are not officially affiliated with the university (yet 👀).
+
+**Q: Where does the menu data come from?**  
+A: The menu data is scraped daily from [UT Austin's official dining page](https://hf-foodpro.austin.utexas.edu/foodpro/location.aspx) using our [UT Dining Scraper](https://github.com/EthanL06/ut-dining-scraper).
+
+**Q: How often is the menu data updated?**  
+A: The menu data is updated every day at 1:00 AM CST (7:00 AM UTC) to ensure you have the most current information.
+
+### Development
+
+**Q: Do I need to run the scraper to test the app locally?**  
+A: No, you can develop and test most app features without running the scraper. If you want to work with real menu data, you'll need to set up the [UT Dining Scraper](https://github.com/EthanL06/ut-dining-scraper) with your local Supabase instance.
+
+**Q: What is local Supabase development and why do I need it?**  
+A: Local Supabase development means running Supabase on your own computer instead of using a hosted service. This gives you:
+
+- A completely isolated development environment
+- Freedom to experiment without affecting production data
+- No need for external credentials or API keys
+- Faster development since you're working with a local database
+
+The setup requires Docker Desktop and Supabase CLI, but once configured, it provides a full Supabase environment including database, authentication, and real-time features. Check the [Supabase Local Development](https://supabase.com/docs/guides/cli/local-development) docs for more details.
+
+**Q: Why can't I use Expo Go?**  
+A: The app uses [react-native-mmkv](https://github.com/mrousavy/react-native-mmkv) for storage, which requires native code. Expo Go doesn't support native modules, so you need to use a development build instead.
+
+**Q: I'm getting SQLite errors, what should I do?**  
+A: Make sure you're using a development build and not Expo Go. If the error persists, try:
+
+1. Delete the app from your device/emulator
+2. Rebuild using `pnpm run ios` or `pnpm run android`
+3. If issues continue, check Drizzle Studio (press `Shift + M` in terminal) to inspect the database
+
+**Q: How do I test admin features?**  
+A: Admin features can be tested by:
+
+1. Setting up the [UT Dining Dashboard](https://github.com/EthanL06/ut-dining-dashboard) locally
+2. Using the same Supabase credentials from your local instance
+3. Accessing the dashboard through your web browser
 
 ## Contributing
 
@@ -257,7 +310,10 @@ Here are the repositories related to the UT Dining project:
 1. **[UT Dining Scraper](https://github.com/EthanL06/ut-dining-scraper)**<br>
    This repository contains the code for scraping dining menus from UT Austin and storing them in the Supabase database.
 
-2. **[UT Dining Website](https://github.com/Longhorn-Developers/ut-dining-website)**<br>
+2. **[UT Dining Dashboard](https://github.com/EthanL06/ut-dining-dashboard)**<br>
+   This repository contains the code for the UT Dining admin dashboard, which is used to manage the menus, locations, and other admin features through a web interface.
+
+3. **[UT Dining Website](https://github.com/Longhorn-Developers/ut-dining-website)**<br>
    This repository hosts the code for the UT Dining website.
 
 ## License
