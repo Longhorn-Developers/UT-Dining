@@ -5,7 +5,7 @@ import * as Network from 'expo-network';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useSQLiteContext } from 'expo-sqlite';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, View, Text } from 'react-native';
 import { Notifier } from 'react-native-notifier';
 

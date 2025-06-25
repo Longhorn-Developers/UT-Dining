@@ -17,14 +17,12 @@ import {
 import React from 'react';
 import { View, Text, Switch, TouchableOpacity, Linking, ScrollView } from 'react-native';
 import { SheetManager, SheetProvider } from 'react-native-actions-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
 import { cn } from '~/utils/utils';
 
 const SettingsPage = () => {
-  const insets = useSafeAreaInsets();
   const {
     useColloquialNames,
     toggleColloquialNames,

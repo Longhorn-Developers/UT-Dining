@@ -428,8 +428,10 @@ export const getLocationMenuData = async (
           location_type_id: schema.location.type_id,
           location_has_menus: schema.location.has_menus,
           location_display_order: schema.location.display_order,
+          location_type: schema.location_type.name,
         })
         .from(schema.location)
+        .leftJoin(schema.location_type, eq(schema.location.type_id, schema.location_type.id))
         .where(eq(schema.location.name, locationName))
         .execute();
 
@@ -441,7 +443,7 @@ export const getLocationMenuData = async (
       return {
         location_name: locationName,
         menus: [],
-        type: locationOnly[0]?.type || '',
+        type: locationOnly[0].location_type || '',
         id: locationOnly[0]?.location_id || '',
         name: locationOnly[0]?.location_name || null,
         colloquial_name: locationOnly[0]?.location_colloquial_name || null,

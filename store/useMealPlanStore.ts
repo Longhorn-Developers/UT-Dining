@@ -3,8 +3,6 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 import { zustandStorage } from './rnmmkv-storage';
 
-import { shouldRequery } from '~/utils/time';
-
 const STORAGE_KEY_MEALPLAN = 'mealPlanItems';
 
 export interface MealPlanItem {

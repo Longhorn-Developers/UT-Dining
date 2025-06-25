@@ -1,7 +1,7 @@
 import { InfoIcon } from 'lucide-react-native';
 import React from 'react';
 import { Text, View, Image } from 'react-native';
-import ActionSheet, { registerSheet, SheetProps } from 'react-native-actions-sheet';
+import ActionSheet, { SheetProps } from 'react-native-actions-sheet';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
