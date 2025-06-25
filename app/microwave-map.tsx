@@ -3,7 +3,7 @@ import * as Location from 'expo-location';
 import { Stack, useRouter } from 'expo-router';
 import { ChevronLeft, Microwave, Locate } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import type { Region } from 'react-native-maps';
