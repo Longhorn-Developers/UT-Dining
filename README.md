@@ -120,7 +120,7 @@ We recommend using the following VSCode extensions to improve your development e
 
    The `API URL` and `anon key` are the environment variables you need to configure in the next step.
 
-   **Optional: Setting up Related Services**
+   **Optional (but HIGHLY recommend): Setting up Related Services**
 
    If you want to work with the complete UT Dining ecosystem, you can also set up:
 
