@@ -51,7 +51,7 @@
     "expo-web-browser": "~14.0.2",
     "husky": "^9.1.7",
     "lucide-react-native": "^0.474.0",
-    "nativewind": "latest",
+    "nativewind": "^4.1.23",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.9",
