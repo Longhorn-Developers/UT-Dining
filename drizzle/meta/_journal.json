@@ -36,6 +36,41 @@
       "when": 1741921379326,
       "tag": "0004_nosy_sunset_bain",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1750475877698,
+      "tag": "0005_plain_sunspot",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1750481485432,
+      "tag": "0006_flat_iron_patriot",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1750545203121,
+      "tag": "0007_noisy_alice",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1750556659259,
+      "tag": "0008_nosy_alex_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1750743874106,
+      "tag": "0009_wide_red_skull",
+      "breakpoints": true
     }
   ]
 }

@@ -1,43 +1,4 @@
-export type WeekDay =
-  | 'Monday'
-  | 'Tuesday'
-  | 'Wednesday'
-  | 'Thursday'
-  | 'Friday'
-  | 'Saturday'
-  | 'Sunday';
-
-export interface TimeInterval {
-  openTime: number; // e.g., 900 for 9:00 AM, 1630 for 4:30 PM
-  closeTime: number; // e.g., 1400 for 2:00 PM, 2000 for 8:00 PM
-}
-
-export interface OpeningHours {
-  days: WeekDay[]; // Days these intervals apply to
-  // Multiple intervals in one day.
-  intervals: TimeInterval[];
-}
-
-export type LocationType = 'Dining Hall' | 'Restaurant' | 'Convenience Store' | 'Coffee Shop';
-
-export interface LocationInfo {
-  name: string;
-  colloquialName?: string;
-  description: string;
-  type: LocationType;
-  address: string;
-  googleMapsLink: string;
-  appleMapsLink: string;
-  schedules: OpeningHours[];
-  mealTimes: {
-    breakfast?: TimeInterval;
-    lunch?: TimeInterval;
-    dinner?: TimeInterval;
-  };
-  image?: string;
-}
-
-export const LOCATION_INFO: LocationInfo[] = [
+export const LOCATION_INFO: any = [
   {
     name: 'J2 Dining',
     colloquialName: 'J2',
@@ -446,15 +407,3 @@ export const LOCATION_INFO: LocationInfo[] = [
       'https://housing.utexas.edu/sites/default/files/styles/utexas_image_style_1800w/public/2025-01/Varsity_Grounds_680x454.png.webp?itok=Pvs9nbCG',
   },
 ];
-
-// Function to get location name on display settings
-export const getLocationName = (originalName: string, useColloquial: boolean): string => {
-  if (!useColloquial) return originalName;
-
-  const locationInfo = LOCATION_INFO.find((location) => location.name === originalName);
-  if (locationInfo?.colloquialName) {
-    return locationInfo.colloquialName;
-  }
-
-  return originalName;
-};

@@ -1,15 +1,40 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 
+export const location_type = sqliteTable('location_type', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  display_order: integer('display_order').notNull().default(0),
+  created_at: text('created_at').default('CURRENT_TIMESTAMP'),
+  updated_at: text('updated_at').default('CURRENT_TIMESTAMP'),
+});
+
 export const location = sqliteTable('location', {
-  id: integer('id').primaryKey(),
-  name: text('name').unique(),
-  updated_at: text('updated_at'),
+  id: text('id').primaryKey(),
+  name: text('name'),
+  colloquial_name: text('colloquial_name'),
+  description: text('description').notNull().default(''),
+  address: text('address').notNull().default(''),
+  display_order: integer('display_order').notNull().default(0),
+  type_id: text('type_id')
+    .notNull()
+    .references(() => location_type.id),
+  regular_service_hours: text('regular_service_hours', { mode: 'json' }).notNull().default('{}'),
+  methods_of_payment: text('methods_of_payment', { mode: 'json' }).notNull().default('[]'),
+  meal_times: text('meal_times', { mode: 'json' }).notNull().default('[]'),
+  google_maps_link: text('google_maps_link').notNull().default(''),
+  apple_maps_link: text('apple_maps_link').notNull().default(''),
+  image: text('image'),
+  force_close: integer('force_close', { mode: 'boolean' }).notNull().default(false),
+  has_menus: integer('has_menus', { mode: 'boolean' }).notNull().default(false),
+  created_at: text('created_at').default('CURRENT_TIMESTAMP'),
+  updated_at: text('updated_at').default('CURRENT_TIMESTAMP'),
 });
 
 export const menu = sqliteTable('menu', {
   id: integer('id').primaryKey(),
   name: text('name'),
-  location_id: integer('location_id').references(() => location.id),
+  location_id: text('location_id').references(() => location.id),
+  date: text('date').notNull(),
 });
 
 export const menu_category = sqliteTable('menu_category', {
@@ -140,9 +165,13 @@ export const favorites = sqliteTable('favorites', {
 });
 
 export type Location = typeof location.$inferSelect;
+export type LocationType = typeof location_type.$inferSelect;
 export type Menu = typeof menu.$inferSelect;
 export type MenuCategory = typeof menu_category.$inferSelect;
 export type Nutrition = typeof nutrition.$inferSelect;
 export type Allergens = typeof allergens.$inferSelect;
 export type FoodItem = typeof food_item.$inferSelect;
 export type Favorite = typeof favorites.$inferSelect;
+export interface LocationWithType extends Location {
+  type: LocationType['name'];
+}

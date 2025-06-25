@@ -1,183 +1,199 @@
+import { useQuery } from '@tanstack/react-query';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
-import * as Haptics from 'expo-haptics';
+import * as Network from 'expo-network';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useSQLiteContext } from 'expo-sqlite';
-import React, { useState, useEffect, useCallback } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native';
+import React, { useState } from 'react';
+import { ActivityIndicator, FlatList, RefreshControl, View, Text } from 'react-native';
 import { Notifier } from 'react-native-notifier';
 
 import * as schema from '../db/schema';
-import HomeHeader from './components/HomeHeader';
-import LocationItem from './components/LocationItem';
+import HomeHeader from './_components/HomeHeader';
+import LocationItem from './_components/LocationItem';
 
 import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
-import { LOCATION_INFO } from '~/data/LocationInfo';
-import { insertDataIntoSQLiteDB } from '~/db/database';
-import { miscStorage } from '~/store/misc-storage';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
-import { shouldRequery } from '~/utils/time';
+import { fetchMenuData } from '~/utils/queries';
 
-// Keep the splash screen visible while we fetch resources
+// Constants
+const SPLASH_SCREEN_DURATION = 1000;
+const NOTIFICATION_DURATION = 3000;
+
+// Configure splash screen
 SplashScreen.preventAutoHideAsync();
-
-// Set the animation options. This is optional.
 SplashScreen.setOptions({
-  duration: 1000,
+  duration: SPLASH_SCREEN_DURATION,
   fade: true,
 });
 
-const sortLocations = (data: schema.Location[]) => {
-  // Make a copy of data and sort based on the index in LOCATION_INFO.
-  return [...data].sort((a, b) => {
-    const indexA = LOCATION_INFO.findIndex((info) => info.name === a.name);
-    const indexB = LOCATION_INFO.findIndex((info) => info.name === b.name);
-    return indexA - indexB;
-  });
+// Types
+export type FilterType = 'all' | string;
+
+// Utility functions
+
+// TODO: gotta fix.
+
+const filterLocationsByType = (
+  locations: schema.LocationWithType[],
+  locationTypes: schema.LocationType[],
+  filter: FilterType
+) => {
+  if (filter === 'all') return locations;
+
+  // Find the location type that matches the filter
+  const targetType = locationTypes.find((type) => type.name === filter);
+  if (!targetType) return locations;
+
+  // Filter locations by type_id
+  return locations.filter((location) => location.type_id === targetType.id);
 };
 
 export default function Home() {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [selectedFilter, setSelectedFilter] = useState('all');
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
   const [refreshing, setRefreshing] = useState(false);
-  const [appIsReady, setAppIsReady] = useState(false);
-  const [showRequeryAlert, setShowRequeryAlert] = useState(false);
-
-  const [locations, setLocations] = useState<schema.Location[] | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
-  useDrizzleStudio(db);
-
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
-  // Check if data needs to be refreshed
-  useEffect(() => {
-    const checkRequery = async () => {
-      if (await shouldRequery()) {
-        setShowRequeryAlert(true);
-      } else {
-        setShowRequeryAlert(false);
-      }
-    };
-    checkRequery();
-  }, [currentTime, lastUpdated]);
+  useDrizzleStudio(db);
 
-  useEffect(() => {
-    async function prepare() {
-      try {
-        console.log('Preparing app...');
-        await insertDataIntoSQLiteDB(drizzleDb);
-        const data = await drizzleDb.select().from(schema.location);
-        setLocations(data);
-
-        const lastUpdated = miscStorage.getString('lastQueryTime');
-
-        if (lastUpdated) {
-          setLastUpdated(new Date(lastUpdated));
-        }
-        console.log('Data initialized!');
-      } catch (e) {
-        console.warn(e);
-      } finally {
-        console.log('App is ready!');
-        // Tell the application to render
-        setAppIsReady(true);
-      }
-    }
-
-    prepare();
-  }, []);
-
-  const onLayoutRootView = useCallback(() => {
-    if (appIsReady) {
-      // This tells the splash screen to hide immediately! If we call this after
-      // `setAppIsReady`, then we may see a blank screen while the app is
-      // loading its initial state and rendering its first pixels. So instead,
-      // we hide the splash screen once we know the root view has already
-      // performed layout.
-      SplashScreen.hide();
-    }
-  }, [appIsReady]);
-
-  // Update current time every minute to refresh the message
-  useEffect(() => {
+  React.useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
-    }, 10000); // update every 10 seconds
+    }, 60000); // 1 minute
     return () => clearInterval(interval);
   }, []);
 
-  const onRefresh = async () => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  // Use TanStack Query for menu/location data
+  const { data, isLoading, isError, refetch, isFetching } = useQuery({
+    queryKey: ['menuData'],
+    queryFn: () => fetchMenuData(drizzleDb),
+    staleTime: 3 * 60 * 60 * 1000, // 3 hour
+    refetchInterval: 1000 * 60 * 3, // 3 minutes polling while in app
+    refetchOnMount: false,
+    refetchOnWindowFocus: true,
+  });
 
+  // Handle refresh
+  const handleRefresh = async () => {
     setRefreshing(true);
-    await insertDataIntoSQLiteDB(drizzleDb, true);
-    setCurrentTime(new Date());
-    setLastUpdated(new Date());
-    setShowRequeryAlert(true); // Reset alert after refreshing
-    setRefreshing(false);
+    try {
+      // Check if user is online before attempting to refetch
+      const networkState = await Network.getNetworkStateAsync();
+      if (!networkState.isConnected) {
+        Notifier.showNotification({
+          title: 'No Internet Connection',
+          description: 'Please check your connection and try again.',
+          duration: NOTIFICATION_DURATION,
+          Component: Alert,
+        });
+        return;
+      }
 
-    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      // Add timeout to refetch operation (10 seconds)
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout')), 10000);
+      });
 
-    Notifier.showNotification({
-      title: 'Data Refreshed!',
-      description: 'The menu data has been refreshed.',
-      duration: 3000,
-      Component: Alert,
-    });
+      await Promise.race([refetch(), timeoutPromise]);
+      setRefreshKey((prev) => prev + 1);
+
+      Notifier.showNotification({
+        title: 'Refreshed!',
+        description: 'Menu data is up to date.',
+        duration: NOTIFICATION_DURATION,
+        Component: Alert,
+      });
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      const errorMessage =
+        error instanceof Error && error.message === 'Request timeout'
+          ? 'Request timed out. Please try again.'
+          : 'Unable to update data. Please try again.';
+
+      Notifier.showNotification({
+        title: 'Refresh Failed',
+        description: errorMessage,
+        duration: NOTIFICATION_DURATION,
+        Component: Alert,
+      });
+    } finally {
+      setRefreshing(false);
+    }
   };
 
-  if (!locations)
+  // Handle splash screen
+  const onLayoutRootView = () => {
+    if (!isLoading && !isFetching) {
+      SplashScreen.hide();
+    }
+  };
+
+  if (isLoading) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color={COLORS['ut-burnt-orange']} />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: isDarkMode ? '#111827' : '#fff',
+        }}>
+        <ActivityIndicator size="small" />
       </View>
     );
-
-  const sortedData = sortLocations(locations);
-
-  const filteredData =
-    selectedFilter === 'all'
-      ? sortedData
-      : sortedData.filter((item) => {
-          const locationInfo = LOCATION_INFO.find((info) => info.name === item.name);
-          if (!locationInfo) return false;
-          if (selectedFilter === 'dining') return locationInfo.type === 'Dining Hall';
-          if (selectedFilter === 'restaurants') return locationInfo.type === 'Restaurant';
-          if (selectedFilter === 'convenience') return locationInfo.type === 'Convenience Store';
-          if (selectedFilter === 'coffee') return locationInfo.type === 'Coffee Shop';
-          return false;
-        });
-
-  if (!appIsReady) {
-    return null;
   }
+
+  if (isError) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: isDarkMode ? '#111827' : '#fff',
+        }}>
+        <Text style={{ color: isDarkMode ? '#fff' : '#000' }}>
+          Failed to load data. Please try again.
+        </Text>
+      </View>
+    );
+  }
+
+  const locations = data?.locations || [];
+  const locationTypes = data?.locationTypes || [];
+
+  const filteredLocations = filterLocationsByType(locations, locationTypes, selectedFilter);
 
   return (
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       <Stack.Screen options={{ title: 'Home' }} />
       <Container onLayout={onLayoutRootView}>
         <FlatList
-          extraData={[currentTime, selectedFilter]}
-          data={filteredData}
+          extraData={[currentTime, selectedFilter, refreshKey]}
+          data={filteredLocations}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={[COLORS['ut-burnt-orange']]}
-              tintColor={COLORS['ut-burnt-orange']}
+              onRefresh={handleRefresh}
+              tintColor={isDarkMode ? COLORS['ut-grey-dark-mode'] : '#8E8E93'}
             />
           }
           contentContainerClassName="flex gap-y-3"
           renderItem={({ item }) => {
-            const locationInfo = LOCATION_INFO.find((info) => info.name === item.name);
-            if (!locationInfo) return null;
-            return <LocationItem location={item} currentTime={currentTime} />;
+            return (
+              <LocationItem
+                key={`${item.id}-${refreshKey}`}
+                location={item}
+                currentTime={currentTime}
+              />
+            );
           }}
           keyExtractor={(item) => item.id.toString()}
           numColumns={1}
@@ -185,10 +201,11 @@ export default function Home() {
           ListHeaderComponent={
             <HomeHeader
               currentTime={currentTime}
-              lastUpdated={lastUpdated}
+              lastUpdated={null}
               selectedFilter={selectedFilter}
               setSelectedFilter={setSelectedFilter}
-              showRequeryAlert={showRequeryAlert}
+              showRequeryAlert={false}
+              locationTypes={locationTypes}
             />
           }
         />

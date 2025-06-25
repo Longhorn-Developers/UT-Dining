@@ -9,13 +9,14 @@ import { Notifier } from 'react-native-notifier';
 
 import Alert from './Alert';
 
-import { LOCATION_INFO } from '~/data/LocationInfo';
 import { isFavoriteItem, toggleFavorites } from '~/db/database';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useFoodData } from '~/hooks/useFoodData';
+import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
+import { cn } from '~/utils/utils';
 
 const icon = require('../assets/image.png');
 
@@ -68,7 +69,7 @@ const HomeTopBar = () => {
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            SheetManager.show('settings');
+            router.push('/settings');
           }}>
           <Cog size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
@@ -80,12 +81,7 @@ const HomeTopBar = () => {
 const LocationTopBar = () => {
   const { location } = useLocalSearchParams<{ location: string }>();
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
-
-  const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
-
-  if (!locationInfo) {
-    return null;
-  }
+  const { locationData } = useLocationDetails(location);
 
   return (
     <View className="flex w-full flex-row items-center justify-between ">
@@ -100,19 +96,6 @@ const LocationTopBar = () => {
       </TouchableOpacity>
 
       <View className="flex flex-row gap-x-5">
-        <TouchableOpacity
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-            if (Platform.OS === 'ios') {
-              Linking.openURL(locationInfo.appleMapsLink);
-            } else {
-              Linking.openURL(locationInfo.googleMapsLink);
-            }
-          }}>
-          <Map size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
-        </TouchableOpacity>
-
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -132,9 +115,12 @@ const LocationTopBar = () => {
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+            if (!locationData) return; // Handle loading state
+
             SheetManager.show('location-about', {
               payload: {
-                location: locationInfo,
+                location: locationData,
               },
             });
           }}>
@@ -274,7 +260,9 @@ const FoodTopBar = () => {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            SheetManager.show('food-info');
+            SheetManager.show('food-info', {
+              context: 'food',
+            });
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}>
           <Info size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
@@ -301,17 +289,21 @@ const BackTopBar = () => {
   );
 };
 
-const CoffeeShopTopBar = () => {
+const GenericLocationTopBar = () => {
   const { location } = useLocalSearchParams<{ location: string }>();
-  const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
+  const { locationData } = useLocationDetails(location);
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
-  if (!locationInfo) {
+  if (!locationData) {
     return null;
   }
 
   return (
-    <View className="flex w-full flex-row items-center justify-between ">
+    <View
+      className={cn(
+        'flex w-full flex-row items-center justify-between  pb-4',
+        isDarkMode ? 'bg-[#111827]' : 'bg-white'
+      )}>
       <TouchableOpacity
         className="flex flex-row items-center"
         onPress={() => {
@@ -328,9 +320,9 @@ const CoffeeShopTopBar = () => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
             if (Platform.OS === 'ios') {
-              Linking.openURL(locationInfo.appleMapsLink);
+              Linking.openURL(locationData.apple_maps_link);
             } else {
-              Linking.openURL(locationInfo.googleMapsLink);
+              Linking.openURL(locationData.google_maps_link);
             }
           }}>
           <Map size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
@@ -341,18 +333,10 @@ const CoffeeShopTopBar = () => {
 };
 
 interface TopBarProps {
-  variant?: 'home' | 'location' | 'back' | 'food' | 'coffee-shop';
+  variant?: 'home' | 'location' | 'back' | 'food' | 'generic-location';
 }
 
 const TopBar = ({ variant = 'home' }: TopBarProps) => {
-  const { location } = useLocalSearchParams<{ location: string }>();
-  const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
-  const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
-
-  if (isCoffeeShop) {
-    return <CoffeeShopTopBar />;
-  }
-
   switch (variant) {
     case 'home':
       return <HomeTopBar />;
@@ -362,6 +346,8 @@ const TopBar = ({ variant = 'home' }: TopBarProps) => {
       return <BackTopBar />;
     case 'food':
       return <FoodTopBar />;
+    case 'generic-location':
+      return <GenericLocationTopBar />;
     default:
       return <HomeTopBar />;
   }

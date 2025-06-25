@@ -6,17 +6,15 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { View, Text } from 'react-native';
 
 import CategoryHeader from './components/CategoryHeader';
-import CoffeeShopSection from './components/CoffeeShopSection';
 import FoodItemRow from './components/FoodItemRow';
 import LocationHeader from './components/LocationHeader';
 import ScrollToTopButton from './components/ScrollToTopButton';
 import SkeletonItem from './components/SkeletonItem';
 import { useCategoryExpansion } from '../../hooks/useCategoryExpansion';
-import { useLocationData } from '../../hooks/useLocationData';
+import { useMenuData } from '../../hooks/useMenuData';
 import { useScrollToTop } from '../../hooks/useScrollToTop';
 
 import { Container } from '~/components/Container';
-import { LOCATION_INFO } from '~/data/LocationInfo';
 import * as schema from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useDebounce } from '~/hooks/useDebounce';
@@ -135,12 +133,12 @@ const Location = () => {
   // Core state and data
   const { location } = useLocalSearchParams<{ location: string }>();
   const {
-    data,
+    menuData: data,
     loading,
     selectedMenu,
     setSelectedMenu,
     filters: menuFilters,
-  } = useLocationData(location);
+  } = useMenuData(location);
   const { toggleCategory, flattenedItems, resetExpandedCategories } = useCategoryExpansion(data);
   const db = useDatabase();
 
@@ -236,13 +234,6 @@ const Location = () => {
   const EmptyState = useCallback(() => {
     if (loading) return null;
 
-    const locationInfo = LOCATION_INFO.find((loc) => loc.name === location);
-    const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
-
-    if (isCoffeeShop) {
-      return <CoffeeShopSection locationName={location} />;
-    }
-
     const subtitle = () => {
       if (debouncedSearchQuery) {
         return 'Try a different search term.';
@@ -272,25 +263,27 @@ const Location = () => {
       <Stack.Screen options={{ title: 'Location' }} />
       <Container className="relative mx-0 w-full flex-1">
         <FlashList
+          estimatedItemSize={60}
           extraData={favorites}
           ref={listRef}
           onScroll={handleScroll}
           scrollEventThrottle={16}
           showsVerticalScrollIndicator
-          estimatedItemSize={80}
           data={getDisplayedItems()}
           ListHeaderComponent={
-            <LocationHeader
-              location={location}
-              selectedMenu={selectedMenu}
-              setSelectedMenu={setSelectedMenu}
-              filters={menuFilters}
-              query={searchQuery}
-              setQuery={(query) => {
-                resetExpandedCategories();
-                setSearchQuery(query);
-              }}
-            />
+            <>
+              <LocationHeader
+                location={location}
+                selectedMenu={selectedMenu}
+                setSelectedMenu={setSelectedMenu}
+                filters={menuFilters}
+                query={searchQuery}
+                setQuery={(query) => {
+                  resetExpandedCategories();
+                  setSearchQuery(query);
+                }}
+              />
+            </>
           }
           ListEmptyComponent={<EmptyState />}
           renderItem={renderItem}

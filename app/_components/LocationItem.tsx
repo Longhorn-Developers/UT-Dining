@@ -5,16 +5,17 @@ import { ChevronRight } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, Animated, Easing } from 'react-native';
 
-import { getLocationName, LOCATION_INFO } from '~/data/LocationInfo';
-import { Location, menu } from '~/db/schema';
+import { LocationWithType, menu } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
+import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
+import { useLocationName } from '~/utils/locations';
 import { getLocationTimeMessage, isLocationOpen } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
 type LocationItemProps = {
-  location: Location;
+  location: LocationWithType;
   currentTime: Date;
 };
 
@@ -23,33 +24,25 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
   const pingAnimation = useRef(new Animated.Value(0)).current;
   const db = useDatabase();
   const { useColloquialNames, isDarkMode, isColorBlindMode } = useSettingsStore();
+  const { locationData } = useLocationDetails(location.name ?? '');
+  const displayName = useLocationName(location.name ?? '', useColloquialNames);
 
   useEffect(() => {
     const checkOpen = async () => {
-      // Checking if there are any menus for the location
-      const res = db.select().from(menu).where(eq(menu.location_id, location.id)).get();
-
-      // Check if this location is a Coffee Shop from LOCATION_INFO
-      const locationInfo = LOCATION_INFO.find((loc) => loc.name === location.name);
-      const isCoffeeShop = locationInfo?.type === 'Coffee Shop';
-
-      // For Coffee Shops, only check if there's a schedule, don't check for menus
-      if (isCoffeeShop) {
-        setOpen(isLocationOpen(location.name as string, currentTime));
-        return;
+      if (location.has_menus) {
+        const res = db.select().from(menu).where(eq(menu.location_id, location.id)).get();
+        if (!res) {
+          setOpen(false);
+          return;
+        }
       }
 
-      // For other locations, check for menu presence
-      if (!res) {
-        setOpen(false);
-        return;
-      }
-
-      setOpen(isLocationOpen(location.name as string, currentTime));
+      const isOpen = isLocationOpen(locationData);
+      setOpen(isOpen);
     };
 
     checkOpen();
-  }, [currentTime]);
+  }, [locationData, currentTime]);
 
   useEffect(() => {
     // Stop any running animation
@@ -89,7 +82,14 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
   return (
     <TouchableOpacity
       onPress={async () => {
-        router.push(`/location/${location.name}`);
+        if (locationData?.has_menus) {
+          if (router.canDismiss()) {
+            router.dismissAll();
+          }
+          router.push(`/location/${location.name}`);
+        } else {
+          router.push(`/location_generic/${location.name}`);
+        }
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       }}
       className={cn(
@@ -155,11 +155,11 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
                   ? 'text-gray-500'
                   : 'text-ut-grey/75'
             )}>
-            {getLocationName(location.name ?? '', useColloquialNames)}
+            {displayName}
           </Text>
           <Text
             className={cn('text-xs font-medium', isDarkMode ? 'text-gray-400' : 'text-ut-grey/75')}>
-            {open ? getLocationTimeMessage(location.name ?? '', currentTime) : 'Closed'}
+            {open ? getLocationTimeMessage(locationData, currentTime) : 'Closed'}
           </Text>
         </View>
       </View>

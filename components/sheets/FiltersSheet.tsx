@@ -44,7 +44,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
     <ActionSheet
       id={sheetId}
       defaultOverlayOpacity={0.5}
-      containerStyle={{ backgroundColor: isDarkMode ? '#1f2937' : 'white' }}
+      containerStyle={{ backgroundColor: isDarkMode ? '#111827' : 'white' }}
       gestureEnabled
       safeAreaInsets={insets}
       useBottomSafeAreaPadding>
@@ -125,8 +125,11 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
           </View>
 
           {/* Allergen Filters */}
-          <Text className={cn('mb-2 text-xl font-semibold', isDarkMode ? 'text-gray-100' : '')}>
+          <Text className={cn('text-xl font-semibold', isDarkMode ? 'text-gray-100' : '')}>
             Allergens
+          </Text>
+          <Text className={cn('mb-2 text-sm', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
+            Exclude items that contain these allergens
           </Text>
           <View className="mb-6 flex-row flex-wrap gap-2">
             {allergens.map(([key, iconSource]) => (

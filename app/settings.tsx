@@ -14,22 +14,15 @@ import {
   Shield,
   Type,
 } from 'lucide-react-native';
-import { View, Text, Switch, TouchableOpacity, Linking } from 'react-native';
-import ActionSheet, {
-  ScrollView,
-  SheetManager,
-  SheetProps,
-  useSheetRef,
-} from 'react-native-actions-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React from 'react';
+import { View, Text, Switch, TouchableOpacity, Linking, ScrollView } from 'react-native';
+import { SheetManager, SheetProvider } from 'react-native-actions-sheet';
 
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
 import { cn } from '~/utils/utils';
 
-const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
-  const insets = useSafeAreaInsets();
-  const sheetRef = useSheetRef('settings');
+const SettingsPage = () => {
   const {
     useColloquialNames,
     toggleColloquialNames,
@@ -104,7 +97,8 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
   );
 
   const AboutSection = () => (
-    <View className={cn('mt-2 rounded-lg p-4', isDarkMode ? 'bg-gray-800' : 'bg-gray-50')}>
+    <View
+      className={cn('mt-2 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50')}>
       <Text
         className={cn(
           'mb-2 text-lg font-semibold',
@@ -120,7 +114,8 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
   );
 
   const HelpSupportSection = (): JSX.Element => (
-    <View className={cn('mt-4 rounded-lg p-4', isDarkMode ? 'bg-gray-800' : 'bg-gray-50')}>
+    <View
+      className={cn('mt-4 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50')}>
       <Text
         className={cn(
           'mb-2 text-lg font-semibold',
@@ -162,7 +157,11 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
   );
 
   const CreditsSection = (): JSX.Element => (
-    <View className={cn('mt-4 gap-y-2 rounded-lg p-4', isDarkMode ? 'bg-gray-800' : 'bg-gray-50')}>
+    <View
+      className={cn(
+        'mt-4 gap-y-2 rounded-lg p-4',
+        isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50'
+      )}>
       <Text className={cn('text-lg font-semibold', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
         Credits
       </Text>
@@ -207,78 +206,94 @@ const SettingsSheet = ({ sheetId, payload }: SheetProps<'settings'>) => {
   );
 
   return (
-    <ActionSheet
-      id={sheetId}
-      defaultOverlayOpacity={0.5}
-      containerStyle={{ backgroundColor: isDarkMode ? '#1f2937' : 'white' }}
-      gestureEnabled
-      safeAreaInsets={insets}
-      useBottomSafeAreaPadding>
-      <ScrollView showsVerticalScrollIndicator={false} className="max-h-[70vh]">
-        <View className="flex-col p-6">
-          <Text className={cn('mb-6 text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
-            Settings
-          </Text>
-
-          <SectionHeader title="Quick Links" className="mt-4" />
-          <SettingItem
-            title="Meal Plan"
-            Icon={ChefHat}
-            hasChevron
-            onPress={() => {
-              sheetRef.current.hide();
+    <SheetProvider context="settings">
+      {/* Pull Down Indicator (outside ScrollView) */}
+      <View
+        style={{
+          alignItems: 'center',
+          paddingTop: 8,
+          paddingBottom: 8,
+          backgroundColor: isDarkMode ? '#111827' : '#fff',
+        }}>
+        <View
+          style={{
+            width: 40,
+            height: 5,
+            borderRadius: 2.5,
+            backgroundColor: isDarkMode ? '#fff' : '#F0F0F0',
+          }}
+        />
+      </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : 'white' }}
+        contentContainerStyle={{ padding: 24 }}>
+        <Text className={cn('text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
+          Settings
+        </Text>
+        <SectionHeader title="Quick Links" className="mt-4" />
+        <SettingItem
+          title="Meal Plan"
+          Icon={ChefHat}
+          hasChevron
+          onPress={() => {
+            router.dismiss();
+            setTimeout(() => {
               router.push('/meal-plan');
-            }}
-          />
-          <SettingItem
-            title="Favorites"
-            Icon={Heart}
-            hasChevron
-            onPress={() => {
-              sheetRef.current.hide();
+            }, 10);
+          }}
+        />
+        <SettingItem
+          title="Favorites"
+          Icon={Heart}
+          hasChevron
+          onPress={() => {
+            router.dismiss();
+            setTimeout(() => {
               router.push('/favorites');
-            }}
-          />
-          <SettingItem
-            title="Filters"
-            Icon={Filter}
-            hasChevron
-            onPress={() => {
-              SheetManager.show('filters');
-            }}
-          />
-          <SectionHeader title="Display" className="mt-4" />
-          <SettingItem
-            title="Dark Mode"
-            Icon={Moon}
-            hasToggle
-            toggleValue={isDarkMode}
-            onToggle={toggleDarkMode}
-          />
-          <SettingItem
-            title="Colorblind Mode"
-            Icon={Accessibility}
-            hasToggle
-            toggleValue={isColorBlindMode}
-            onToggle={toggleColorBlindMode}
-          />
-          <SettingItem
-            title="Use Colloquial Names"
-            Icon={Type}
-            hasToggle
-            toggleValue={useColloquialNames}
-            onToggle={toggleColloquialNames}
-          />
-          <SectionHeader title="Information" className="mt-4" />
-          <AboutSection />
-          <CreditsSection />
-          <HelpSupportSection />
-
-          <VersionInfo />
-        </View>
+            }, 10);
+          }}
+        />
+        <SettingItem
+          title="Filters"
+          Icon={Filter}
+          hasChevron
+          onPress={() => {
+            SheetManager.show('filters', {
+              context: 'settings',
+            });
+          }}
+        />
+        <SectionHeader title="Display" className="mt-4" />
+        <SettingItem
+          title="Dark Mode"
+          Icon={Moon}
+          hasToggle
+          toggleValue={isDarkMode}
+          onToggle={toggleDarkMode}
+        />
+        <SettingItem
+          title="Colorblind Mode"
+          Icon={Accessibility}
+          hasToggle
+          toggleValue={isColorBlindMode}
+          onToggle={toggleColorBlindMode}
+        />
+        <SettingItem
+          title="Use Colloquial Names"
+          Icon={Type}
+          hasToggle
+          toggleValue={useColloquialNames}
+          onToggle={toggleColloquialNames}
+        />
+        <SectionHeader title="Information" className="mt-4" />
+        <AboutSection />
+        <CreditsSection />
+        <HelpSupportSection />
+        <VersionInfo />
       </ScrollView>
-    </ActionSheet>
+    </SheetProvider>
   );
 };
 
-export default SettingsSheet;
+export default SettingsPage;

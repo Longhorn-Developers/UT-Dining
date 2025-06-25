@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { Stack } from 'expo-router';
@@ -8,6 +9,7 @@ import { SheetProvider } from 'react-native-actions-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NotifierWrapper } from 'react-native-notifier';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
 
 import * as schema from '../db/schema';
 import migrations from '../drizzle/migrations';
@@ -23,41 +25,69 @@ configureReanimatedLogger({
   strict: false, // Reanimated runs in strict mode by default
 });
 
+const expoDb = openDatabaseSync(DATABASE_NAME);
+const db = drizzle<typeof schema>(expoDb);
+const queryClient = new QueryClient();
+
 export default function Layout() {
-  const expoDb = openDatabaseSync(DATABASE_NAME);
-  const db = drizzle<typeof schema>(expoDb);
   const { success, error } = useMigrations(db, migrations);
+  useSyncQueries({ queryClient });
 
   useEffect(() => {
     if (success) {
-      console.log('Database migrated successfully');
+      console.log('✅ Database migrated successfully');
     } else if (error) {
-      console.error('Error migrating database:', error);
+      console.error('❌ Error migrating database:', error);
     }
   }, [success]);
 
   return (
-    <Suspense fallback={<ActivityIndicator size="large" />}>
-      <SQLiteProvider
-        databaseName={DATABASE_NAME}
-        options={{ enableChangeListener: true }}
-        useSuspense>
-        <GestureHandlerRootView>
-          <NotifierWrapper>
-            <SheetProvider>
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  contentStyle: {
-                    backgroundColor: 'white',
-                  },
-                  gestureEnabled: true,
-                }}
-              />
-            </SheetProvider>
-          </NotifierWrapper>
-        </GestureHandlerRootView>
-      </SQLiteProvider>
-    </Suspense>
+    <QueryClientProvider client={queryClient}>
+      <Suspense fallback={<ActivityIndicator size="small" />}>
+        <SQLiteProvider
+          databaseName={DATABASE_NAME}
+          options={{ enableChangeListener: true }}
+          useSuspense>
+          <GestureHandlerRootView>
+            <NotifierWrapper useRNScreensOverlay>
+              <SheetProvider>
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    contentStyle: {
+                      backgroundColor: 'white',
+                    },
+                    gestureEnabled: true,
+                  }}>
+                  <Stack.Screen
+                    name="location_generic/[location]"
+                    options={{
+                      presentation: 'modal',
+                      sheetGrabberVisible: true,
+                    }}
+                  />
+
+                  <Stack.Screen
+                    name="location/food/[food]"
+                    options={{
+                      presentation: 'modal',
+                      sheetGrabberVisible: true,
+                    }}
+                  />
+
+                  <Stack.Screen
+                    name="settings"
+                    options={{
+                      presentation: 'modal',
+                      sheetGrabberVisible: true,
+                    }}
+                  />
+                </Stack>
+              </SheetProvider>
+            </NotifierWrapper>
+          </GestureHandlerRootView>
+        </SQLiteProvider>
+      </Suspense>
+    </QueryClientProvider>
   );
 }

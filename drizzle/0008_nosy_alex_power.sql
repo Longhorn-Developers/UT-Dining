@@ -1,0 +1,1 @@
+ALTER TABLE `location` ADD `has_menus` integer DEFAULT false NOT NULL;

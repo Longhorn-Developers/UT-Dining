@@ -5,6 +5,11 @@ import m0001 from './0001_vengeful_thunderbolt.sql';
 import m0002 from './0002_grey_sharon_carter.sql';
 import m0003 from './0003_cold_shard.sql';
 import m0004 from './0004_nosy_sunset_bain.sql';
+import m0005 from './0005_plain_sunspot.sql';
+import m0006 from './0006_flat_iron_patriot.sql';
+import m0007 from './0007_noisy_alice.sql';
+import m0008 from './0008_nosy_alex_power.sql';
+import m0009 from './0009_wide_red_skull.sql';
 import journal from './meta/_journal.json';
 
 export default {
@@ -15,5 +20,10 @@ export default {
     m0002,
     m0003,
     m0004,
+    m0005,
+    m0006,
+    m0007,
+    m0008,
+    m0009,
   },
 };

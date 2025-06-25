@@ -46,8 +46,8 @@ const Favorites = () => {
           headerShown: false,
         }}
       />
-      <Container>
-        <View className="my-6 flex gap-y-5">
+      <Container className="mx-0 mb-12">
+        <View className="mt-6 flex gap-y-5 px-6">
           <TopBar variant="back" />
           <View>
             <View className="flex-row items-center gap-x-2">
@@ -71,10 +71,10 @@ const Favorites = () => {
           />
         </View>
         <FlashList
-          estimatedItemSize={100}
+          estimatedItemSize={44}
           data={sortedFavorites}
           renderItem={({ item }) => (
-            <View>
+            <View className="px-6">
               <FoodComponent
                 categoryName={item.category_name}
                 food={{

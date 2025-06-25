@@ -1,9 +1,7 @@
 import { InfoIcon } from 'lucide-react-native';
 import React from 'react';
 import { Text, View, Image } from 'react-native';
-import ActionSheet, { SheetProps } from 'react-native-actions-sheet';
 import { ScrollView } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ALLERGEN_ICONS, ALLERGEN_EXCEPTIONS } from '~/data/AllergenInfo';
 import { useSettingsStore } from '~/store/useSettingsStore';
@@ -37,19 +35,13 @@ const categorizeAllergens = () => {
   return { allergens, dietary };
 };
 
-const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
-  const insets = useSafeAreaInsets();
+const FoodInfoSheet = () => {
+  //   const insets = useSafeAreaInsets();
   const { allergens, dietary } = categorizeAllergens();
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   return (
-    <ActionSheet
-      id={sheetId}
-      defaultOverlayOpacity={0.5}
-      containerStyle={{ backgroundColor: isDarkMode ? '#111827' : 'white' }}
-      gestureEnabled
-      safeAreaInsets={insets}
-      useBottomSafeAreaPadding>
+    <View style={{ backgroundColor: isDarkMode ? '#1F2937' : 'white' }}>
       <ScrollView showsVerticalScrollIndicator={false} className="max-h-[60vh]">
         <View className="p-6">
           {/* Header */}
@@ -135,7 +127,7 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
           </View>
         </View>
       </ScrollView>
-    </ActionSheet>
+    </View>
   );
 };
 
