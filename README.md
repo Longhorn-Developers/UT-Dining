@@ -255,7 +255,7 @@ A: The menu data is updated every day at 1:00 AM CST (7:00 AM UTC) to ensure you
 ### Development
 
 **Q: Do I need to run the scraper to test the app locally?**  
-A: No, you can develop and test most app features without running the scraper. If you want to work with real menu data, you'll need to set up the [UT Dining Scraper](https://github.com/EthanL06/ut-dining-scraper) with your local Supabase instance.
+A: No, you can develop and test the app without running the scraper, but we highly recommend you do to be able to fully test all of the app's features. If you want to work with real menu data, you'll need to set up the [UT Dining Scraper](https://github.com/EthanL06/ut-dining-scraper) with your local Supabase instance.
 
 **Q: What is local Supabase development and why do I need it?**  
 A: Local Supabase development means running Supabase on your own computer instead of using a hosted service. This gives you:
