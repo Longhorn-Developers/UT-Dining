@@ -129,10 +129,10 @@ const MicrowaveMap = () => {
   }, []);
 
   const allowedBounds = {
-    north: 30.31,
-    south: 30.26,
-    east: -97.72,
-    west: -97.76,
+    north: 30.35,
+    south: 30.22,
+    east: -97.68,
+    west: -97.8,
   };
 
   const handleRegionChangeComplete = (region: Region) => {
@@ -287,7 +287,7 @@ const MicrowaveMap = () => {
               centerOnUser();
             }}
             className={cn(
-              'absolute bottom-12 right-12 rounded-full p-4 shadow-lg',
+              'absolute bottom-12 right-12 rounded-full p-4',
               isDarkMode ? 'bg-gray-700' : 'bg-white'
             )}>
             <Locate size={24} color={COLORS['ut-burnt-orange']} />
