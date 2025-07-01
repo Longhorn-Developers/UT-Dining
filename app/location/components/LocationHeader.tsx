@@ -89,6 +89,18 @@ const LocationHeader = React.memo(
                 )}>
                 {displayName}
               </Text>
+            </View>
+            <View className="flex-row items-center gap-x-3">
+              <Text className="text-lg font-semibold text-ut-burnt-orange">
+                {open ? 'Open' : 'Closed'}
+              </Text>
+
+              <View
+                className={cn(
+                  'size-1 rounded-full',
+                  isDarkMode ? 'bg-ut-grey-dark-mode' : 'bg-ut-burnt-orange'
+                )}
+              />
 
               {/* Location Type Pill */}
               {locationData && locationData.type && (
@@ -110,11 +122,6 @@ const LocationHeader = React.memo(
                   </View>
                 </>
               )}
-            </View>
-            <View className="flex-row items-center gap-x-3">
-              <Text className="text-lg font-semibold text-ut-burnt-orange">
-                {open ? 'Open' : 'Closed'}
-              </Text>
             </View>
           </View>
 
