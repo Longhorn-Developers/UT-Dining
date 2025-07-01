@@ -1,9 +1,16 @@
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { Stack, useRouter } from 'expo-router';
-import { ChevronLeft, Microwave, Locate } from 'lucide-react-native';
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import {
+  ChevronLeft,
+  Microwave,
+  Locate,
+  ChevronUp,
+  ChevronDown,
+  ChevronRight,
+} from 'lucide-react-native';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { View, Text, TouchableOpacity, Alert, Dimensions, Animated } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import type { Region } from 'react-native-maps';
@@ -40,6 +47,108 @@ const CustomMarker = ({ onPress }: { onPress: () => void }) => (
     <Microwave size={20} color="white" />
   </TouchableOpacity>
 );
+
+type Direction = 'north' | 'south' | 'east' | 'west';
+
+const EdgeIndicator = ({ direction, onPress }: { direction: Direction; onPress: () => void }) => {
+  const scaleAnimation = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Scale in animation when component mounts
+    Animated.spring(scaleAnimation, {
+      toValue: 1,
+      useNativeDriver: true,
+      tension: 100,
+      friction: 8,
+    }).start();
+
+    // Return cleanup function for scale out animation
+    return () => {
+      Animated.spring(scaleAnimation, {
+        toValue: 0,
+        friction: 8,
+        tension: 100,
+        useNativeDriver: true,
+      }).start();
+    };
+  }, [scaleAnimation]);
+
+  const getPositionStyle = () => {
+    const { width, height } = Dimensions.get('window');
+    const indicatorSize = 60;
+    const margin = 20;
+
+    switch (direction) {
+      case 'north':
+        return {
+          top: 140,
+          left: width / 2 - indicatorSize / 2,
+        };
+      case 'south':
+        return {
+          bottom: 80,
+          left: width / 2 - indicatorSize / 2,
+        };
+      case 'east':
+        return {
+          top: height / 2 - indicatorSize / 2,
+          right: margin,
+        };
+      case 'west':
+        return {
+          top: height / 2 - indicatorSize / 2,
+          left: margin,
+        };
+    }
+  };
+
+  const getIcon = () => {
+    switch (direction) {
+      case 'north':
+        return <ChevronUp size={16} color="white" />;
+      case 'south':
+        return <ChevronDown size={16} color="white" />;
+      case 'east':
+        return <ChevronRight size={16} color="white" />;
+      case 'west':
+        return <ChevronLeft size={16} color="white" />;
+    }
+  };
+
+  return (
+    <Animated.View
+      style={[
+        {
+          position: 'absolute',
+          transform: [{ scale: scaleAnimation }],
+        },
+        getPositionStyle(),
+      ]}>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={onPress}
+        style={{
+          width: 60,
+          height: 60,
+          backgroundColor: COLORS['ut-burnt-orange'],
+          borderRadius: 30,
+          borderWidth: 2,
+          borderColor: 'white',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.3,
+          shadowRadius: 4,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View style={{ alignItems: 'center' }}>
+          {getIcon()}
+          <Microwave size={14} color="white" style={{ marginTop: 2 }} />
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
 
 const MapMarkers = ({
   onMarkerPress,
@@ -92,6 +201,7 @@ const MicrowaveMap = () => {
   const mapRef = useRef<MapView>(null);
   const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
   const [hasLocationPermission, setHasLocationPermission] = useState(false);
+  const [currentRegion, setCurrentRegion] = useState<Region>(initialRegion);
 
   useEffect(() => {
     (async () => {
@@ -128,45 +238,125 @@ const MicrowaveMap = () => {
     })();
   }, []);
 
-  const allowedBounds = {
-    north: 30.35,
-    south: 30.22,
-    east: -97.68,
-    west: -97.8,
-  };
-
   const handleRegionChangeComplete = (region: Region) => {
-    const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
-
-    const maxLatitudeDelta = 0.015;
-    const maxLongitudeDelta = 0.015;
-
-    // Clamp the coordinates to the allowed bounds
-    const clampedLatitude = Math.max(allowedBounds.south, Math.min(allowedBounds.north, latitude));
-    const clampedLongitude = Math.max(allowedBounds.west, Math.min(allowedBounds.east, longitude));
-
-    // Clamp the deltas to the maximum allowed zoom
-    const clampedLatitudeDelta = Math.min(latitudeDelta, maxLatitudeDelta);
-    const clampedLongitudeDelta = Math.min(longitudeDelta, maxLongitudeDelta);
-
-    // Only animate if the region needs to be adjusted
-    if (
-      latitude !== clampedLatitude ||
-      longitude !== clampedLongitude ||
-      latitudeDelta !== clampedLatitudeDelta ||
-      longitudeDelta !== clampedLongitudeDelta
-    ) {
-      mapRef.current?.animateToRegion({
-        latitude: clampedLatitude,
-        longitude: clampedLongitude,
-        latitudeDelta: clampedLatitudeDelta,
-        longitudeDelta: clampedLongitudeDelta,
-      });
-    }
+    // Update current region for edge indicator calculations
+    setCurrentRegion(region);
   };
 
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  const outOfViewMicrowaves = useMemo(() => {
+    // Calculate distance from initial campus center
+    const distanceFromCampus = Math.sqrt(
+      Math.pow(currentRegion.latitude - initialRegion.latitude, 2) +
+        Math.pow(currentRegion.longitude - initialRegion.longitude, 2)
+    );
+
+    // Threshold to determine if user has scrolled away from main campus area
+    const campusDistanceThreshold = 0.01;
+
+    // Only show edge indicators when user has scrolled significantly away from campus
+    const isAwayFromCampus = distanceFromCampus > campusDistanceThreshold;
+
+    const grouped: Record<Direction, (typeof MICROWAVE_LOCATIONS)[number][]> = {
+      north: [],
+      south: [],
+      east: [],
+      west: [],
+    };
+
+    // Return empty groups if still within campus area
+    if (!isAwayFromCampus) {
+      return grouped;
+    }
+
+    const visibleBounds = {
+      north: currentRegion.latitude + currentRegion.latitudeDelta / 2,
+      south: currentRegion.latitude - currentRegion.latitudeDelta / 2,
+      east: currentRegion.longitude + currentRegion.longitudeDelta / 2,
+      west: currentRegion.longitude - currentRegion.longitudeDelta / 2,
+    };
+
+    MICROWAVE_LOCATIONS.forEach((location) => {
+      const { latitude, longitude } = location.coordinates;
+
+      // Check if microwave is outside visible bounds
+      const isOutOfView =
+        latitude > visibleBounds.north ||
+        latitude < visibleBounds.south ||
+        longitude > visibleBounds.east ||
+        longitude < visibleBounds.west;
+
+      if (isOutOfView) {
+        // Determine primary direction
+        const latDiff = latitude - currentRegion.latitude;
+        const lonDiff = longitude - currentRegion.longitude;
+
+        if (Math.abs(latDiff) > Math.abs(lonDiff)) {
+          // Primary direction is north/south
+          if (latDiff > 0) {
+            grouped.north.push(location);
+          } else {
+            grouped.south.push(location);
+          }
+        } else {
+          // Primary direction is east/west
+          if (lonDiff > 0) {
+            grouped.east.push(location);
+          } else {
+            grouped.west.push(location);
+          }
+        }
+      }
+    });
+
+    // Find the direction with the most microwaves
+    const directionWithMost = Object.entries(grouped).reduce(
+      (max, [direction, locations]) => {
+        return locations.length > max.count
+          ? { direction: direction as Direction, count: locations.length }
+          : max;
+      },
+      { direction: 'north' as Direction, count: 0 }
+    );
+
+    // Return only the direction with the most microwaves
+    return {
+      [directionWithMost.direction]: grouped[directionWithMost.direction],
+    };
+  }, [currentRegion]);
+
+  const navigateToDirection = (direction: Direction) => {
+    const microwavesInDirection = outOfViewMicrowaves[direction];
+    if (microwavesInDirection.length === 0) return;
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    // Find the closest microwave in that direction
+    const closest = microwavesInDirection.reduce((closest, current) => {
+      const closestDistance = Math.sqrt(
+        Math.pow(closest.coordinates.latitude - currentRegion.latitude, 2) +
+          Math.pow(closest.coordinates.longitude - currentRegion.longitude, 2)
+      );
+      const currentDistance = Math.sqrt(
+        Math.pow(current.coordinates.latitude - currentRegion.latitude, 2) +
+          Math.pow(current.coordinates.longitude - currentRegion.longitude, 2)
+      );
+      return currentDistance < closestDistance ? current : closest;
+    });
+
+    // Animate to the closest microwave
+    mapRef.current?.animateToRegion(
+      {
+        latitude: closest.coordinates.latitude,
+        longitude: closest.coordinates.longitude,
+        latitudeDelta: 0.0075,
+        longitudeDelta: 0.0075,
+      },
+      500
+    );
+  };
 
   const handleMarkerPress = (coordinates: { latitude: number; longitude: number }) => {
     mapRef.current?.animateToRegion(
@@ -185,25 +375,12 @@ const MicrowaveMap = () => {
       const userLat = userLocation.coords.latitude;
       const userLong = userLocation.coords.longitude;
 
-      // Check if user is within bounds
-      if (
-        userLat <= allowedBounds.north &&
-        userLat >= allowedBounds.south &&
-        userLong <= allowedBounds.east &&
-        userLong >= allowedBounds.west
-      ) {
-        mapRef.current.animateToRegion({
-          latitude: userLat,
-          longitude: userLong,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
-        });
-      } else {
-        // Alert user they're outside the viewable area
-        Alert.alert('Out of Range', 'You’re currently outside the UT campus area.', [
-          { text: 'OK' },
-        ]);
-      }
+      mapRef.current.animateToRegion({
+        latitude: userLat,
+        longitude: userLong,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
+      });
     }
   };
 
@@ -266,17 +443,24 @@ const MicrowaveMap = () => {
           provider={PROVIDER_DEFAULT}
           initialRegion={initialRegion}
           showsUserLocation={hasLocationPermission}
-          followsUserLocation={Boolean(
-            userLocation &&
-              userLocation.coords.latitude <= allowedBounds.north &&
-              userLocation.coords.latitude >= allowedBounds.south &&
-              userLocation.coords.longitude <= allowedBounds.east &&
-              userLocation.coords.longitude >= allowedBounds.west
-          )}
+          // followsUserLocation={Boolean(userLocation)}
           onRegionChangeComplete={handleRegionChangeComplete}
           userInterfaceStyle={isDarkMode ? 'dark' : 'light'}>
           <MapMarkers onMarkerPress={handleMarkerPress} />
         </MapView>
+
+        {/* Edge Indicators */}
+        {Object.entries(outOfViewMicrowaves).map(([direction, locations]) => {
+          if (locations.length === 0) return null;
+
+          return (
+            <EdgeIndicator
+              key={direction}
+              direction={direction as Direction}
+              onPress={() => navigateToDirection(direction as Direction)}
+            />
+          );
+        })}
 
         {/* Location Button */}
         {hasLocationPermission && (
