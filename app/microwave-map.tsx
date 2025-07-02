@@ -8,6 +8,7 @@ import {
   ChevronUp,
   ChevronDown,
   ChevronRight,
+  MapPin,
 } from 'lucide-react-native';
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, Alert, Dimensions, Animated } from 'react-native';
@@ -18,6 +19,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Container } from '~/components/Container';
 import { MICROWAVE_LOCATIONS } from '~/data/MicrowaveLocations';
+import { getAllLocationsWithCoordinates } from '~/db/database';
+import { useDatabase } from '~/hooks/useDatabase';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
@@ -45,6 +48,25 @@ const CustomMarker = ({ onPress }: { onPress: () => void }) => (
       shadowRadius: 2,
     }}>
     <Microwave size={20} color="white" />
+  </TouchableOpacity>
+);
+
+const NonMicrowaveMarker = ({ onPress }: { onPress: () => void }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    activeOpacity={0.7}
+    style={{
+      backgroundColor: COLORS['ut-burnt-orange'],
+      padding: 8,
+      borderRadius: 50,
+      borderWidth: 2,
+      borderColor: 'white',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 2,
+    }}>
+    <MapPin size={20} color="white" />
   </TouchableOpacity>
 );
 
@@ -151,45 +173,69 @@ const EdgeIndicator = ({ direction, onPress }: { direction: Direction; onPress: 
 };
 
 const MapMarkers = ({
+  locations,
   onMarkerPress,
 }: {
+  locations: {
+    name: string;
+    address: string;
+    coordinates: { latitude: number; longitude: number };
+    description?: string;
+    note?: string;
+    isMicrowave?: boolean;
+  }[];
   onMarkerPress: (coords: { latitude: number; longitude: number }) => void;
 }) => {
   return (
     <>
-      {MICROWAVE_LOCATIONS.map((location, index) => (
+      {locations.map((location, index) => (
         <Marker
           key={location.name + index}
           coordinate={location.coordinates}
           tracksViewChanges={false}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            // Center the map on this location
             onMarkerPress(location.coordinates);
-            // Show the details sheet
             SheetManager.show('microwave-location', {
               payload: {
                 name: location.name,
                 address: location.address,
-                description: location.description,
-                ...('note' in location ? { note: location.note } : {}),
+                description: location.description ?? '',
+                ...(location.note ? { note: location.note } : {}),
               },
             });
           }}>
-          <CustomMarker
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              onMarkerPress(location.coordinates);
-              SheetManager.show('microwave-location', {
-                payload: {
-                  name: location.name,
-                  address: location.address,
-                  description: location.description,
-                  ...('note' in location ? { note: location.note } : {}),
-                },
-              });
-            }}
-          />
+          {location.isMicrowave ? (
+            <CustomMarker
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                onMarkerPress(location.coordinates);
+                SheetManager.show('microwave-location', {
+                  payload: {
+                    name: location.name,
+                    address: location.address,
+                    description: location.description ?? '',
+                    ...(location.note ? { note: location.note } : {}),
+                  },
+                });
+              }}
+            />
+          ) : (
+            <NonMicrowaveMarker
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                onMarkerPress(location.coordinates);
+                SheetManager.show('microwave-location', {
+                  payload: {
+                    name: location.name,
+                    address: location.address,
+                    description: location.description ?? '',
+                    ...(location.note ? { note: location.note } : {}),
+                  },
+                });
+              }}
+            />
+          )}
         </Marker>
       ))}
     </>
@@ -202,6 +248,8 @@ const MicrowaveMap = () => {
   const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
   const [hasLocationPermission, setHasLocationPermission] = useState(false);
   const [currentRegion, setCurrentRegion] = useState<Region>(initialRegion);
+  const db = useDatabase();
+  const [dbLocations, setDbLocations] = useState<any[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -237,6 +285,47 @@ const MicrowaveMap = () => {
       };
     })();
   }, []);
+
+  useEffect(() => {
+    async function fetchDbLocations() {
+      if (!db) return;
+
+      const locs = await getAllLocationsWithCoordinates(db);
+      setDbLocations(locs);
+    }
+    fetchDbLocations();
+  }, [db]);
+
+  // Merge static and DB locations, deduplicate by lat/lng (prefer DB)
+  const mergedLocations = React.useMemo(() => {
+    const dbLocs = dbLocations.map((loc) => {
+      // Check if this DB location matches a static microwave location
+      const isMicrowave = MICROWAVE_LOCATIONS.some(
+        (staticLoc) =>
+          Math.abs(Number(loc.latitude) - staticLoc.coordinates.latitude) < 1e-6 &&
+          Math.abs(Number(loc.longitude) - staticLoc.coordinates.longitude) < 1e-6
+      );
+      return {
+        name: (loc.name ?? '') as string,
+        address: (loc.address ?? '') as string,
+        coordinates: {
+          latitude: Number(loc.latitude),
+          longitude: Number(loc.longitude),
+        },
+        description: loc.description ?? '',
+        isMicrowave,
+      };
+    });
+    const staticLocs = MICROWAVE_LOCATIONS.filter(
+      (staticLoc) =>
+        !dbLocs.some(
+          (dbLoc) =>
+            Math.abs(dbLoc.coordinates.latitude - staticLoc.coordinates.latitude) < 1e-6 &&
+            Math.abs(dbLoc.coordinates.longitude - staticLoc.coordinates.longitude) < 1e-6
+        )
+    ).map((staticLoc) => ({ ...staticLoc, isMicrowave: true }));
+    return [...dbLocs, ...staticLocs];
+  }, [dbLocations]);
 
   const handleRegionChangeComplete = (region: Region) => {
     // Update current region for edge indicator calculations
@@ -443,10 +532,11 @@ const MicrowaveMap = () => {
           provider={PROVIDER_DEFAULT}
           initialRegion={initialRegion}
           showsUserLocation={hasLocationPermission}
-          // followsUserLocation={Boolean(userLocation)}
           onRegionChangeComplete={handleRegionChangeComplete}
-          userInterfaceStyle={isDarkMode ? 'dark' : 'light'}>
-          <MapMarkers onMarkerPress={handleMarkerPress} />
+          userInterfaceStyle={isDarkMode ? 'dark' : 'light'}
+          loadingEnabled
+          loadingBackgroundColor={isDarkMode ? 'rgba(17,24,39,0.7)' : 'rgba(255,255,255,0.9)'}>
+          <MapMarkers locations={mergedLocations} onMarkerPress={handleMarkerPress} />
         </MapView>
 
         {/* Edge Indicators */}

@@ -41,7 +41,7 @@ const MicrowaveLocationSheet = ({ payload, sheetId }: MicrowaveLocationProps) =>
       id={sheetId}
       defaultOverlayOpacity={0.2}
       containerStyle={{
-        backgroundColor: isDarkMode ? '#1f2937' : 'white',
+        backgroundColor: isDarkMode ? '#111827' : 'white',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
       }}

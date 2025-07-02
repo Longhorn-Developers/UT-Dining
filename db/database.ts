@@ -887,3 +887,23 @@ export const getAppInformation = async (
     return null;
   }
 };
+
+export const getAllLocationsWithCoordinates = async (
+  db: ExpoSQLiteDatabase<typeof schema>
+): Promise<Pick<schema.Location, 'id' | 'name' | 'latitude' | 'longitude' | 'address'>[]> => {
+  const data = await db
+    .select({
+      id: schema.location.id,
+      name: schema.location.name,
+      description: schema.location.description,
+      latitude: schema.location.latitude,
+      longitude: schema.location.longitude,
+      address: schema.location.address,
+    })
+    .from(schema.location)
+    .where(
+      sql`${schema.location.latitude} IS NOT NULL AND ${schema.location.longitude} IS NOT NULL`
+    )
+    .execute();
+  return data;
+};
