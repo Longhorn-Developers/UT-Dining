@@ -899,11 +899,14 @@ export const getAllLocationsWithCoordinates = async (
       latitude: schema.location.latitude,
       longitude: schema.location.longitude,
       address: schema.location.address,
+      type: schema.location_type.name,
     })
     .from(schema.location)
     .where(
       sql`${schema.location.latitude} IS NOT NULL AND ${schema.location.longitude} IS NOT NULL`
     )
+    .leftJoin(schema.location_type, eq(schema.location.type_id, schema.location_type.id))
     .execute();
+
   return data;
 };

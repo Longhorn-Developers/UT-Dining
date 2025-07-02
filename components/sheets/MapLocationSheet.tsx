@@ -9,7 +9,7 @@ import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS, getColor } from '~/utils/colors';
 import { cn } from '~/utils/utils';
 
-type MicrowaveLocationProps = {
+type MapLocationProps = {
   sheetId: string;
   payload: {
     name: string;
@@ -20,7 +20,7 @@ type MicrowaveLocationProps = {
   ref: React.RefObject<ActionSheetRef>;
 };
 
-const MicrowaveLocationSheet = ({ payload, sheetId }: MicrowaveLocationProps) => {
+const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
   const { name, address, description, note } = payload;
   const insets = useSafeAreaInsets();
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
@@ -103,4 +103,4 @@ const MicrowaveLocationSheet = ({ payload, sheetId }: MicrowaveLocationProps) =>
   );
 };
 
-export default MicrowaveLocationSheet;
+export default MapLocationSheet;

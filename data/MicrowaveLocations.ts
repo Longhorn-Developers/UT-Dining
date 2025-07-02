@@ -23,8 +23,8 @@ export const MICROWAVE_LOCATIONS = [
     name: 'Robert L. Patton Hall (RLP)',
     address: '305 E 23rd St, Austin, TX 78712',
     coordinates: {
-      latitude: 30.284769,
-      longitude: -97.73558,
+      latitude: 30.285143,
+      longitude: -97.735896,
     },
     description: '2nd floor in the LAH office.',
     note: 'LAH Students Only',
@@ -79,8 +79,8 @@ export const MICROWAVE_LOCATIONS = [
     name: 'The Texas Union (UNB)',
     address: '2308 Whitis Ave, Austin, TX 78712',
     coordinates: {
-      latitude: 30.286613,
-      longitude: -97.741231,
+      latitude: 30.286406,
+      longitude: -97.741169,
     },
     description: `1st floor, Tower Burger and Fries and 40 Acres 
 Showroom areas.`,

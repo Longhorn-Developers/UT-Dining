@@ -9,6 +9,10 @@ import {
   ChevronDown,
   ChevronRight,
   MapPin,
+  Coffee,
+  Store,
+  Utensils,
+  ChefHat,
 } from 'lucide-react-native';
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, Alert, Dimensions, Animated } from 'react-native';
@@ -32,43 +36,35 @@ const initialRegion = {
   longitudeDelta: 0.01,
 };
 
-const CustomMarker = ({ onPress }: { onPress: () => void }) => (
-  <TouchableOpacity
-    onPress={onPress}
-    activeOpacity={0.7}
-    style={{
-      backgroundColor: COLORS['ut-burnt-orange'],
-      padding: 8,
-      borderRadius: 50,
-      borderWidth: 2,
-      borderColor: 'white',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.3,
-      shadowRadius: 2,
-    }}>
-    <Microwave size={20} color="white" />
-  </TouchableOpacity>
-);
+const ICON_MAP = {
+  microwave: Microwave,
+  'Coffee Shop': Coffee,
+  'Convenience Store': Store,
+  'Dining Hall': Utensils,
+  Restaurant: ChefHat,
+};
 
-const NonMicrowaveMarker = ({ onPress }: { onPress: () => void }) => (
-  <TouchableOpacity
-    onPress={onPress}
-    activeOpacity={0.7}
-    style={{
-      backgroundColor: COLORS['ut-burnt-orange'],
-      padding: 8,
-      borderRadius: 50,
-      borderWidth: 2,
-      borderColor: 'white',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.3,
-      shadowRadius: 2,
-    }}>
-    <MapPin size={20} color="white" />
-  </TouchableOpacity>
-);
+const MarkerIcon = ({ onPress, type }: { onPress: () => void; type: string }) => {
+  const IconComponent = ICON_MAP[type as keyof typeof ICON_MAP] || MapPin;
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.7}
+      style={{
+        backgroundColor: COLORS['ut-burnt-orange'],
+        padding: 8,
+        borderRadius: 50,
+        borderWidth: 2,
+        borderColor: 'white',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+      }}>
+      <IconComponent size={20} color="white" />
+    </TouchableOpacity>
+  );
+};
 
 type Direction = 'north' | 'south' | 'east' | 'west';
 
@@ -127,13 +123,13 @@ const EdgeIndicator = ({ direction, onPress }: { direction: Direction; onPress: 
   const getIcon = () => {
     switch (direction) {
       case 'north':
-        return <ChevronUp size={16} color="white" />;
+        return <ChevronUp size={24} color="white" />;
       case 'south':
-        return <ChevronDown size={16} color="white" />;
+        return <ChevronDown size={24} color="white" />;
       case 'east':
-        return <ChevronRight size={16} color="white" />;
+        return <ChevronRight size={24} color="white" />;
       case 'west':
-        return <ChevronLeft size={16} color="white" />;
+        return <ChevronLeft size={24} color="white" />;
     }
   };
 
@@ -163,10 +159,7 @@ const EdgeIndicator = ({ direction, onPress }: { direction: Direction; onPress: 
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <View style={{ alignItems: 'center' }}>
-          {getIcon()}
-          <Microwave size={14} color="white" style={{ marginTop: 2 }} />
-        </View>
+        <View style={{ alignItems: 'center' }}>{getIcon()}</View>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -182,7 +175,7 @@ const MapMarkers = ({
     coordinates: { latitude: number; longitude: number };
     description?: string;
     note?: string;
-    isMicrowave?: boolean;
+    type: string;
   }[];
   onMarkerPress: (coords: { latitude: number; longitude: number }) => void;
 }) => {
@@ -196,7 +189,7 @@ const MapMarkers = ({
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             onMarkerPress(location.coordinates);
-            SheetManager.show('microwave-location', {
+            SheetManager.show('map-location', {
               payload: {
                 name: location.name,
                 address: location.address,
@@ -205,44 +198,28 @@ const MapMarkers = ({
               },
             });
           }}>
-          {location.isMicrowave ? (
-            <CustomMarker
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                onMarkerPress(location.coordinates);
-                SheetManager.show('microwave-location', {
-                  payload: {
-                    name: location.name,
-                    address: location.address,
-                    description: location.description ?? '',
-                    ...(location.note ? { note: location.note } : {}),
-                  },
-                });
-              }}
-            />
-          ) : (
-            <NonMicrowaveMarker
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                onMarkerPress(location.coordinates);
-                SheetManager.show('microwave-location', {
-                  payload: {
-                    name: location.name,
-                    address: location.address,
-                    description: location.description ?? '',
-                    ...(location.note ? { note: location.note } : {}),
-                  },
-                });
-              }}
-            />
-          )}
+          <MarkerIcon
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              onMarkerPress(location.coordinates);
+              SheetManager.show('map-location', {
+                payload: {
+                  name: location.name,
+                  address: location.address,
+                  description: location.description ?? '',
+                  ...(location.note ? { note: location.note } : {}),
+                },
+              });
+            }}
+            type={location.type}
+          />
         </Marker>
       ))}
     </>
   );
 };
 
-const MicrowaveMap = () => {
+const MapPage = () => {
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   const mapRef = useRef<MapView>(null);
   const [userLocation, setUserLocation] = useState<Location.LocationObject | null>(null);
@@ -312,8 +289,8 @@ const MicrowaveMap = () => {
           latitude: Number(loc.latitude),
           longitude: Number(loc.longitude),
         },
-        description: loc.description ?? '',
-        isMicrowave,
+        description: loc.description,
+        type: isMicrowave ? 'microwave' : loc.type,
       };
     });
     const staticLocs = MICROWAVE_LOCATIONS.filter(
@@ -323,7 +300,7 @@ const MicrowaveMap = () => {
             Math.abs(dbLoc.coordinates.latitude - staticLoc.coordinates.latitude) < 1e-6 &&
             Math.abs(dbLoc.coordinates.longitude - staticLoc.coordinates.longitude) < 1e-6
         )
-    ).map((staticLoc) => ({ ...staticLoc, isMicrowave: true }));
+    ).map((staticLoc) => ({ ...staticLoc, type: 'microwave' }));
     return [...dbLocs, ...staticLocs];
   }, [dbLocations]);
 
@@ -335,7 +312,7 @@ const MicrowaveMap = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const outOfViewMicrowaves = useMemo(() => {
+  const outOfViewLocations = useMemo(() => {
     // Calculate distance from initial campus center
     const distanceFromCampus = Math.sqrt(
       Math.pow(currentRegion.latitude - initialRegion.latitude, 2) +
@@ -348,7 +325,7 @@ const MicrowaveMap = () => {
     // Only show edge indicators when user has scrolled significantly away from campus
     const isAwayFromCampus = distanceFromCampus > campusDistanceThreshold;
 
-    const grouped: Record<Direction, (typeof MICROWAVE_LOCATIONS)[number][]> = {
+    const grouped: Record<Direction, typeof mergedLocations> = {
       north: [],
       south: [],
       east: [],
@@ -367,10 +344,10 @@ const MicrowaveMap = () => {
       west: currentRegion.longitude - currentRegion.longitudeDelta / 2,
     };
 
-    MICROWAVE_LOCATIONS.forEach((location) => {
+    mergedLocations.forEach((location) => {
       const { latitude, longitude } = location.coordinates;
 
-      // Check if microwave is outside visible bounds
+      // Check if location is outside visible bounds
       const isOutOfView =
         latitude > visibleBounds.north ||
         latitude < visibleBounds.south ||
@@ -400,7 +377,7 @@ const MicrowaveMap = () => {
       }
     });
 
-    // Find the direction with the most microwaves
+    // Find the direction with the most locations
     const directionWithMost = Object.entries(grouped).reduce(
       (max, [direction, locations]) => {
         return locations.length > max.count
@@ -410,20 +387,23 @@ const MicrowaveMap = () => {
       { direction: 'north' as Direction, count: 0 }
     );
 
-    // Return only the direction with the most microwaves
+    // Return only the direction with the most locations
     return {
       [directionWithMost.direction]: grouped[directionWithMost.direction],
     };
-  }, [currentRegion]);
+  }, [currentRegion, mergedLocations]);
 
-  const navigateToDirection = (direction: Direction) => {
-    const microwavesInDirection = outOfViewMicrowaves[direction];
-    if (microwavesInDirection.length === 0) return;
+  const navigateToDirection = (
+    direction: Direction,
+    deltas?: { latitudeDelta: number; longitudeDelta: number }
+  ) => {
+    const locationsInDirection = outOfViewLocations[direction];
+    if (locationsInDirection.length === 0) return;
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    // Find the closest microwave in that direction
-    const closest = microwavesInDirection.reduce((closest, current) => {
+    // Find the closest location in that direction
+    const closest = locationsInDirection.reduce((closest, current) => {
       const closestDistance = Math.sqrt(
         Math.pow(closest.coordinates.latitude - currentRegion.latitude, 2) +
           Math.pow(closest.coordinates.longitude - currentRegion.longitude, 2)
@@ -435,13 +415,13 @@ const MicrowaveMap = () => {
       return currentDistance < closestDistance ? current : closest;
     });
 
-    // Animate to the closest microwave
+    // Animate to the closest location
     mapRef.current?.animateToRegion(
       {
         latitude: closest.coordinates.latitude,
         longitude: closest.coordinates.longitude,
-        latitudeDelta: 0.0075,
-        longitudeDelta: 0.0075,
+        latitudeDelta: deltas?.latitudeDelta ?? 0.0015,
+        longitudeDelta: deltas?.longitudeDelta ?? 0.0015,
       },
       500
     );
@@ -452,8 +432,8 @@ const MicrowaveMap = () => {
       {
         latitude: coordinates.latitude,
         longitude: coordinates.longitude,
-        latitudeDelta: 0.0075,
-        longitudeDelta: 0.0075,
+        latitudeDelta: 0.00125,
+        longitudeDelta: 0.00125,
       },
       500
     );
@@ -498,7 +478,7 @@ const MicrowaveMap = () => {
           )}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            SheetManager.hide('microwave-location');
+            SheetManager.hide('map-location');
             router.back();
           }}>
           <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
@@ -508,7 +488,7 @@ const MicrowaveMap = () => {
             'ml-4 font-sans text-3xl font-extrabold',
             isDarkMode ? 'text-white' : 'text-gray-800'
           )}>
-          Microwave Map
+          Map
         </Text>
       </View>
 
@@ -517,7 +497,7 @@ const MicrowaveMap = () => {
         className={cn('mx-0 gap-6', isDarkMode ? 'bg-gray-900' : 'bg-white')}>
         <Stack.Screen
           options={{
-            title: 'Microwave Map',
+            title: 'Map',
             headerShown: false,
           }}
         />
@@ -540,14 +520,19 @@ const MicrowaveMap = () => {
         </MapView>
 
         {/* Edge Indicators */}
-        {Object.entries(outOfViewMicrowaves).map(([direction, locations]) => {
+        {Object.entries(outOfViewLocations).map(([direction, locations]) => {
           if (locations.length === 0) return null;
 
           return (
             <EdgeIndicator
               key={direction}
               direction={direction as Direction}
-              onPress={() => navigateToDirection(direction as Direction)}
+              onPress={() =>
+                navigateToDirection(direction as Direction, {
+                  latitudeDelta: 0.0075,
+                  longitudeDelta: 0.0075,
+                })
+              }
             />
           );
         })}
@@ -572,4 +557,4 @@ const MicrowaveMap = () => {
   );
 };
 
-export default MicrowaveMap;
+export default MapPage;
