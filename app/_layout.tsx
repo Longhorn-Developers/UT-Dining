@@ -11,10 +11,11 @@ import { NotifierWrapper } from 'react-native-notifier';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
 
+import '../components/sheets/Sheets';
+
 import * as schema from '../db/schema';
 import migrations from '../drizzle/migrations';
 
-import '../components/sheets/Sheets';
 import '../global.css';
 
 export const DATABASE_NAME = 'database.db';
@@ -51,35 +52,31 @@ export default function Layout() {
           <GestureHandlerRootView>
             <NotifierWrapper useRNScreensOverlay>
               <SheetProvider>
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                    contentStyle: {
-                      backgroundColor: 'white',
-                    },
-                    gestureEnabled: true,
-                  }}>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen name="(stack)" options={{ headerShown: false }} />
                   <Stack.Screen
                     name="location_generic/[location]"
                     options={{
                       presentation: 'modal',
                       sheetGrabberVisible: true,
+                      headerShown: false,
                     }}
                   />
-
                   <Stack.Screen
-                    name="location/food/[food]"
+                    name="food/[food]"
                     options={{
                       presentation: 'modal',
                       sheetGrabberVisible: true,
+                      headerShown: false,
                     }}
                   />
-
                   <Stack.Screen
                     name="settings"
                     options={{
                       presentation: 'modal',
                       sheetGrabberVisible: true,
+                      headerShown: false,
                     }}
                   />
                 </Stack>

@@ -455,45 +455,8 @@ const MapPage = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
-      {/* Header Bar with Back Button and Title */}
-      <View
-        className={cn(
-          'absolute z-10 w-full flex-row items-center px-5',
-          isDarkMode ? 'bg-gray-900' : 'bg-white'
-        )}
-        style={{
-          top: 0,
-          paddingTop: insets.top + 10,
-          paddingBottom: 15,
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 3,
-          elevation: 2,
-        }}>
-        <TouchableOpacity
-          className={cn(
-            'h-10 w-10 items-center justify-center rounded-full',
-            isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
-          )}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            SheetManager.hide('map-location');
-            router.back();
-          }}>
-          <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
-        </TouchableOpacity>
-        <Text
-          className={cn(
-            'ml-4 font-sans text-3xl font-extrabold',
-            isDarkMode ? 'text-white' : 'text-gray-800'
-          )}>
-          Map
-        </Text>
-      </View>
-
       <Container
-        disableBottomPadding
+        disableInsets
         className={cn('mx-0 gap-6', isDarkMode ? 'bg-gray-900' : 'bg-white')}>
         <Stack.Screen
           options={{

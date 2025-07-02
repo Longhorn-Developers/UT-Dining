@@ -9,10 +9,10 @@ import AllergenSection from './components/AllergenSection';
 import NutritionFooter from './components/NutritionFooter';
 import NutritionInfo from './components/NutritionInfo';
 import NutritionRow from './components/NutritionRow';
-import { useFoodData } from '../../../hooks/useFoodData';
 
 import { Container } from '~/components/Container';
 import TopBar from '~/components/TopBar';
+import { useFoodData } from '~/hooks/useFoodData';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';

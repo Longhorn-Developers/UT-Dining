@@ -10,9 +10,9 @@ import FoodItemRow from './components/FoodItemRow';
 import LocationHeader from './components/LocationHeader';
 import ScrollToTopButton from './components/ScrollToTopButton';
 import SkeletonItem from './components/SkeletonItem';
-import { useCategoryExpansion } from '../../hooks/useCategoryExpansion';
-import { useMenuData } from '../../hooks/useMenuData';
-import { useScrollToTop } from '../../hooks/useScrollToTop';
+import { useCategoryExpansion } from '../../../hooks/useCategoryExpansion';
+import { useMenuData } from '../../../hooks/useMenuData';
+import { useScrollToTop } from '../../../hooks/useScrollToTop';
 
 import { Container } from '~/components/Container';
 import * as schema from '~/db/schema';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-import { FilterType } from '..';
+import { FilterType } from '../(tabs)';
 import * as schema from '../../db/schema';
 
 import FilterBar from '~/components/FilterBar';

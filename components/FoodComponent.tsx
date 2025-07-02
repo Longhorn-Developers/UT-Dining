@@ -129,7 +129,7 @@ const FoodComponent = ({
         onPress={async () => {
           await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           router.push({
-            pathname: `/location/food/[food]`,
+            pathname: `/food/[food]`,
             params: {
               food: food.name as string,
               menu: selectedMenu,
