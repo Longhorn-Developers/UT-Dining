@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 
 export const location_type = sqliteTable('location_type', {
   id: text('id').primaryKey(),
@@ -26,6 +26,8 @@ export const location = sqliteTable('location', {
   image: text('image'),
   force_close: integer('force_close', { mode: 'boolean' }).notNull().default(false),
   has_menus: integer('has_menus', { mode: 'boolean' }).notNull().default(false),
+  latitude: real('latitude'),
+  longitude: real('longitude'),
   created_at: text('created_at').default('CURRENT_TIMESTAMP'),
   updated_at: text('updated_at').default('CURRENT_TIMESTAMP'),
 });
