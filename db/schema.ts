@@ -164,6 +164,14 @@ export const favorites = sqliteTable('favorites', {
   milk: integer('milk', { mode: 'boolean' }),
 });
 
+export const app_information = sqliteTable('app_information', {
+  id: text('id').primaryKey(),
+  about_title: text('about_title'),
+  about_description: text('about_description'),
+  credits_contributors: text('credits_contributors', { mode: 'json' }),
+  support_links: text('support_links', { mode: 'json' }),
+});
+
 export type Location = typeof location.$inferSelect;
 export type LocationType = typeof location_type.$inferSelect;
 export type Menu = typeof menu.$inferSelect;
@@ -174,4 +182,19 @@ export type FoodItem = typeof food_item.$inferSelect;
 export type Favorite = typeof favorites.$inferSelect;
 export interface LocationWithType extends Location {
   type: LocationType['name'];
+}
+
+type AppInfo = typeof app_information.$inferSelect;
+export interface AppInformation extends AppInfo {
+  credits_contributors: {
+    id: string;
+    name: string;
+    order: number;
+  }[];
+  support_links: {
+    id: string;
+    url: string;
+    label: string;
+    order: number;
+  }[];
 }

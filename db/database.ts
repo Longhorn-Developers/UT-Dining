@@ -38,11 +38,13 @@ const querySupabase = async () => {
     const formattedDate = centralTime.toISOString().split('T')[0];
 
     // Fetch base data in parallel (independent queries)
-    const [locationResult, locationTypeResult, menuResult] = await Promise.all([
-      supabase.from('location').select('*'),
-      supabase.from('location_type').select('*'),
-      supabase.from('menu').select('*').eq('date', formattedDate),
-    ]);
+    const [locationResult, locationTypeResult, menuResult, appInformationResult] =
+      await Promise.all([
+        supabase.from('location').select('*'),
+        supabase.from('location_type').select('*'),
+        supabase.from('menu').select('*').eq('date', formattedDate),
+        supabase.from('app_information').select('*'),
+      ]);
 
     // Check for errors in base queries
     if (locationResult.error) {
@@ -57,10 +59,15 @@ const querySupabase = async () => {
       console.error('❌ Error fetching menu:', menuResult.error);
       throw new Error(`menu: ${menuResult.error.message}`);
     }
+    if (appInformationResult.error) {
+      console.error('❌ Error fetching app_information:', appInformationResult.error);
+      throw new Error(`app_information: ${appInformationResult.error.message}`);
+    }
 
     const locationData = locationResult.data ?? [];
     const locationTypeData = locationTypeResult.data ?? [];
     const menuData = menuResult.data ?? [];
+    const appInformationData = appInformationResult.data ?? [];
 
     // Early return if no menus for today
     if (menuData.length === 0) {
@@ -73,6 +80,7 @@ const querySupabase = async () => {
         food_item: [],
         nutrition: [],
         allergens: [],
+        app_information: appInformationData,
       };
     }
 
@@ -103,6 +111,7 @@ const querySupabase = async () => {
         food_item: [],
         nutrition: [],
         allergens: [],
+        app_information: appInformationData,
       };
     }
 
@@ -132,6 +141,7 @@ const querySupabase = async () => {
         food_item: [],
         nutrition: [],
         allergens: [],
+        app_information: appInformationData,
       };
     }
 
@@ -178,6 +188,7 @@ const querySupabase = async () => {
       food_item: foodItemData,
       nutrition: nutritionResult.data ?? [],
       allergens: allergensResult.data ?? [],
+      app_information: appInformationData,
     };
   } catch (error) {
     console.error('❌ Unexpected error fetching Supabase data:', error);
@@ -210,6 +221,7 @@ export const insertDataIntoSQLiteDB = async (
         db.delete(food_item).execute(),
         db.delete(nutrition).execute(),
         db.delete(allergens).execute(),
+        db.delete(schema.app_information).execute(),
       ]);
 
       // Insert data from Supabase (with proper type casting)
@@ -235,6 +247,9 @@ export const insertDataIntoSQLiteDB = async (
       }
       if (data.allergens.length > 0) {
         insertPromises.push(db.insert(allergens).values(data.allergens as any));
+      }
+      if (data.app_information.length > 0) {
+        insertPromises.push(db.insert(schema.app_information).values(data.app_information as any));
       }
 
       if (insertPromises.length > 0) {
@@ -843,6 +858,23 @@ export const getCompleteLocationData = async (
     return structuredData;
   } catch (e) {
     console.error('Error fetching complete location data:', e);
+    return null;
+  }
+};
+
+export const getAppInformation = async (
+  db: ExpoSQLiteDatabase<typeof schema>
+): Promise<schema.AppInformation | null> => {
+  try {
+    const data = await db.select().from(schema.app_information).execute();
+
+    if (data.length === 0) {
+      return null;
+    }
+
+    return data[0] as schema.AppInformation;
+  } catch (error) {
+    console.error('❌ Error fetching app information:', error);
     return null;
   }
 };

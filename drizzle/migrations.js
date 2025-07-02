@@ -10,6 +10,7 @@ import m0006 from './0006_flat_iron_patriot.sql';
 import m0007 from './0007_noisy_alice.sql';
 import m0008 from './0008_nosy_alex_power.sql';
 import m0009 from './0009_wide_red_skull.sql';
+import m0010 from './0010_normal_purifiers.sql';
 import journal from './meta/_journal.json';
 
 export default {
@@ -25,5 +26,6 @@ export default {
     m0007,
     m0008,
     m0009,
+    m0010,
   },
 };

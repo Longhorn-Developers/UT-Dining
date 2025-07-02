@@ -93,6 +93,36 @@ export type Database = {
           },
         ];
       };
+      app_information: {
+        Row: {
+          about_description: string | null;
+          about_title: string | null;
+          created_at: string;
+          credits_contributors: Json | null;
+          id: string;
+          support_links: Json | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          about_description?: string | null;
+          about_title?: string | null;
+          created_at?: string;
+          credits_contributors?: Json | null;
+          id?: string;
+          support_links?: Json | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          about_description?: string | null;
+          about_title?: string | null;
+          created_at?: string;
+          credits_contributors?: Json | null;
+          id?: string;
+          support_links?: Json | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
       food_item: {
         Row: {
           allergens_id: number | null;
