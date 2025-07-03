@@ -4,8 +4,8 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { useDatabase } from './useDatabase';
 
 import { ALLERGEN_EXCEPTIONS, NUTRITION_ORDER } from '~/data/AllergenInfo';
-import { getFoodItem, FoodItem, getFavoriteItem } from '~/db/database';
-import { Favorite } from '~/db/schema';
+import { getFoodItem, FoodItem, getFavoriteItem } from '~/services/database/database';
+import { Favorite } from '~/services/database/schema';
 
 // Helper function to format nutrition keys
 const formatNutritionKey = (key: string) =>

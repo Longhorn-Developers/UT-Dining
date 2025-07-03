@@ -5,8 +5,8 @@ import { Notifier } from 'react-native-notifier';
 
 import Alert from '~/components/Alert';
 import FoodComponent from '~/components/FoodComponent';
-import { FoodItem, toggleFavorites } from '~/db/database';
-import * as schema from '~/db/schema';
+import { FoodItem, toggleFavorites } from '~/services/database/database';
+import * as schema from '~/services/database/schema';
 
 // Define interfaces for the props
 interface FoodItemProps {

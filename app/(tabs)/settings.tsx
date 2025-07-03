@@ -19,9 +19,9 @@ import { View, Text, Switch, TouchableOpacity, Linking, ScrollView } from 'react
 import { SheetProvider, SheetManager } from 'react-native-actions-sheet';
 
 import { Container } from '~/components/Container';
-import { getAppInformation } from '~/db/database';
-import { AppInformation } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
+import { getAppInformation } from '~/services/database/database';
+import { AppInformation } from '~/services/database/schema';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
 import { cn } from '~/utils/utils';

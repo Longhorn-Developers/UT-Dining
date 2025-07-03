@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 
 import { useDatabase } from './useDatabase';
 
-import { getLocationDetails } from '~/db/database';
-import * as schema from '~/db/schema';
+import { getLocationDetails } from '~/services/database/database';
+import * as schema from '~/services/database/schema';
 
 export function useLocationDetails(locationName: string) {
   const db = useDatabase();

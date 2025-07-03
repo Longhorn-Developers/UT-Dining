@@ -17,7 +17,7 @@ import Alert from './Alert';
 import { FavoriteAction, RemoveAction, AddMealPlanAction } from './AnimatedActions';
 
 import { ALLERGEN_ICONS } from '~/data/AllergenInfo';
-import { FoodItem } from '~/db/database';
+import { FoodItem } from '~/services/database/database';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';

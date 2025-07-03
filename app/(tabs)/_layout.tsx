@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import { Tabs } from 'expo-router';
 import { Cog, Home, MapPin } from 'lucide-react-native';
 import { useColorScheme } from 'react-native';
@@ -11,6 +12,10 @@ export default function Layout() {
 
   // Use manual dark mode setting if available, otherwise fall back to system
   const isDark = isDarkMode ?? colorScheme === 'dark';
+
+  const handleTabPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
 
   return (
     <Tabs
@@ -43,6 +48,9 @@ export default function Layout() {
             <Home size={size} color={color} strokeWidth={1.5} />
           ),
         }}
+        listeners={{
+          tabPress: handleTabPress,
+        }}
       />
       <Tabs.Screen
         name="map"
@@ -52,6 +60,9 @@ export default function Layout() {
             <MapPin size={size} color={color} strokeWidth={1.5} />
           ),
         }}
+        listeners={{
+          tabPress: handleTabPress,
+        }}
       />
       <Tabs.Screen
         name="settings"
@@ -60,6 +71,9 @@ export default function Layout() {
           tabBarIcon: ({ color, size, focused }) => (
             <Cog size={size} color={color} strokeWidth={1.5} />
           ),
+        }}
+        listeners={{
+          tabPress: handleTabPress,
         }}
       />
     </Tabs>

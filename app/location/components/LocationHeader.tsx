@@ -8,9 +8,9 @@ import TimeSchedule from './TimeSchedule';
 
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
-import { menu, location as location_schema } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
+import { menu, location as location_schema } from '~/services/database/schema';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { useLocationName, useMealTimes } from '~/utils/locations';
 import { generateSchedule, isLocationOpen } from '~/utils/time';

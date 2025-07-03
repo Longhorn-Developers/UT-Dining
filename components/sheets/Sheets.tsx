@@ -7,7 +7,7 @@ import FoodInfoSheet from './FoodInfoSheet';
 import LocationAboutSheet from './LocationAboutSheet';
 import MapLocationSheet from './MapLocationSheet';
 
-import { Location } from '~/db/schema';
+import { Location } from '~/services/database/schema';
 
 registerSheet('location-about', LocationAboutSheet);
 registerSheet('food-info', FoodInfoSheet, 'food');

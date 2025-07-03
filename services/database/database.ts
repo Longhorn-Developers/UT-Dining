@@ -2,7 +2,7 @@ import { eq, sql } from 'drizzle-orm';
 import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 
 import { allergens, food_item, location, menu, menu_category, nutrition } from './schema';
-import * as schema from '../db/schema';
+import * as schema from './schema';
 
 import { supabase } from '~/utils/supabase';
 

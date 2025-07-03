@@ -13,8 +13,8 @@ import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
 
 import '../components/sheets/Sheets';
 
-import * as schema from '../db/schema';
 import migrations from '../drizzle/migrations';
+import * as schema from '../services/database/schema';
 
 import '../global.css';
 

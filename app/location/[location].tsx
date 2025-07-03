@@ -12,12 +12,12 @@ import ScrollToTopButton from './components/ScrollToTopButton';
 import SkeletonItem from './components/SkeletonItem';
 
 import { Container } from '~/components/Container';
-import * as schema from '~/db/schema';
 import { useCategoryExpansion } from '~/hooks/useCategoryExpansion';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useDebounce } from '~/hooks/useDebounce';
 import { useMenuData } from '~/hooks/useMenuData';
 import { useScrollToTop } from '~/hooks/useScrollToTop';
+import * as schema from '~/services/database/schema';
 import { useFiltersStore } from '~/store/useFiltersStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { filterFoodItems } from '~/utils/filter';

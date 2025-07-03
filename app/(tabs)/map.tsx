@@ -22,8 +22,8 @@ import type { Region } from 'react-native-maps';
 
 import { Container } from '~/components/Container';
 import { MICROWAVE_LOCATIONS } from '~/data/MicrowaveLocations';
-import { getAllLocationsWithCoordinates } from '~/db/database';
 import { useDatabase } from '~/hooks/useDatabase';
+import { getAllLocationsWithCoordinates } from '~/services/database/database';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';

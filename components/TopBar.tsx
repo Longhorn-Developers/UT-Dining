@@ -8,10 +8,10 @@ import { Notifier } from 'react-native-notifier';
 
 import Alert from './Alert';
 
-import { isFavoriteItem, toggleFavorites } from '~/db/database';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useFoodData } from '~/hooks/useFoodData';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
+import { isFavoriteItem, toggleFavorites } from '~/services/database/database';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
