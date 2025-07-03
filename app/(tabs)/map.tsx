@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
-import { Stack, useRouter } from 'expo-router';
+import { Stack } from 'expo-router';
 import {
   ChevronLeft,
   Microwave,
@@ -12,14 +12,13 @@ import {
   Coffee,
   Store,
   Utensils,
-  ChefHat,
+  Soup,
 } from 'lucide-react-native';
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { View, Text, TouchableOpacity, Alert, Dimensions, Animated } from 'react-native';
+import { View, TouchableOpacity, Alert, Dimensions, Animated } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import type { Region } from 'react-native-maps';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Container } from '~/components/Container';
 import { MICROWAVE_LOCATIONS } from '~/data/MicrowaveLocations';
@@ -41,17 +40,50 @@ const ICON_MAP = {
   'Coffee Shop': Coffee,
   'Convenience Store': Store,
   'Dining Hall': Utensils,
-  Restaurant: ChefHat,
+  Restaurant: Soup,
 };
 
-const MarkerIcon = ({ onPress, type }: { onPress: () => void; type: string }) => {
+const ICON_MAP_COLORS = {
+  microwave: {
+    default: '#C0392B', // Gold
+    colorBlind: '#556B2F', // Much darker gold/brown for high contrast
+  },
+  'Coffee Shop': {
+    default: '#5C3A21', // Deep Brown
+    colorBlind: '#D2691E', // Strong reddish-brown (chocolate) for separation
+  },
+  'Convenience Store': {
+    default: '#36827F', // Teal
+    colorBlind: '#004D60', // Deep blue-teal for clearer difference
+  },
+  'Dining Hall': {
+    default: COLORS['ut-burnt-orange'], // Burnt Orange
+    colorBlind: '#5A2200', // Very dark brownish orange for strong contrast
+  },
+  Restaurant: {
+    default: '#D97706', // Amber
+    colorBlind: '#C2185B', // Dark burnt brown for clear separation from amber/orange
+  },
+};
+
+const MarkerIcon = ({
+  onPress,
+  type,
+  isColorBlindMode,
+}: {
+  onPress: () => void;
+  type: string;
+  isColorBlindMode: boolean;
+}) => {
   const IconComponent = ICON_MAP[type as keyof typeof ICON_MAP] || MapPin;
   return (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.7}
       style={{
-        backgroundColor: COLORS['ut-burnt-orange'],
+        backgroundColor: isColorBlindMode
+          ? ICON_MAP_COLORS[type as keyof typeof ICON_MAP_COLORS].colorBlind
+          : ICON_MAP_COLORS[type as keyof typeof ICON_MAP_COLORS].default,
         padding: 8,
         borderRadius: 50,
         borderWidth: 2,
@@ -99,7 +131,7 @@ const EdgeIndicator = ({ direction, onPress }: { direction: Direction; onPress: 
     switch (direction) {
       case 'north':
         return {
-          top: 140,
+          top: 100,
           left: width / 2 - indicatorSize / 2,
         };
       case 'south':
@@ -168,16 +200,19 @@ const EdgeIndicator = ({ direction, onPress }: { direction: Direction; onPress: 
 const MapMarkers = ({
   locations,
   onMarkerPress,
+  isColorBlindMode,
 }: {
   locations: {
     name: string;
     address: string;
     coordinates: { latitude: number; longitude: number };
+    hasMenu: boolean;
     description?: string;
     note?: string;
     type: string;
   }[];
   onMarkerPress: (coords: { latitude: number; longitude: number }) => void;
+  isColorBlindMode: boolean;
 }) => {
   return (
     <>
@@ -194,6 +229,8 @@ const MapMarkers = ({
                 name: location.name,
                 address: location.address,
                 description: location.description ?? '',
+                type: location.type,
+                hasMenu: location.hasMenu,
                 ...(location.note ? { note: location.note } : {}),
               },
             });
@@ -207,11 +244,14 @@ const MapMarkers = ({
                   name: location.name,
                   address: location.address,
                   description: location.description ?? '',
+                  type: location.type,
+                  hasMenu: location.hasMenu,
                   ...(location.note ? { note: location.note } : {}),
                 },
               });
             }}
             type={location.type}
+            isColorBlindMode={isColorBlindMode}
           />
         </Marker>
       ))}
@@ -227,7 +267,7 @@ const MapPage = () => {
   const [currentRegion, setCurrentRegion] = useState<Region>(initialRegion);
   const db = useDatabase();
   const [dbLocations, setDbLocations] = useState<any[]>([]);
-
+  const isColorBlindMode = useSettingsStore((state) => state.isColorBlindMode);
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -291,6 +331,7 @@ const MapPage = () => {
         },
         description: loc.description,
         type: isMicrowave ? 'microwave' : loc.type,
+        hasMenu: loc.has_menus,
       };
     });
     const staticLocs = MICROWAVE_LOCATIONS.filter(
@@ -300,7 +341,11 @@ const MapPage = () => {
             Math.abs(dbLoc.coordinates.latitude - staticLoc.coordinates.latitude) < 1e-6 &&
             Math.abs(dbLoc.coordinates.longitude - staticLoc.coordinates.longitude) < 1e-6
         )
-    ).map((staticLoc) => ({ ...staticLoc, type: 'microwave' }));
+    ).map((staticLoc) => ({
+      ...staticLoc,
+      type: 'microwave',
+      hasMenu: false,
+    }));
     return [...dbLocs, ...staticLocs];
   }, [dbLocations]);
 
@@ -308,9 +353,6 @@ const MapPage = () => {
     // Update current region for edge indicator calculations
     setCurrentRegion(region);
   };
-
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
 
   const outOfViewLocations = useMemo(() => {
     // Calculate distance from initial campus center
@@ -320,7 +362,7 @@ const MapPage = () => {
     );
 
     // Threshold to determine if user has scrolled away from main campus area
-    const campusDistanceThreshold = 0.01;
+    const campusDistanceThreshold = 0.013;
 
     // Only show edge indicators when user has scrolled significantly away from campus
     const isAwayFromCampus = distanceFromCampus > campusDistanceThreshold;
@@ -479,7 +521,11 @@ const MapPage = () => {
           userInterfaceStyle={isDarkMode ? 'dark' : 'light'}
           loadingEnabled
           loadingBackgroundColor={isDarkMode ? 'rgba(17,24,39,0.7)' : 'rgba(255,255,255,0.9)'}>
-          <MapMarkers locations={mergedLocations} onMarkerPress={handleMarkerPress} />
+          <MapMarkers
+            locations={mergedLocations}
+            onMarkerPress={handleMarkerPress}
+            isColorBlindMode={isColorBlindMode}
+          />
         </MapView>
 
         {/* Edge Indicators */}
@@ -510,7 +556,7 @@ const MapPage = () => {
             }}
             className={cn(
               'absolute bottom-12 right-12 rounded-full p-4',
-              isDarkMode ? 'bg-gray-700' : 'bg-white'
+              isDarkMode ? 'bg-[#111827]' : 'bg-white'
             )}>
             <Locate size={24} color={COLORS['ut-burnt-orange']} />
           </TouchableOpacity>

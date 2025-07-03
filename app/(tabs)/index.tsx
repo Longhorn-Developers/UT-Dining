@@ -174,7 +174,7 @@ export default function Home() {
   return (
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       <Stack.Screen options={{ title: 'Home' }} />
-      <Container onLayout={onLayoutRootView}>
+      <Container disableBottomPadding onLayout={onLayoutRootView}>
         <FlatList
           extraData={[currentTime, selectedFilter, refreshKey]}
           data={filteredLocations}
@@ -185,7 +185,7 @@ export default function Home() {
               tintColor={isDarkMode ? COLORS['ut-grey-dark-mode'] : '#8E8E93'}
             />
           }
-          contentContainerClassName="flex gap-y-3"
+          contentContainerClassName="flex gap-y-3 pb-8"
           renderItem={({ item }) => {
             return (
               <LocationItem

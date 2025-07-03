@@ -32,6 +32,8 @@ declare module 'react-native-actions-sheet' {
         name: string;
         address: string;
         description: string;
+        type: string;
+        hasMenu: boolean;
         note?: string;
       };
     }>;

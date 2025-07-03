@@ -184,11 +184,6 @@ const MealPlan = () => {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: 'Meal Plan',
-        }}
-      />
       <Container className="m-0">
         <FlatList
           keyExtractor={(item) => `${item.name}-${item.categoryName}-${item.menuName}`}

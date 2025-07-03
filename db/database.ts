@@ -900,6 +900,7 @@ export const getAllLocationsWithCoordinates = async (
       longitude: schema.location.longitude,
       address: schema.location.address,
       type: schema.location_type.name,
+      has_menus: schema.location.has_menus,
     })
     .from(schema.location)
     .where(

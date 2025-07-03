@@ -52,7 +52,14 @@ export default function Layout() {
           <GestureHandlerRootView>
             <NotifierWrapper useRNScreensOverlay>
               <SheetProvider>
-                <Stack screenOptions={{ headerShown: false }}>
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    contentStyle: {
+                      backgroundColor: 'white',
+                    },
+                    gestureEnabled: true,
+                  }}>
                   <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                   <Stack.Screen name="(stack)" options={{ headerShown: false }} />
                   <Stack.Screen
@@ -71,11 +78,23 @@ export default function Layout() {
                       headerShown: false,
                     }}
                   />
+
                   <Stack.Screen
-                    name="settings"
+                    name="favorites"
                     options={{
-                      presentation: 'modal',
-                      sheetGrabberVisible: true,
+                      headerShown: false,
+                    }}
+                  />
+
+                  <Stack.Screen
+                    name="meal-plan"
+                    options={{
+                      headerShown: false,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="location/[location]"
+                    options={{
                       headerShown: false,
                     }}
                   />
