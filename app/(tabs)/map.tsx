@@ -76,25 +76,48 @@ const MarkerIcon = ({
   isColorBlindMode: boolean;
 }) => {
   const IconComponent = ICON_MAP[type as keyof typeof ICON_MAP] || MapPin;
+  const squishAnimation = useRef(new Animated.Value(1)).current;
+
+  const handlePress = () => {
+    Animated.sequence([
+      Animated.timing(squishAnimation, {
+        toValue: 0.8,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(squishAnimation, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    onPress();
+  };
+
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.7}
+    <Animated.View
       style={{
-        backgroundColor: isColorBlindMode
-          ? ICON_MAP_COLORS[type as keyof typeof ICON_MAP_COLORS].colorBlind
-          : ICON_MAP_COLORS[type as keyof typeof ICON_MAP_COLORS].default,
-        padding: 8,
-        borderRadius: 50,
-        borderWidth: 2,
-        borderColor: 'white',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 2,
+        transform: [{ scale: squishAnimation }],
       }}>
-      <IconComponent size={20} color="white" />
-    </TouchableOpacity>
+      <TouchableOpacity
+        onPress={handlePress}
+        activeOpacity={0.9}
+        style={{
+          backgroundColor: isColorBlindMode
+            ? ICON_MAP_COLORS[type as keyof typeof ICON_MAP_COLORS].colorBlind
+            : ICON_MAP_COLORS[type as keyof typeof ICON_MAP_COLORS].default,
+          padding: 8,
+          borderRadius: 50,
+          borderWidth: 2,
+          borderColor: 'white',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.3,
+          shadowRadius: 2,
+        }}>
+        <IconComponent size={20} color="white" />
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -102,6 +125,7 @@ type Direction = 'north' | 'south' | 'east' | 'west';
 
 const EdgeIndicator = ({ direction, onPress }: { direction: Direction; onPress: () => void }) => {
   const scaleAnimation = useRef(new Animated.Value(0)).current;
+  const squishAnimation = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     // Scale in animation when component mounts
@@ -122,6 +146,22 @@ const EdgeIndicator = ({ direction, onPress }: { direction: Direction; onPress: 
       }).start();
     };
   }, [scaleAnimation]);
+
+  const handlePress = () => {
+    Animated.sequence([
+      Animated.timing(squishAnimation, {
+        toValue: 0.8,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(squishAnimation, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    onPress();
+  };
 
   const getPositionStyle = () => {
     const { width, height } = Dimensions.get('window');
@@ -170,13 +210,13 @@ const EdgeIndicator = ({ direction, onPress }: { direction: Direction; onPress: 
       style={[
         {
           position: 'absolute',
-          transform: [{ scale: scaleAnimation }],
+          transform: [{ scale: scaleAnimation }, { scale: squishAnimation }],
         },
         getPositionStyle(),
       ]}>
       <TouchableOpacity
         activeOpacity={0.7}
-        onPress={onPress}
+        onPress={handlePress}
         style={{
           width: 60,
           height: 60,
