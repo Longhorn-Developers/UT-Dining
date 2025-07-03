@@ -9,9 +9,9 @@ import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, View, Text } from 'react-native';
 import { Notifier } from 'react-native-notifier';
 
-import * as schema from '../db/schema';
-import HomeHeader from './_components/HomeHeader';
-import LocationItem from './_components/LocationItem';
+import * as schema from '../../db/schema';
+import HomeHeader from '../_components/HomeHeader';
+import LocationItem from '../_components/LocationItem';
 
 import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
@@ -174,7 +174,7 @@ export default function Home() {
   return (
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       <Stack.Screen options={{ title: 'Home' }} />
-      <Container onLayout={onLayoutRootView}>
+      <Container disableBottomPadding onLayout={onLayoutRootView}>
         <FlatList
           extraData={[currentTime, selectedFilter, refreshKey]}
           data={filteredLocations}
@@ -185,7 +185,7 @@ export default function Home() {
               tintColor={isDarkMode ? COLORS['ut-grey-dark-mode'] : '#8E8E93'}
             />
           }
-          contentContainerClassName="flex gap-y-3"
+          contentContainerClassName="flex gap-y-3 pb-8"
           renderItem={({ item }) => {
             return (
               <LocationItem

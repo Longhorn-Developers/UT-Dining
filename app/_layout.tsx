@@ -11,10 +11,11 @@ import { NotifierWrapper } from 'react-native-notifier';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
 
+import '../components/sheets/Sheets';
+
 import * as schema from '../db/schema';
 import migrations from '../drizzle/migrations';
 
-import '../components/sheets/Sheets';
 import '../global.css';
 
 export const DATABASE_NAME = 'database.db';
@@ -59,27 +60,42 @@ export default function Layout() {
                     },
                     gestureEnabled: true,
                   }}>
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen name="(stack)" options={{ headerShown: false }} />
                   <Stack.Screen
                     name="location_generic/[location]"
                     options={{
                       presentation: 'modal',
                       sheetGrabberVisible: true,
+                      headerShown: false,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="food/[food]"
+                    options={{
+                      presentation: 'modal',
+                      sheetGrabberVisible: true,
+                      headerShown: false,
                     }}
                   />
 
                   <Stack.Screen
-                    name="location/food/[food]"
+                    name="favorites"
                     options={{
-                      presentation: 'modal',
-                      sheetGrabberVisible: true,
+                      headerShown: false,
                     }}
                   />
 
                   <Stack.Screen
-                    name="settings"
+                    name="meal-plan"
                     options={{
-                      presentation: 'modal',
-                      sheetGrabberVisible: true,
+                      headerShown: false,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="location/[location]"
+                    options={{
+                      headerShown: false,
                     }}
                   />
                 </Stack>

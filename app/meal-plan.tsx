@@ -1,5 +1,4 @@
 import * as Haptics from 'expo-haptics';
-import { Stack } from 'expo-router';
 import { BicepsFlexed, Flame, Wheat } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { View, Text, FlatList, Image, TextInput } from 'react-native';
@@ -184,11 +183,6 @@ const MealPlan = () => {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: 'Meal Plan',
-        }}
-      />
       <Container className="m-0">
         <FlatList
           keyExtractor={(item) => `${item.name}-${item.categoryName}-${item.menuName}`}

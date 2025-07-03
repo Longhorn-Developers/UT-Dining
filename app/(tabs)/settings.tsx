@@ -16,8 +16,9 @@ import {
 } from 'lucide-react-native';
 import React from 'react';
 import { View, Text, Switch, TouchableOpacity, Linking, ScrollView } from 'react-native';
-import { SheetManager, SheetProvider } from 'react-native-actions-sheet';
+import { SheetProvider, SheetManager } from 'react-native-actions-sheet';
 
+import { Container } from '~/components/Container';
 import { getAppInformation } from '~/db/database';
 import { AppInformation } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
@@ -30,6 +31,7 @@ interface SettingItemProps {
   Icon?: LucideIcon;
   hasToggle?: boolean;
   toggleValue?: boolean;
+  activeOpacity?: number;
   onToggle?: () => void;
   hasChevron?: boolean;
   onPress?: () => void;
@@ -41,6 +43,7 @@ const SettingItem = ({
   Icon,
   hasToggle = false,
   toggleValue = false,
+  activeOpacity = 1,
   onToggle = () => {},
   hasChevron = false,
   onPress = () => {},
@@ -52,7 +55,8 @@ const SettingItem = ({
       isDarkMode ? 'border-gray-700' : 'border-gray-100'
     )}
     onPress={onPress}
-    disabled={!hasChevron && !onPress}>
+    disabled={!hasChevron && !onPress}
+    activeOpacity={activeOpacity}>
     <View className="flex-row items-center">
       {Icon && (
         <View
@@ -240,97 +244,86 @@ const SettingsPage = () => {
 
   return (
     <SheetProvider context="settings">
-      {/* Pull Down Indicator (outside ScrollView) */}
-      <View
-        style={{
-          alignItems: 'center',
-          paddingTop: 8,
-          paddingBottom: 8,
-          backgroundColor: isDarkMode ? '#111827' : '#fff',
-        }}>
-        <View
-          style={{
-            width: 40,
-            height: 5,
-            borderRadius: 2.5,
-            backgroundColor: isDarkMode ? '#fff' : '#F0F0F0',
-          }}
-        />
-      </View>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : 'white' }}
-        contentContainerStyle={{ padding: 24 }}>
-        <Text className={cn('text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
-          Settings
-        </Text>
-        <SectionHeader title="Quick Links" className="mt-4" isDarkMode={isDarkMode} />
-        <SettingItem
-          title="Meal Plan"
-          Icon={ChefHat}
-          hasChevron
-          isDarkMode={isDarkMode}
-          onPress={() => {
-            router.dismiss();
-            setTimeout(() => {
-              router.push('/meal-plan');
-            }, 10);
-          }}
-        />
-        <SettingItem
-          title="Favorites"
-          Icon={Heart}
-          hasChevron
-          isDarkMode={isDarkMode}
-          onPress={() => {
-            router.dismiss();
-            setTimeout(() => {
-              router.push('/favorites');
-            }, 10);
-          }}
-        />
-        <SettingItem
-          title="Filters"
-          Icon={Filter}
-          hasChevron
-          isDarkMode={isDarkMode}
-          onPress={() => {
-            SheetManager.show('filters', {
-              context: 'settings',
-            });
-          }}
-        />
-        <SectionHeader title="Display" className="mt-4" isDarkMode={isDarkMode} />
-        <SettingItem
-          title="Dark Mode"
-          Icon={Moon}
-          hasToggle
-          toggleValue={isDarkMode}
-          onToggle={toggleDarkMode}
-          isDarkMode={isDarkMode}
-        />
-        <SettingItem
-          title="Colorblind Mode"
-          Icon={Accessibility}
-          hasToggle
-          toggleValue={isColorBlindMode}
-          onToggle={toggleColorBlindMode}
-          isDarkMode={isDarkMode}
-        />
-        <SettingItem
-          title="Use Colloquial Names"
-          Icon={Type}
-          hasToggle
-          toggleValue={useColloquialNames}
-          onToggle={toggleColloquialNames}
-          isDarkMode={isDarkMode}
-        />
-        <SectionHeader title="Information" className="mt-4" isDarkMode={isDarkMode} />
-        {appInfo && <AboutSection appInfo={appInfo} isDarkMode={isDarkMode} />}
-        {appInfo && <CreditsSection appInfo={appInfo} isDarkMode={isDarkMode} />}
-        {appInfo && <HelpSupportSection appInfo={appInfo} isDarkMode={isDarkMode} />}
-        <VersionInfo isDarkMode={isDarkMode} appInfo={appInfo} />
-      </ScrollView>
+      <Container
+        className={cn('m-0', isDarkMode ? 'bg-[#111827]' : 'bg-white')}
+        disableBottomPadding>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : 'white' }}
+          contentContainerStyle={{ padding: 24 }}>
+          <Text className={cn('text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
+            Settings
+          </Text>
+          <SectionHeader title="Quick Links" className="mt-4" isDarkMode={isDarkMode} />
+          <SettingItem
+            activeOpacity={0.5}
+            title="Meal Plan"
+            Icon={ChefHat}
+            hasChevron
+            isDarkMode={isDarkMode}
+            onPress={() => {
+              router.navigate('/');
+              setTimeout(() => {
+                router.push('/meal-plan');
+              }, 10);
+            }}
+          />
+          <SettingItem
+            activeOpacity={0.5}
+            title="Favorites"
+            Icon={Heart}
+            hasChevron
+            isDarkMode={isDarkMode}
+            onPress={() => {
+              router.navigate('/');
+              setTimeout(() => {
+                router.push('/favorites');
+              }, 10);
+            }}
+          />
+          <SettingItem
+            title="Filters"
+            Icon={Filter}
+            hasChevron
+            isDarkMode={isDarkMode}
+            onPress={() => {
+              SheetManager.show('filters', {
+                context: 'settings',
+              });
+            }}
+          />
+          <SectionHeader title="Display" className="mt-4" isDarkMode={isDarkMode} />
+          <SettingItem
+            title="Dark Mode"
+            Icon={Moon}
+            hasToggle
+            toggleValue={isDarkMode}
+            onToggle={toggleDarkMode}
+            isDarkMode={isDarkMode}
+          />
+          <SettingItem
+            title="Colorblind Mode"
+            Icon={Accessibility}
+            hasToggle
+            toggleValue={isColorBlindMode}
+            onToggle={toggleColorBlindMode}
+            isDarkMode={isDarkMode}
+          />
+          <SettingItem
+            title="Use Colloquial Names"
+            Icon={Type}
+            hasToggle
+            toggleValue={useColloquialNames}
+            onToggle={toggleColloquialNames}
+            isDarkMode={isDarkMode}
+          />
+          <SectionHeader title="Information" className="mt-4" isDarkMode={isDarkMode} />
+          {appInfo && <AboutSection appInfo={appInfo} isDarkMode={isDarkMode} />}
+          {appInfo && <CreditsSection appInfo={appInfo} isDarkMode={isDarkMode} />}
+          {appInfo && <HelpSupportSection appInfo={appInfo} isDarkMode={isDarkMode} />}
+          <VersionInfo isDarkMode={isDarkMode} appInfo={appInfo} />
+        </ScrollView>
+      </Container>
     </SheetProvider>
   );
 };

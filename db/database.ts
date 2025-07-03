@@ -305,6 +305,8 @@ export const getLocationMenuData = async (
         location_type_id: schema.location.type_id,
         location_has_menus: schema.location.has_menus,
         location_display_order: schema.location.display_order,
+        location_latitude: schema.location.latitude,
+        location_longitude: schema.location.longitude,
         // Menu and food data
         menu_id: schema.menu.id,
         menu_name: schema.menu.name,
@@ -374,6 +376,8 @@ export const getLocationMenuData = async (
       force_close: data[0]?.location_force_close || false,
       has_menus: data[0]?.location_has_menus || false,
       display_order: data[0]?.location_display_order || 1000,
+      latitude: data[0]?.location_latitude || null,
+      longitude: data[0]?.location_longitude || null,
     };
 
     // Create a menu entry for the selected menu
@@ -688,6 +692,8 @@ export const getLocationDetails = async (
         has_menus: schema.location.has_menus,
         type: schema.location_type.name,
         display_order: schema.location.display_order,
+        latitude: schema.location.latitude,
+        longitude: schema.location.longitude,
       })
       .from(schema.location)
       .leftJoin(schema.location_type, eq(schema.location.type_id, schema.location_type.id))
@@ -734,7 +740,8 @@ export const getCompleteLocationData = async (
         location_type_id: schema.location.type_id,
         location_has_menus: schema.location.has_menus,
         location_display_order: schema.location.display_order,
-
+        location_latitude: schema.location.latitude,
+        location_longitude: schema.location.longitude,
         // Menu and food data (optional)
         menu_id: schema.menu.id,
         menu_name: schema.menu.name,
@@ -805,6 +812,8 @@ export const getCompleteLocationData = async (
       force_close: data[0]?.location_force_close || false,
       has_menus: data[0]?.location_has_menus || false,
       display_order: data[0]?.location_display_order || 1000,
+      latitude: data[0]?.location_latitude || null,
+      longitude: data[0]?.location_longitude || null,
     };
 
     // Group menus and their categories
@@ -877,4 +886,28 @@ export const getAppInformation = async (
     console.error('❌ Error fetching app information:', error);
     return null;
   }
+};
+
+export const getAllLocationsWithCoordinates = async (
+  db: ExpoSQLiteDatabase<typeof schema>
+): Promise<Pick<schema.Location, 'id' | 'name' | 'latitude' | 'longitude' | 'address'>[]> => {
+  const data = await db
+    .select({
+      id: schema.location.id,
+      name: schema.location.name,
+      description: schema.location.description,
+      latitude: schema.location.latitude,
+      longitude: schema.location.longitude,
+      address: schema.location.address,
+      type: schema.location_type.name,
+      has_menus: schema.location.has_menus,
+    })
+    .from(schema.location)
+    .where(
+      sql`${schema.location.latitude} IS NOT NULL AND ${schema.location.longitude} IS NOT NULL`
+    )
+    .leftJoin(schema.location_type, eq(schema.location.type_id, schema.location_type.id))
+    .execute();
+
+  return data;
 };

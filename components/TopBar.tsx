@@ -1,9 +1,8 @@
 import * as Haptics from 'expo-haptics';
-import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ChefHat, ChevronLeft, Cog, Heart, Info, Map, Microwave } from 'lucide-react-native';
+import { ChefHat, ChevronLeft, Heart, Info } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { View, Image, TouchableOpacity, Text, Platform } from 'react-native';
+import { View, Image, TouchableOpacity, Text } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { Notifier } from 'react-native-notifier';
 
@@ -16,7 +15,6 @@ import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
-import { cn } from '~/utils/utils';
 
 const icon = require('../assets/image.png');
 
@@ -42,17 +40,6 @@ const HomeTopBar = () => {
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push('/microwave-map');
-          }}>
-          <Microwave
-            size={20}
-            color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/meal-plan`);
           }}>
           <ChefHat size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
@@ -64,14 +51,6 @@ const HomeTopBar = () => {
             router.push(`/favorites`);
           }}>
           <Heart size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push('/settings');
-          }}>
-          <Cog size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
       </View>
     </View>
@@ -289,51 +268,8 @@ const BackTopBar = () => {
   );
 };
 
-const GenericLocationTopBar = () => {
-  const { location } = useLocalSearchParams<{ location: string }>();
-  const { locationData } = useLocationDetails(location);
-  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
-
-  if (!locationData) {
-    return null;
-  }
-
-  return (
-    <View
-      className={cn(
-        'flex w-full flex-row items-center justify-between  pb-4',
-        isDarkMode ? 'bg-[#111827]' : 'bg-white'
-      )}>
-      <TouchableOpacity
-        className="flex flex-row items-center"
-        onPress={() => {
-          router.back();
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        }}>
-        <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
-        <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>
-      </TouchableOpacity>
-
-      <View className="flex flex-row gap-x-5">
-        <TouchableOpacity
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-            if (Platform.OS === 'ios') {
-              Linking.openURL(locationData.apple_maps_link);
-            } else {
-              Linking.openURL(locationData.google_maps_link);
-            }
-          }}>
-          <Map size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
-
 interface TopBarProps {
-  variant?: 'home' | 'location' | 'back' | 'food' | 'generic-location';
+  variant?: 'home' | 'location' | 'back' | 'food';
 }
 
 const TopBar = ({ variant = 'home' }: TopBarProps) => {
@@ -346,8 +282,6 @@ const TopBar = ({ variant = 'home' }: TopBarProps) => {
       return <BackTopBar />;
     case 'food':
       return <FoodTopBar />;
-    case 'generic-location':
-      return <GenericLocationTopBar />;
     default:
       return <HomeTopBar />;
   }
