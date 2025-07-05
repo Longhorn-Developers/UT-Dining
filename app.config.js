@@ -43,6 +43,7 @@ export default {
           locationAlwaysAndWhenInUsePermission: 'Allow $(PRODUCT_NAME) to use your location.',
         },
       ],
+      'expo-notifications',
     ],
     experiments: {
       typedRoutes: true,

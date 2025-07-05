@@ -17,6 +17,7 @@ import migrations from '../drizzle/migrations';
 import * as schema from '../services/database/schema';
 
 import '../global.css';
+import { PushNotificationsInitializer } from '~/services/notifications/notifications';
 
 export const DATABASE_NAME = 'database.db';
 
@@ -52,6 +53,7 @@ export default function Layout() {
           <GestureHandlerRootView>
             <NotifierWrapper useRNScreensOverlay>
               <SheetProvider>
+                <PushNotificationsInitializer />
                 <Stack
                   screenOptions={{
                     headerShown: false,
@@ -61,7 +63,7 @@ export default function Layout() {
                     gestureEnabled: true,
                   }}>
                   <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                  <Stack.Screen name="(stack)" options={{ headerShown: false }} />
+
                   <Stack.Screen
                     name="location_generic/[location]"
                     options={{

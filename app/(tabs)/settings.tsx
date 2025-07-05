@@ -22,6 +22,7 @@ import { Container } from '~/components/Container';
 import { useDatabase } from '~/hooks/useDatabase';
 import { getAppInformation } from '~/services/database/database';
 import { AppInformation } from '~/services/database/schema';
+import { getOrCreateDeviceId } from '~/services/device/deviceId';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
 import { cn } from '~/utils/utils';
@@ -211,13 +212,22 @@ interface VersionInfoProps {
   appInfo?: any;
 }
 
-const VersionInfo = ({ isDarkMode, appInfo }: VersionInfoProps): JSX.Element => (
-  <View className="mt-6 items-center">
-    <Text className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
-      Version {Application.nativeApplicationVersion}
-    </Text>
-  </View>
-);
+const VersionInfo = ({ isDarkMode, appInfo }: VersionInfoProps): JSX.Element => {
+  const deviceId = getOrCreateDeviceId();
+
+  return (
+    <View className="mt-6 items-center">
+      <Text className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
+        Version {Application.nativeApplicationVersion}
+      </Text>
+      {deviceId && (
+        <Text className={cn('mt-1 text-[10px]', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
+          {deviceId}
+        </Text>
+      )}
+    </View>
+  );
+};
 
 const SettingsPage = () => {
   const {

@@ -59,7 +59,7 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
       safeAreaInsets={insets}
       useBottomSafeAreaPadding
       backgroundInteractionEnabled>
-      <ScrollView showsHorizontalScrollIndicator={false} className="p-5">
+      <ScrollView showsHorizontalScrollIndicator={false} className="max-h-[60vh] p-5">
         {/* Location header */}
         <View className="mb-4 flex-row items-start justify-between">
           <View className="flex-1">
