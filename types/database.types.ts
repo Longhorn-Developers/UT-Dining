@@ -328,6 +328,68 @@ export type Database = {
           },
         ];
       };
+      notification_types: {
+        Row: {
+          created_at: string;
+          id: string;
+          name: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          name: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          name?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
+      notifications: {
+        Row: {
+          body: string | null;
+          created_at: string;
+          id: string;
+          redirect_url: string | null;
+          scheduled_at: string | null;
+          sent: boolean | null;
+          title: string | null;
+          type: string;
+        };
+        Insert: {
+          body?: string | null;
+          created_at?: string;
+          id?: string;
+          redirect_url?: string | null;
+          scheduled_at?: string | null;
+          sent?: boolean | null;
+          title?: string | null;
+          type: string;
+        };
+        Update: {
+          body?: string | null;
+          created_at?: string;
+          id?: string;
+          redirect_url?: string | null;
+          scheduled_at?: string | null;
+          sent?: boolean | null;
+          title?: string | null;
+          type?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'notifications_type_fkey';
+            columns: ['type'];
+            isOneToOne: false;
+            referencedRelation: 'notification_types';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       nutrition: {
         Row: {
           calcium: string | null;
@@ -398,36 +460,6 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
-      };
-      scheduled_notifications: {
-        Row: {
-          body: string | null;
-          created_at: string;
-          id: string;
-          redirect_url: string | null;
-          scheduled_at: string;
-          sent: boolean | null;
-          title: string | null;
-        };
-        Insert: {
-          body?: string | null;
-          created_at?: string;
-          id?: string;
-          redirect_url?: string | null;
-          scheduled_at: string;
-          sent?: boolean | null;
-          title?: string | null;
-        };
-        Update: {
-          body?: string | null;
-          created_at?: string;
-          id?: string;
-          redirect_url?: string | null;
-          scheduled_at?: string;
-          sent?: boolean | null;
-          title?: string | null;
-        };
-        Relationships: [];
       };
       user_devices: {
         Row: {

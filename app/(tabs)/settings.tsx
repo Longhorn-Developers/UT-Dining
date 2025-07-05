@@ -261,7 +261,7 @@ const SettingsPage = () => {
           showsVerticalScrollIndicator={false}
           style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : 'white' }}
           contentContainerStyle={{ padding: 24 }}>
-          <Text className={cn('text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
+          <Text className={cn('text-3xl font-extrabold', isDarkMode ? 'text-white' : 'text-black')}>
             Settings
           </Text>
           <SectionHeader title="Quick Links" className="mt-4" isDarkMode={isDarkMode} />

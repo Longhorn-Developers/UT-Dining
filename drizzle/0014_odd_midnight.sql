@@ -1,0 +1,1 @@
+ALTER TABLE `notifications` RENAME COLUMN "created_at" TO "sent_at";

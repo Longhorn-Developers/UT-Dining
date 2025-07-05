@@ -1,14 +1,16 @@
 import * as Haptics from 'expo-haptics';
 import { Tabs } from 'expo-router';
-import { Cog, Home, MapPin } from 'lucide-react-native';
+import { Bell, Cog, Home, MapPin } from 'lucide-react-native';
 import { useColorScheme } from 'react-native';
 
+import { useUnreadNotifications } from '~/hooks/useUnreadNotifications';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 
 export default function Layout() {
   const colorScheme = useColorScheme();
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
+  const { unreadCount, hasUnread } = useUnreadNotifications();
 
   // Use manual dark mode setting if available, otherwise fall back to system
   const isDark = isDarkMode ?? colorScheme === 'dark';
@@ -65,6 +67,25 @@ export default function Layout() {
           tabPress: handleTabPress,
         }}
       />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: 'Notifications',
+          tabBarIcon: ({ color, size, focused }) => (
+            <Bell size={size} color={color} strokeWidth={1.5} />
+          ),
+          tabBarActiveBackgroundColor: 'rgba(191, 87, 0, 0.05)',
+          tabBarBadge: hasUnread ? unreadCount : undefined,
+          tabBarBadgeStyle: {
+            backgroundColor: COLORS['ut-burnt-orange'],
+            color: 'white',
+          },
+        }}
+        listeners={{
+          tabPress: handleTabPress,
+        }}
+      />
+
       <Tabs.Screen
         name="settings"
         options={{

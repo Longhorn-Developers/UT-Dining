@@ -22,10 +22,12 @@ Deno.serve(async (req) => {
     console.log('🕐 Current Central Time:', centralTime.toISOString());
     // Query for scheduled notifications that are due and haven't been sent
     const { data: scheduledNotifications, error: queryError } = await supabase
-      .from('scheduled_notifications')
+      .from('notifications')
       .select('*')
+      .not('scheduled_at', 'is', null)
       .eq('sent', false)
       .gte('scheduled_at', centralTime.toISOString());
+
     if (queryError) {
       console.error('❌ Error querying scheduled notifications:', queryError);
       return new Response(
@@ -113,7 +115,9 @@ Deno.serve(async (req) => {
             title: notification.title,
             body: notification.body,
             data: {
-              redirect: notification.redirect_url,
+              redirect_url: notification.redirect_url,
+              type: notification.type,
+              sent_at: new Date().toISOString(),
             },
           };
           return fetch('https://exp.host/--/api/v2/push/send', {
@@ -131,7 +135,7 @@ Deno.serve(async (req) => {
         await Promise.all(sendPromises);
         // Mark notification as sent
         const { error: updateError } = await supabase
-          .from('scheduled_notifications')
+          .from('notifications')
           .update({
             sent: true,
           })

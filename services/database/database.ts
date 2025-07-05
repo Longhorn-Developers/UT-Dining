@@ -38,13 +38,21 @@ const querySupabase = async () => {
     const formattedDate = centralTime.toISOString().split('T')[0];
 
     // Fetch base data in parallel (independent queries)
-    const [locationResult, locationTypeResult, menuResult, appInformationResult] =
-      await Promise.all([
-        supabase.from('location').select('*'),
-        supabase.from('location_type').select('*'),
-        supabase.from('menu').select('*').eq('date', formattedDate),
-        supabase.from('app_information').select('*'),
-      ]);
+    const [
+      locationResult,
+      locationTypeResult,
+      menuResult,
+      appInformationResult,
+      notificationResult,
+      notificationTypeResult,
+    ] = await Promise.all([
+      supabase.from('location').select('*'),
+      supabase.from('location_type').select('*'),
+      supabase.from('menu').select('*').eq('date', formattedDate),
+      supabase.from('app_information').select('*'),
+      supabase.from('notifications').select('*'),
+      supabase.from('notification_types').select('*'),
+    ]);
 
     // Check for errors in base queries
     if (locationResult.error) {
@@ -64,10 +72,21 @@ const querySupabase = async () => {
       throw new Error(`app_information: ${appInformationResult.error.message}`);
     }
 
+    if (notificationResult.error) {
+      console.error('❌ Error fetching notifications:', notificationResult.error);
+      throw new Error(`notifications: ${notificationResult.error.message}`);
+    }
+    if (notificationTypeResult.error) {
+      console.error('❌ Error fetching notification_types:', notificationTypeResult.error);
+      throw new Error(`notification_types: ${notificationTypeResult.error.message}`);
+    }
+
     const locationData = locationResult.data ?? [];
     const locationTypeData = locationTypeResult.data ?? [];
     const menuData = menuResult.data ?? [];
     const appInformationData = appInformationResult.data ?? [];
+    const notificationData = notificationResult.data ?? [];
+    const notificationTypeData = notificationTypeResult.data ?? [];
 
     // Early return if no menus for today
     if (menuData.length === 0) {
@@ -81,6 +100,8 @@ const querySupabase = async () => {
         nutrition: [],
         allergens: [],
         app_information: appInformationData,
+        notifications: notificationData,
+        notification_types: notificationTypeData,
       };
     }
 
@@ -142,6 +163,8 @@ const querySupabase = async () => {
         nutrition: [],
         allergens: [],
         app_information: appInformationData,
+        notifications: notificationData,
+        notification_types: notificationTypeData,
       };
     }
 
@@ -189,6 +212,8 @@ const querySupabase = async () => {
       nutrition: nutritionResult.data ?? [],
       allergens: allergensResult.data ?? [],
       app_information: appInformationData,
+      notifications: notificationData,
+      notification_types: notificationTypeData,
     };
   } catch (error) {
     console.error('❌ Unexpected error fetching Supabase data:', error);
@@ -222,6 +247,8 @@ export const insertDataIntoSQLiteDB = async (
         db.delete(nutrition).execute(),
         db.delete(allergens).execute(),
         db.delete(schema.app_information).execute(),
+        db.delete(schema.notifications).execute(),
+        db.delete(schema.notification_types).execute(),
       ]);
 
       // Insert data from Supabase (with proper type casting)
@@ -250,6 +277,19 @@ export const insertDataIntoSQLiteDB = async (
       }
       if (data.app_information.length > 0) {
         insertPromises.push(db.insert(schema.app_information).values(data.app_information as any));
+      }
+      if (data.notifications && data.notifications.length > 0) {
+        // For each notification, determine what sent_at value to use. If the notification is scheduled, sent_at will each scheduled_at value. If the notification is not scheduled, sent_at will be created_at value.
+        const notificationsWithSentAt = data.notifications.map((notification) => {
+          if (notification.scheduled_at) {
+            return { ...notification, sent_at: notification.scheduled_at };
+          }
+          return { ...notification, sent_at: notification.created_at };
+        });
+        insertPromises.push(db.insert(schema.notifications).values(notificationsWithSentAt as any));
+      }
+      if (data.notification_types && data.notification_types.length > 0) {
+        insertPromises.push(db.insert(schema.notification_types).values(data.notification_types));
       }
 
       if (insertPromises.length > 0) {
@@ -910,4 +950,89 @@ export const getAllLocationsWithCoordinates = async (
     .execute();
 
   return data;
+};
+
+export const getNotificationTypes = async (
+  db: ExpoSQLiteDatabase<typeof schema>
+): Promise<schema.NotificationType[]> => {
+  const data = await db.select().from(schema.notification_types).execute();
+  return data;
+};
+
+export const getNotifications = async (
+  db: ExpoSQLiteDatabase<typeof schema>
+): Promise<(schema.Notification & { type_name: string })[]> => {
+  const data = await db
+    .select({
+      id: schema.notifications.id,
+      title: schema.notifications.title,
+      body: schema.notifications.body,
+      redirect_url: schema.notifications.redirect_url,
+      type: schema.notifications.type,
+      sent_at: schema.notifications.sent_at,
+      type_name: schema.notification_types.name,
+    })
+    .from(schema.notifications)
+    .leftJoin(
+      schema.notification_types,
+      eq(schema.notifications.type, schema.notification_types.id)
+    )
+    .orderBy(sql`datetime(${schema.notifications.sent_at}) DESC`)
+    .execute();
+
+  return data.map((row) => ({
+    id: row.id,
+    title: row.title,
+    body: row.body,
+    redirect_url: row.redirect_url,
+    type: row.type,
+    sent_at: row.sent_at,
+    type_name: row.type_name || 'system_announcement',
+  }));
+};
+
+export const insertNotification = async (
+  db: ExpoSQLiteDatabase<typeof schema>,
+  notificationData: {
+    id?: string;
+    title: string;
+    body: string;
+    sent_at: string;
+    redirect_url?: string;
+    type?: string;
+  }
+): Promise<void> => {
+  try {
+    const notificationId =
+      notificationData.id || `notif_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+    // Check if notification with this ID already exists
+    const existingNotification = await db
+      .select({ id: schema.notifications.id })
+      .from(schema.notifications)
+      .where(eq(schema.notifications.id, notificationId))
+      .get();
+
+    if (existingNotification) {
+      console.log('ℹ️  Notification already exists, skipping insert.');
+      return;
+    }
+
+    await db
+      .insert(schema.notifications)
+      .values({
+        id: notificationId,
+        title: notificationData.title,
+        body: notificationData.body,
+        redirect_url: notificationData.redirect_url || null,
+        type: notificationData.type || null,
+        sent_at: notificationData.sent_at,
+      })
+      .execute();
+
+    console.log('✅ Notification inserted into SQLite database:', notificationId);
+  } catch (error) {
+    console.error('❌ Error inserting notification into SQLite:', error);
+    throw error;
+  }
 };

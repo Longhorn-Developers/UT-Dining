@@ -12,6 +12,9 @@ import m0008 from './0008_nosy_alex_power.sql';
 import m0009 from './0009_wide_red_skull.sql';
 import m0010 from './0010_normal_purifiers.sql';
 import m0011 from './0011_green_eddie_brock.sql';
+import m0012 from './0012_remarkable_nova.sql';
+import m0013 from './0013_eminent_wallop.sql';
+import m0014 from './0014_odd_midnight.sql';
 import journal from './meta/_journal.json';
 
 export default {
@@ -29,5 +32,8 @@ export default {
     m0009,
     m0010,
     m0011,
+    m0012,
+    m0013,
+    m0014,
   },
 };

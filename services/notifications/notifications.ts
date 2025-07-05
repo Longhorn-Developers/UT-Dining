@@ -4,6 +4,9 @@ import * as Notifications from 'expo-notifications';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
+import { insertNotification } from '../database/database';
+
+import { useDatabase } from '~/hooks/useDatabase';
 import { getOrCreateDeviceId } from '~/services/device/deviceId';
 import { usePushNotificationsStore } from '~/store/usePushNotificationsStore';
 import { supabase } from '~/utils/supabase';
@@ -23,6 +26,7 @@ export function PushNotificationsInitializer() {
   const setDeviceId = usePushNotificationsStore((s) => s.setDeviceId);
   const setExpoPushToken = usePushNotificationsStore((s) => s.setExpoPushToken);
   const setNotification = usePushNotificationsStore((s) => s.setNotification);
+  const db = useDatabase();
 
   useEffect(() => {
     const deviceId = getOrCreateDeviceId();
@@ -98,12 +102,39 @@ export function PushNotificationsInitializer() {
     registerAndSync();
 
     const notificationListener = Notifications.addNotificationReceivedListener((notification) => {
+      console.log('📱 Notification received:', notification);
       setNotification(notification);
+
+      if (db) {
+        insertNotification(db, {
+          id: notification.request.identifier,
+          title: notification.request.content.title ?? 'Notification',
+          body: notification.request.content.body ?? '',
+          sent_at: new Date().toISOString(),
+          redirect_url: notification.request.content.data?.redirect_url ?? null,
+          type: notification.request.content.data?.type ?? null,
+        }).catch((error) => {
+          console.error('❌ Error saving received notification to database:', error);
+        });
+      }
     });
 
     const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
+      console.log('📱 Notification response:', JSON.stringify(response, null, 2));
       setNotification(response.notification);
-      console.log('Notification response:', response.notification.request.content);
+
+      if (db) {
+        insertNotification(db, {
+          id: response.notification.request.identifier,
+          title: response.notification.request.content.title ?? 'Notification',
+          body: response.notification.request.content.body ?? '',
+          sent_at: new Date().toISOString(),
+          redirect_url: response.notification.request.content.data?.redirect_url ?? null,
+          type: response.notification.request.content.data?.type ?? null,
+        }).catch((error) => {
+          console.error('❌ Error saving notification response to database:', error);
+        });
+      }
     });
 
     return () => {

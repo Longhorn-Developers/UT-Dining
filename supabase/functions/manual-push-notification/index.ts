@@ -15,7 +15,7 @@ const BATCH_SIZE = 100;
 console.log('🔍 Starting manual push notification function...');
 
 Deno.serve(async (req) => {
-  const { title, body, redirect_url } = await req.json();
+  const { title, body, redirect_url, type } = await req.json();
 
   const { data: userDevices } = await supabase.from('user_devices').select('push_token');
   console.log('🔍 User devices:', JSON.stringify(userDevices, null, 2));
@@ -29,6 +29,8 @@ Deno.serve(async (req) => {
     tokenBatches.push(pushTokens.slice(i, i + BATCH_SIZE));
   }
 
+  const sentAt = new Date().toISOString();
+
   // Send notifications to each batch
   const sendPromises = tokenBatches.map(async (tokenBatch) => {
     const notificationMessage = {
@@ -36,7 +38,7 @@ Deno.serve(async (req) => {
       sound: 'default',
       title,
       body,
-      data: { redirect: redirect_url },
+      data: { redirect_url, type, sent_at: sentAt },
     };
 
     return fetch('https://exp.host/--/api/v2/push/send', {
@@ -53,6 +55,23 @@ Deno.serve(async (req) => {
 
   // Wait for all batches to be sent
   await Promise.all(sendPromises);
+
+  // Create new row in notifications table
+  const { error } = await supabase.from('notifications').insert({
+    title,
+    body,
+    redirect_url,
+    type,
+    sent: true,
+  });
+
+  if (error) {
+    console.error('❌ Error inserting notification:', error);
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 
   return new Response(
     JSON.stringify({
