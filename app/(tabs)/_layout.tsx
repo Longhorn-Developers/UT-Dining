@@ -26,8 +26,7 @@ export default function Layout() {
           borderTopColor: isDark ? '#374151' : '#e5e7eb',
           borderTopWidth: 1,
           height: 88,
-          paddingBottom: 20,
-          paddingTop: 8,
+          paddingBottom: 24,
         },
         tabBarActiveTintColor: COLORS['ut-burnt-orange'],
         tabBarInactiveTintColor: isDark ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey'],
@@ -47,6 +46,7 @@ export default function Layout() {
           tabBarIcon: ({ color, size, focused }) => (
             <Home size={size} color={color} strokeWidth={1.5} />
           ),
+          tabBarActiveBackgroundColor: 'rgba(191, 87, 0, 0.05)',
         }}
         listeners={{
           tabPress: handleTabPress,
@@ -59,6 +59,7 @@ export default function Layout() {
           tabBarIcon: ({ color, size, focused }) => (
             <MapPin size={size} color={color} strokeWidth={1.5} />
           ),
+          tabBarActiveBackgroundColor: 'rgba(191, 87, 0, 0.05)',
         }}
         listeners={{
           tabPress: handleTabPress,
@@ -71,6 +72,7 @@ export default function Layout() {
           tabBarIcon: ({ color, size, focused }) => (
             <Cog size={size} color={color} strokeWidth={1.5} />
           ),
+          tabBarActiveBackgroundColor: 'rgba(191, 87, 0, 0.05)',
         }}
         listeners={{
           tabPress: handleTabPress,
