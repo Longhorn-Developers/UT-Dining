@@ -1,6 +1,6 @@
 import { Search, X } from 'lucide-react-native';
 import React, { useRef, useState } from 'react';
-import { View, TextInput, Text, Pressable, Keyboard, TouchableOpacity } from 'react-native';
+import { View, TextInput, Text, Keyboard, TouchableOpacity } from 'react-native';
 
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';

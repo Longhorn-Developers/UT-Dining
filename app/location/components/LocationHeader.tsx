@@ -86,7 +86,7 @@ const LocationHeader = React.memo(
 
               {/* Location Header */}
               <View>
-                <View className="w-full flex-row flex-wrap items-center gap-x-3 gap-y-1">
+                <View className="mb-1 w-full flex-row flex-wrap items-center gap-x-3 gap-y-1">
                   <Text
                     className={cn(
                       'font-sans text-3xl font-extrabold',
