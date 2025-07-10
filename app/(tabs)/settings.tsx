@@ -3,6 +3,7 @@ import * as Application from 'expo-application';
 import { Link, router } from 'expo-router';
 import {
   Accessibility,
+  Bell,
   ChefHat,
   Code,
   Filter,
@@ -19,9 +20,11 @@ import { View, Text, Switch, TouchableOpacity, Linking, ScrollView } from 'react
 import { SheetProvider, SheetManager } from 'react-native-actions-sheet';
 
 import { Container } from '~/components/Container';
-import { getAppInformation } from '~/db/database';
-import { AppInformation } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
+import { useNotificationPermissions } from '~/hooks/useNotificationPermissions';
+import { getAppInformation } from '~/services/database/database';
+import { AppInformation } from '~/services/database/schema';
+import { getOrCreateDeviceId } from '~/services/device/deviceId';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
 import { cn } from '~/utils/utils';
@@ -211,13 +214,80 @@ interface VersionInfoProps {
   appInfo?: any;
 }
 
-const VersionInfo = ({ isDarkMode, appInfo }: VersionInfoProps): JSX.Element => (
-  <View className="mt-6 items-center">
-    <Text className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
-      Version {Application.nativeApplicationVersion}
-    </Text>
-  </View>
-);
+const NotificationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): JSX.Element => {
+  const { isGranted, isDenied, isUndetermined, requestPermissions } = useNotificationPermissions();
+
+  const handleNotificationAction = async () => {
+    if (isUndetermined) {
+      await requestPermissions();
+    } else if (isDenied) {
+      Linking.openSettings();
+    }
+  };
+
+  const getStatusText = () => {
+    if (isGranted) return 'Notifications Enabled';
+    if (isDenied) return 'Notifications Disabled';
+    return 'Notifications Disabled';
+  };
+
+  const getDescriptionText = () => {
+    if (isGranted) return 'You’ll receive helpful updates and alerts';
+    if (isDenied) return 'Currently disabled - tap to open Settings';
+    return 'Tap to enable push notifications';
+  };
+
+  return (
+    <TouchableOpacity
+      className={cn(
+        'flex-row items-center justify-between border-b py-3',
+        isDarkMode ? 'border-gray-700' : 'border-gray-100'
+      )}
+      onPress={handleNotificationAction}
+      activeOpacity={isGranted ? 1 : 0.5}>
+      <View className="flex-row items-center">
+        <View
+          className={cn(
+            'mr-3 h-8 w-8 items-center justify-center rounded-full',
+            isDarkMode ? 'bg-gray-800' : 'bg-orange-100'
+          )}>
+          <Bell size={16} color={getColor('ut-burnt-orange', false)} />
+        </View>
+        <View className="flex-1">
+          <Text
+            className={cn('text-base font-medium', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+            {getStatusText()}
+          </Text>
+          <Text className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+            {getDescriptionText()}
+          </Text>
+        </View>
+
+        {isDenied ||
+          (isUndetermined && (
+            <Ionicons name="chevron-forward" size={18} color={isDarkMode ? '#888' : '#9CA3AF'} />
+          ))}
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const VersionInfo = ({ isDarkMode, appInfo }: VersionInfoProps): JSX.Element => {
+  const deviceId = getOrCreateDeviceId();
+
+  return (
+    <View className="mt-6 items-center">
+      <Text className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
+        Version {Application.nativeApplicationVersion}
+      </Text>
+      {deviceId && (
+        <Text className={cn('mt-1 text-[10px]', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
+          {deviceId}
+        </Text>
+      )}
+    </View>
+  );
+};
 
 const SettingsPage = () => {
   const {
@@ -251,7 +321,7 @@ const SettingsPage = () => {
           showsVerticalScrollIndicator={false}
           style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : 'white' }}
           contentContainerStyle={{ padding: 24 }}>
-          <Text className={cn('text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
+          <Text className={cn('text-3xl font-extrabold', isDarkMode ? 'text-white' : 'text-black')}>
             Settings
           </Text>
           <SectionHeader title="Quick Links" className="mt-4" isDarkMode={isDarkMode} />
@@ -317,6 +387,8 @@ const SettingsPage = () => {
             onToggle={toggleColloquialNames}
             isDarkMode={isDarkMode}
           />
+          <SectionHeader title="Notifications" className="mt-4" isDarkMode={isDarkMode} />
+          <NotificationSettingsSection isDarkMode={isDarkMode} />
           <SectionHeader title="Information" className="mt-4" isDarkMode={isDarkMode} />
           {appInfo && <AboutSection appInfo={appInfo} isDarkMode={isDarkMode} />}
           {appInfo && <CreditsSection appInfo={appInfo} isDarkMode={isDarkMode} />}

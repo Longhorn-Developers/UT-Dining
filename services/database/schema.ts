@@ -1,5 +1,21 @@
 import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
 
+export const notification_types = sqliteTable('notification_type', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  created_at: text('created_at').default('CURRENT_TIMESTAMP'),
+  updated_at: text('updated_at').default('CURRENT_TIMESTAMP'),
+});
+
+export const notifications = sqliteTable('notifications', {
+  id: text('id').primaryKey(),
+  title: text('title'),
+  body: text('body'),
+  redirect_url: text('redirect_url'),
+  type: text('type').references(() => notification_types.id),
+  sent_at: text('sent_at').default('CURRENT_TIMESTAMP'),
+});
+
 export const location_type = sqliteTable('location_type', {
   id: text('id').primaryKey(),
   name: text('name').notNull().unique(),
@@ -185,6 +201,8 @@ export type Favorite = typeof favorites.$inferSelect;
 export interface LocationWithType extends Location {
   type: LocationType['name'];
 }
+export type NotificationType = typeof notification_types.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;
 
 type AppInfo = typeof app_information.$inferSelect;
 export interface AppInformation extends AppInfo {

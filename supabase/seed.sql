@@ -79,7 +79,34 @@ INSERT INTO "auth"."audit_log_entries" ("instance_id", "id", "payload", "created
 	('00000000-0000-0000-0000-000000000000', 'a8234401-2576-411b-b59d-d384d12acb1e', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-02 19:11:16.984924+00', ''),
 	('00000000-0000-0000-0000-000000000000', 'aa595a2a-88b3-4b65-9b1d-23c979e206b5', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-02 22:48:07.35449+00', ''),
 	('00000000-0000-0000-0000-000000000000', '56155f13-e9a7-4975-9cec-2f317416729d', '{"action":"token_revoked","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-02 22:48:07.356479+00', ''),
-	('00000000-0000-0000-0000-000000000000', '8935d4b9-9201-4b55-8645-e07106c20029', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-02 22:48:07.403755+00', '');
+	('00000000-0000-0000-0000-000000000000', '8935d4b9-9201-4b55-8645-e07106c20029', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-02 22:48:07.403755+00', ''),
+	('00000000-0000-0000-0000-000000000000', '42b081c0-6bd8-4839-8302-56c9c66fc715', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-04 17:22:22.779468+00', ''),
+	('00000000-0000-0000-0000-000000000000', '86f9ca67-7a20-426a-8687-077476efa64e', '{"action":"token_revoked","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-04 17:22:22.780497+00', ''),
+	('00000000-0000-0000-0000-000000000000', '41396569-9a51-4281-94e0-4e1a9a574618', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-04 17:22:22.818961+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'e1bc1f6a-a203-4b39-b927-fe79d09c9810', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 00:15:28.351677+00', ''),
+	('00000000-0000-0000-0000-000000000000', '8bd1dd00-5916-4436-9311-a30e8fea57df', '{"action":"token_revoked","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 00:15:28.353309+00', ''),
+	('00000000-0000-0000-0000-000000000000', '6f41a188-b192-4e9f-9017-26a3441327b1', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 00:15:28.386334+00', ''),
+	('00000000-0000-0000-0000-000000000000', '37ae7df5-5a76-4073-9401-81edd800c21c', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 02:47:32.098595+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1624d9a4-5445-4024-92b3-6aea2117330f', '{"action":"token_revoked","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 02:47:32.101337+00', ''),
+	('00000000-0000-0000-0000-000000000000', '34f74b1a-bdb6-4271-a9ac-ad83e808acad', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 02:47:32.134649+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b1b9c516-baa0-47c9-bf96-d0e6b2613070', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 04:18:55.076771+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'baabeea1-834e-49ca-b588-cbab6e2da1af', '{"action":"token_revoked","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 04:18:55.079041+00', ''),
+	('00000000-0000-0000-0000-000000000000', '9246ec07-594d-4a82-8bc7-285be32a8b37', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 04:18:55.111534+00', ''),
+	('00000000-0000-0000-0000-000000000000', '84efade4-c531-416f-a2b2-bc6b375d1316', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 05:17:30.298841+00', ''),
+	('00000000-0000-0000-0000-000000000000', '1be7863d-77e5-45da-b08b-8ec9eef817de', '{"action":"token_revoked","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 05:17:30.301397+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2e953a60-9b8c-4dac-bead-b838462d1dc8', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 20:44:47.025934+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b7bfa78b-fb2f-4772-9386-a716d4e3ef34', '{"action":"token_revoked","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 20:44:47.031556+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2658e660-c906-4e9c-95f2-a837434b0cfa', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 20:44:47.063377+00', ''),
+	('00000000-0000-0000-0000-000000000000', '7c57d58e-1724-4aeb-ac27-365f22b1f022', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 21:46:21.727178+00', ''),
+	('00000000-0000-0000-0000-000000000000', '452f51ab-7761-4d35-b9dc-60f470bbe25a', '{"action":"token_revoked","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-05 21:46:21.72955+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0f49ada7-56a3-4a03-8729-4267c8e9ca4e', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-09 23:59:25.904359+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0b80350d-259a-40b6-8be8-5c028a58a9c1', '{"action":"token_revoked","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-09 23:59:25.911962+00', ''),
+	('00000000-0000-0000-0000-000000000000', '3c00200a-1778-4c06-b400-6ac2e9ee5b26', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-09 23:59:25.95626+00', ''),
+	('00000000-0000-0000-0000-000000000000', '2ba7dc7a-7d6e-4467-8d19-6f52dd9e84c3', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-10 02:08:56.938323+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'b5a1f829-499d-40a0-80c3-9c4f81545458', '{"action":"token_revoked","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-10 02:08:56.939597+00', ''),
+	('00000000-0000-0000-0000-000000000000', '64c5fb7b-3a7e-4e3a-943a-e8123353d7d1', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-10 02:08:56.974228+00', ''),
+	('00000000-0000-0000-0000-000000000000', '0feb4f4c-ac57-45d3-99b0-41ecf2c8df0d', '{"action":"token_refreshed","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-10 03:07:29.582103+00', ''),
+	('00000000-0000-0000-0000-000000000000', 'f97aea5f-da00-4ec1-a1c0-36cd0d563ef1', '{"action":"token_revoked","actor_id":"64c1b2ea-9ed0-4273-8356-b6c156ae9d6a","actor_username":"test@test.com","actor_via_sso":false,"log_type":"token"}', '2025-07-10 03:07:29.58286+00', '');
 
 
 --
@@ -93,7 +120,7 @@ INSERT INTO "auth"."audit_log_entries" ("instance_id", "id", "payload", "created
 --
 
 INSERT INTO "auth"."users" ("instance_id", "id", "aud", "role", "email", "encrypted_password", "email_confirmed_at", "invited_at", "confirmation_token", "confirmation_sent_at", "recovery_token", "recovery_sent_at", "email_change_token_new", "email_change", "email_change_sent_at", "last_sign_in_at", "raw_app_meta_data", "raw_user_meta_data", "is_super_admin", "created_at", "updated_at", "phone", "phone_confirmed_at", "phone_change", "phone_change_token", "phone_change_sent_at", "email_change_token_current", "email_change_confirm_status", "banned_until", "reauthentication_token", "reauthentication_sent_at", "is_sso_user", "deleted_at", "is_anonymous") VALUES
-	('00000000-0000-0000-0000-000000000000', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', 'authenticated', 'authenticated', 'test@test.com', '$2a$06$0./BnpfuDJRQDWHH4OfzoOLK.T9omU2ae3muytlEFJHOzmDQVbkmG', '2025-06-18 22:07:58.136313+00', NULL, '', NULL, '', '2025-06-18 22:07:58.136313+00', '', '', NULL, '2025-07-02 17:37:31.587264+00', '{"provider": "email", "providers": ["email"]}', '{}', NULL, '2025-06-18 22:07:58.136313+00', '2025-07-02 22:48:07.358215+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false);
+	('00000000-0000-0000-0000-000000000000', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', 'authenticated', 'authenticated', 'test@test.com', '$2a$06$0./BnpfuDJRQDWHH4OfzoOLK.T9omU2ae3muytlEFJHOzmDQVbkmG', '2025-06-18 22:07:58.136313+00', NULL, '', NULL, '', '2025-06-18 22:07:58.136313+00', '', '', NULL, '2025-07-02 17:37:31.587264+00', '{"provider": "email", "providers": ["email"]}', '{}', NULL, '2025-06-18 22:07:58.136313+00', '2025-07-10 03:07:29.584538+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL, false);
 
 
 --
@@ -120,7 +147,7 @@ INSERT INTO "auth"."sessions" ("id", "user_id", "created_at", "updated_at", "fac
 	('0f79b4ad-1d90-4941-acba-5b37b5b715e4', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', '2025-07-01 23:03:56.42822+00', '2025-07-02 15:28:01.796142+00', NULL, 'aal1', NULL, '2025-07-02 15:28:01.796065', 'Next.js Middleware', '24.242.137.154', NULL),
 	('da75fd93-009b-45a2-a456-7b6ff59ae039', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', '2025-07-02 17:33:04.184055+00', '2025-07-02 17:33:04.184055+00', NULL, 'aal1', NULL, NULL, 'node', '24.242.137.154', NULL),
 	('94294c7a-0595-4bf5-a6b7-d6d2c6e44605', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', '2025-07-02 17:34:21.541708+00', '2025-07-02 17:34:21.541708+00', NULL, 'aal1', NULL, NULL, 'node', '24.242.137.154', NULL),
-	('5e6bc396-db77-42b9-91ee-de4ae6473c0c', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', '2025-07-02 17:37:31.587356+00', '2025-07-02 22:48:07.404766+00', NULL, 'aal1', NULL, '2025-07-02 22:48:07.404711', 'Next.js Middleware', '192.168.65.1', NULL);
+	('5e6bc396-db77-42b9-91ee-de4ae6473c0c', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', '2025-07-02 17:37:31.587356+00', '2025-07-10 03:07:29.585415+00', NULL, 'aal1', NULL, '2025-07-10 03:07:29.585367', 'Next.js Middleware', '192.168.65.1', NULL);
 
 
 --
@@ -170,7 +197,17 @@ INSERT INTO "auth"."refresh_tokens" ("instance_id", "id", "token", "user_id", "r
 	('00000000-0000-0000-0000-000000000000', 29, 'm7rnz7nqf257', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', false, '2025-07-02 17:34:21.54306+00', '2025-07-02 17:34:21.54306+00', NULL, '94294c7a-0595-4bf5-a6b7-d6d2c6e44605'),
 	('00000000-0000-0000-0000-000000000000', 30, 'qquojsyiwwvf', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', true, '2025-07-02 17:37:31.59052+00', '2025-07-02 19:11:16.955899+00', NULL, '5e6bc396-db77-42b9-91ee-de4ae6473c0c'),
 	('00000000-0000-0000-0000-000000000000', 31, 'hn5o4yvd6iql', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', true, '2025-07-02 19:11:16.956737+00', '2025-07-02 22:48:07.356659+00', 'qquojsyiwwvf', '5e6bc396-db77-42b9-91ee-de4ae6473c0c'),
-	('00000000-0000-0000-0000-000000000000', 32, '67q47aohmhmx', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', false, '2025-07-02 22:48:07.357108+00', '2025-07-02 22:48:07.357108+00', 'hn5o4yvd6iql', '5e6bc396-db77-42b9-91ee-de4ae6473c0c');
+	('00000000-0000-0000-0000-000000000000', 32, '67q47aohmhmx', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', true, '2025-07-02 22:48:07.357108+00', '2025-07-04 17:22:22.780738+00', 'hn5o4yvd6iql', '5e6bc396-db77-42b9-91ee-de4ae6473c0c'),
+	('00000000-0000-0000-0000-000000000000', 33, '32ah7gykrugf', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', true, '2025-07-04 17:22:22.78155+00', '2025-07-05 00:15:28.353518+00', '67q47aohmhmx', '5e6bc396-db77-42b9-91ee-de4ae6473c0c'),
+	('00000000-0000-0000-0000-000000000000', 34, 'n6wbb4544stq', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', true, '2025-07-05 00:15:28.354591+00', '2025-07-05 02:47:32.101587+00', '32ah7gykrugf', '5e6bc396-db77-42b9-91ee-de4ae6473c0c'),
+	('00000000-0000-0000-0000-000000000000', 35, 'dayw4rxwll2k', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', true, '2025-07-05 02:47:32.102229+00', '2025-07-05 04:18:55.080451+00', 'n6wbb4544stq', '5e6bc396-db77-42b9-91ee-de4ae6473c0c'),
+	('00000000-0000-0000-0000-000000000000', 36, 'ymog2nhpmyf7', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', true, '2025-07-05 04:18:55.082463+00', '2025-07-05 05:17:30.301773+00', 'dayw4rxwll2k', '5e6bc396-db77-42b9-91ee-de4ae6473c0c'),
+	('00000000-0000-0000-0000-000000000000', 37, 'f576o35arp6b', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', true, '2025-07-05 05:17:30.303521+00', '2025-07-05 20:44:47.032342+00', 'ymog2nhpmyf7', '5e6bc396-db77-42b9-91ee-de4ae6473c0c'),
+	('00000000-0000-0000-0000-000000000000', 38, 'q5o7uc5zjsre', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', true, '2025-07-05 20:44:47.038506+00', '2025-07-05 21:46:21.729822+00', 'f576o35arp6b', '5e6bc396-db77-42b9-91ee-de4ae6473c0c'),
+	('00000000-0000-0000-0000-000000000000', 39, 'kjgtqcjsonky', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', true, '2025-07-05 21:46:21.732537+00', '2025-07-09 23:59:25.914437+00', 'q5o7uc5zjsre', '5e6bc396-db77-42b9-91ee-de4ae6473c0c'),
+	('00000000-0000-0000-0000-000000000000', 40, '356a5y3yqg6y', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', true, '2025-07-09 23:59:25.916072+00', '2025-07-10 02:08:56.939803+00', 'kjgtqcjsonky', '5e6bc396-db77-42b9-91ee-de4ae6473c0c'),
+	('00000000-0000-0000-0000-000000000000', 41, '5ny2sfrxudbu', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', true, '2025-07-10 02:08:56.940294+00', '2025-07-10 03:07:29.583296+00', '356a5y3yqg6y', '5e6bc396-db77-42b9-91ee-de4ae6473c0c'),
+	('00000000-0000-0000-0000-000000000000', 42, 'wxpbmnsamvjk', '64c1b2ea-9ed0-4273-8356-b6c156ae9d6a', false, '2025-07-10 03:07:29.583742+00', '2025-07-10 03:07:29.583742+00', '5ny2sfrxudbu', '5e6bc396-db77-42b9-91ee-de4ae6473c0c');
 
 
 --
@@ -208,7 +245,7 @@ INSERT INTO "auth"."refresh_tokens" ("instance_id", "id", "token", "user_id", "r
 --
 
 INSERT INTO "public"."app_information" ("id", "about_title", "about_description", "credits_contributors", "support_links", "created_at", "updated_at") VALUES
-	('987e7606-c084-4b71-b583-f972b8f31b0f', 'About UT Dining', 'UT Dining is your companion app for exploring dining options at the University of Texas at Austin. Browse menus, check dining hours, and find the perfect meal on campus.', '[{"id": "1751429639255", "name": "David Nguyen", "order": 1}, {"id": "1751429646841", "name": "Austin Tran", "order": 2}, {"id": "1751429651538", "name": "Ali Vayani", "order": 3}, {"id": "1751429683238", "name": "Chetan Gorantla", "order": 4}]', '[{"id": "17514297261920", "url": "mailto:ethanlanting@gmail.com", "label": "Contact Support", "order": 1}, {"id": "17514297261921", "url": "https://longhorn-developers.github.io/ut-dining-website/faq", "label": "FAQ", "order": 2}, {"id": "17514297261922", "url": "https://longhorn-developers.github.io/ut-dining-website/privacy-policy", "label": "Privacy Policy", "order": 3}, {"id": "17514297261923", "url": "https://github.com/Longhorn-Developers/UT-Dining", "label": "Source Code", "order": 4}]', '2025-07-02 04:12:54.44+00', '2025-07-02 05:16:24.273');
+	('987e7606-c084-4b71-b583-f972b8f31b0f', 'About UT Dining', 'UT Dining is your companion app for exploring dining options at the University of Texas at Austin. Browse menus, check dining hours, and find the perfect meal on campus.', '[{"id": "1751429639255", "name": "David Nguyen", "order": 1}, {"id": "1751429646841", "name": "Austin Tran", "order": 2}, {"id": "1751429651538", "name": "Ali Vayani", "order": 3}, {"id": "1751429683238", "name": "Chetan Gorantla", "order": 4}]', '[{"id": "17514297261920", "url": "mailto:ethanlanting@gmail.com", "label": "Contact Support", "order": 1}, {"id": "17514297261921", "url": "https://longhorn-developers.github.io/ut-dining-website/faq", "label": "FAQ", "order": 2}, {"id": "17514297261922", "url": "https://longhorn-developers.github.io/ut-dining-website/privacy-policy", "label": "Privacy Policy", "order": 3}, {"id": "17514297261923", "url": "https://github.com/Longhorn-Developers/UT-Dining", "label": "Source Code", "order": 4}]', '2025-07-02 04:12:54.44+00', '2025-07-04 17:22:52.386');
 
 
 --
@@ -318,7 +355,35 @@ Hook ‘em Hut offers grab and go food, beverages and sundries to satisfy your n
 
 
 --
+-- Data for Name: notification_types; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."notification_types" ("id", "name", "created_at", "updated_at") VALUES
+	('b68cb27f-1eca-439c-bec0-e109a78a87a1', 'System Announcement', '2025-07-05 20:58:42.592689+00', '2025-07-05 20:58:42.592689+00'),
+	('ddd275bc-9620-499b-82e0-c6a31e7c9ad3', 'Food Alert', '2025-07-05 20:59:00.068011+00', '2025-07-05 20:59:00.068011+00'),
+	('9d6d913b-856b-4afe-9cbf-6ada99c29fb7', 'Location Update', '2025-07-05 20:59:07.440183+00', '2025-07-05 20:59:07.440183+00'),
+	('a0510183-252a-4998-9542-621df7b0cd4a', 'Special Alert', '2025-07-05 20:59:39.775092+00', '2025-07-05 20:59:39.775092+00');
+
+
+--
+-- Data for Name: notifications; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+INSERT INTO "public"."notifications" ("id", "title", "body", "redirect_url", "scheduled_at", "created_at", "sent", "type") VALUES
+	('7fce4f94-59cd-4ccf-97ac-5ce3d14609f3', 'Welcome Back, Longhorns! 🤘', 'New menus just dropped! Tap to see what’s good on campus.', '', NULL, '2025-07-10 03:06:05.883693+00', true, 'a0510183-252a-4998-9542-621df7b0cd4a'),
+	('ba6a7d24-0046-4c41-8226-8c7da68e1b8d', 'J2 Temporarily Closed', 'J2 is temporarily closed. Check other spots open nearby.', 'https://housing.utexas.edu/dining/dining-locations/dining-halls/j2-dining', NULL, '2025-07-10 03:08:00.390549+00', true, '9d6d913b-856b-4afe-9cbf-6ada99c29fb7'),
+	('a851565e-50f5-4797-9bed-92b1e3ef240c', '🔥 Fresh Drop at Kins', 'Pssst… steak at Kins. You didn’t hear it from me 👀', '', NULL, '2025-07-10 03:09:35.488165+00', true, 'ddd275bc-9620-499b-82e0-c6a31e7c9ad3'),
+	('d15905d4-6dfc-4f44-b1f2-d311644efb23', 'Maintenance Underway', 'We’re making improvements behind the scenes. Dining info and notifications might be delayed. Everything will be back soon!', '', NULL, '2025-07-10 03:10:17.158217+00', true, 'b68cb27f-1eca-439c-bec0-e109a78a87a1');
+
+
+--
 -- Data for Name: nutrition; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+
+
+--
+-- Data for Name: user_devices; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
@@ -357,42 +422,42 @@ Hook ‘em Hut offers grab and go food, beverages and sundries to satisfy your n
 -- Name: refresh_tokens_id_seq; Type: SEQUENCE SET; Schema: auth; Owner: supabase_auth_admin
 --
 
-SELECT pg_catalog.setval('"auth"."refresh_tokens_id_seq"', 32, true);
+SELECT pg_catalog.setval('"auth"."refresh_tokens_id_seq"', 42, true);
 
 
 --
 -- Name: allergens_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."allergens_id_seq"', 2256, true);
+SELECT pg_catalog.setval('"public"."allergens_id_seq"', 2487, true);
 
 
 --
 -- Name: food_item_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."food_item_id_seq"', 2256, true);
+SELECT pg_catalog.setval('"public"."food_item_id_seq"', 2487, true);
 
 
 --
 -- Name: menu_category_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."menu_category_id_seq"', 331, true);
+SELECT pg_catalog.setval('"public"."menu_category_id_seq"', 364, true);
 
 
 --
 -- Name: menu_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."menu_id_seq"', 42, true);
+SELECT pg_catalog.setval('"public"."menu_id_seq"', 75, true);
 
 
 --
 -- Name: nutrition_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."nutrition_id_seq"', 2256, true);
+SELECT pg_catalog.setval('"public"."nutrition_id_seq"', 2487, true);
 
 
 --

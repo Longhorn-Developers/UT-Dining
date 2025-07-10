@@ -22,8 +22,8 @@ import type { Region } from 'react-native-maps';
 
 import { Container } from '~/components/Container';
 import { MICROWAVE_LOCATIONS } from '~/data/MicrowaveLocations';
-import { getAllLocationsWithCoordinates } from '~/db/database';
 import { useDatabase } from '~/hooks/useDatabase';
+import { getAllLocationsWithCoordinates } from '~/services/database/database';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
@@ -510,9 +510,13 @@ const MapPage = () => {
   };
 
   const handleMarkerPress = (coordinates: { latitude: number; longitude: number }) => {
+    // Calculate a vertical offset to account for the sheet height (60vh)
+    // We'll move the target point up by ~25% of the view delta to position it in the upper portion of the screen
+    const targetLatitude = coordinates.latitude - 0.00031; // Offset north by a small amount
+
     mapRef.current?.animateToRegion(
       {
-        latitude: coordinates.latitude,
+        latitude: targetLatitude,
         longitude: coordinates.longitude,
         latitudeDelta: 0.00125,
         longitudeDelta: 0.00125,

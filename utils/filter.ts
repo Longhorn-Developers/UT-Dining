@@ -1,4 +1,4 @@
-import { FoodItem } from '~/db/database';
+import { FoodItem } from '~/services/database/database';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 
 export const filterFoodItems = (foodItems: FoodItem[], filters: any, favorites: any[]) => {

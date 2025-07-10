@@ -2,7 +2,7 @@ import { drizzle, ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useMemo } from 'react';
 
-import * as schema from '../db/schema';
+import * as schema from '../services/database/schema';
 
 /**
  * Custom hook for accessing the drizzle database instance

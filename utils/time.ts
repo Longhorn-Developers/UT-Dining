@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 
-import * as schema from '~/db/schema';
+import * as schema from '~/services/database/schema';
 import type { MealTimes } from '~/utils/locations';
 
 type WeekDay = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';

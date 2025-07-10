@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 
-import { FoodItem, Location } from '~/db/database';
+import { FoodItem, Location } from '~/services/database/database';
 
 // Add a new flag to mark hidden items
 export type ListItem =

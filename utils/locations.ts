@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm';
 import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 
-import * as schema from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
+import * as schema from '~/services/database/schema';
 
 // Type definition for meal times from database
 export interface MealTimes {

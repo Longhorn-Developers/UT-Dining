@@ -2,7 +2,7 @@ import { eq, sql } from 'drizzle-orm';
 import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 
 import { allergens, food_item, location, menu, menu_category, nutrition } from './schema';
-import * as schema from '../db/schema';
+import * as schema from './schema';
 
 import { supabase } from '~/utils/supabase';
 
@@ -29,6 +29,15 @@ export interface FoodItem {
   nutrition: schema.Nutrition;
 }
 
+/**
+ * Fetches all relevant data from Supabase tables including locations, menus, notifications, and nutrition/allergens.
+ *
+ * - Determines today's date in Central Time.
+ * - Fetches base data in parallel.
+ * - Fetches related menu categories, food items, nutrition, and allergens if menus exist.
+ *
+ * @returns A Promise resolving to an object containing all fetched data, or null if an error occurs.
+ */
 const querySupabase = async () => {
   try {
     // Calculate today's date in Central Time Zone
@@ -38,13 +47,21 @@ const querySupabase = async () => {
     const formattedDate = centralTime.toISOString().split('T')[0];
 
     // Fetch base data in parallel (independent queries)
-    const [locationResult, locationTypeResult, menuResult, appInformationResult] =
-      await Promise.all([
-        supabase.from('location').select('*'),
-        supabase.from('location_type').select('*'),
-        supabase.from('menu').select('*').eq('date', formattedDate),
-        supabase.from('app_information').select('*'),
-      ]);
+    const [
+      locationResult,
+      locationTypeResult,
+      menuResult,
+      appInformationResult,
+      notificationResult,
+      notificationTypeResult,
+    ] = await Promise.all([
+      supabase.from('location').select('*'),
+      supabase.from('location_type').select('*'),
+      supabase.from('menu').select('*').eq('date', formattedDate),
+      supabase.from('app_information').select('*'),
+      supabase.from('notifications').select('*'),
+      supabase.from('notification_types').select('*'),
+    ]);
 
     // Check for errors in base queries
     if (locationResult.error) {
@@ -64,10 +81,21 @@ const querySupabase = async () => {
       throw new Error(`app_information: ${appInformationResult.error.message}`);
     }
 
+    if (notificationResult.error) {
+      console.error('❌ Error fetching notifications:', notificationResult.error);
+      throw new Error(`notifications: ${notificationResult.error.message}`);
+    }
+    if (notificationTypeResult.error) {
+      console.error('❌ Error fetching notification_types:', notificationTypeResult.error);
+      throw new Error(`notification_types: ${notificationTypeResult.error.message}`);
+    }
+
     const locationData = locationResult.data ?? [];
     const locationTypeData = locationTypeResult.data ?? [];
     const menuData = menuResult.data ?? [];
     const appInformationData = appInformationResult.data ?? [];
+    const notificationData = notificationResult.data ?? [];
+    const notificationTypeData = notificationTypeResult.data ?? [];
 
     // Early return if no menus for today
     if (menuData.length === 0) {
@@ -81,6 +109,8 @@ const querySupabase = async () => {
         nutrition: [],
         allergens: [],
         app_information: appInformationData,
+        notifications: notificationData,
+        notification_types: notificationTypeData,
       };
     }
 
@@ -142,6 +172,8 @@ const querySupabase = async () => {
         nutrition: [],
         allergens: [],
         app_information: appInformationData,
+        notifications: notificationData,
+        notification_types: notificationTypeData,
       };
     }
 
@@ -189,6 +221,8 @@ const querySupabase = async () => {
       nutrition: nutritionResult.data ?? [],
       allergens: allergensResult.data ?? [],
       app_information: appInformationData,
+      notifications: notificationData,
+      notification_types: notificationTypeData,
     };
   } catch (error) {
     console.error('❌ Unexpected error fetching Supabase data:', error);
@@ -222,6 +256,8 @@ export const insertDataIntoSQLiteDB = async (
         db.delete(nutrition).execute(),
         db.delete(allergens).execute(),
         db.delete(schema.app_information).execute(),
+        db.delete(schema.notifications).execute(),
+        db.delete(schema.notification_types).execute(),
       ]);
 
       // Insert data from Supabase (with proper type casting)
@@ -251,6 +287,19 @@ export const insertDataIntoSQLiteDB = async (
       if (data.app_information.length > 0) {
         insertPromises.push(db.insert(schema.app_information).values(data.app_information as any));
       }
+      if (data.notifications && data.notifications.length > 0) {
+        // For each notification, determine what sent_at value to use. If the notification is scheduled, sent_at will each scheduled_at value. If the notification is not scheduled, sent_at will be created_at value.
+        const notificationsWithSentAt = data.notifications.map((notification) => {
+          if (notification.scheduled_at) {
+            return { ...notification, sent_at: notification.scheduled_at };
+          }
+          return { ...notification, sent_at: notification.created_at };
+        });
+        insertPromises.push(db.insert(schema.notifications).values(notificationsWithSentAt as any));
+      }
+      if (data.notification_types && data.notification_types.length > 0) {
+        insertPromises.push(db.insert(schema.notification_types).values(data.notification_types));
+      }
 
       if (insertPromises.length > 0) {
         await Promise.all(insertPromises);
@@ -265,6 +314,13 @@ export const insertDataIntoSQLiteDB = async (
   }
 };
 
+/**
+ * Retrieves a list of menu names for a given location.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param locationName - The name of the location to query.
+ * @returns A Promise resolving to an array of menu names.
+ */
 export const getLocationMenuNames = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string
@@ -279,6 +335,16 @@ export const getLocationMenuNames = async (
   return data.map((row) => row.menu?.name).filter((name) => name !== undefined);
 };
 
+/**
+ * Retrieves structured menu and food data for a specific location and menu name.
+ *
+ * If an error occurs during fetching, attempts to return only basic location info.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param locationName - The name of the location to query.
+ * @param menuName - The name of the menu to query.
+ * @returns A Promise resolving to a `Location` object or null if not found.
+ */
 export const getLocationMenuData = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string,
@@ -488,6 +554,16 @@ export const getLocationMenuData = async (
   }
 };
 
+/**
+ * Retrieves a single food item by its location, menu, category, and item name.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param locationName - The location containing the item.
+ * @param menuName - The menu containing the item.
+ * @param categoryName - The category containing the item.
+ * @param itemName - The name of the food item.
+ * @returns A Promise resolving to a `FoodItem` or null if not found.
+ */
 export const getFoodItem = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string,
@@ -566,12 +642,25 @@ export const getFoodItem = async (
   return foodItem;
 };
 
+/**
+ * Retrieves all favorite food items stored in the local database.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @returns A Promise resolving to an array of favorite items.
+ */
 export const getFavorites = async (db: ExpoSQLiteDatabase<typeof schema>) => {
   const data = await db.select().from(schema.favorites).execute();
 
   return data;
 };
 
+/**
+ * Checks whether a food item is marked as a favorite.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param foodName - The name of the food item.
+ * @returns A boolean indicating if the item is a favorite.
+ */
 export const isFavoriteItem = (db: ExpoSQLiteDatabase<typeof schema>, foodName: string) => {
   const favorite = db
     .select()
@@ -582,11 +671,31 @@ export const isFavoriteItem = (db: ExpoSQLiteDatabase<typeof schema>, foodName: 
   return favorite !== null && favorite !== undefined;
 };
 
+/**
+ * Retrieves a single favorite food item by its name.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param foodName - The name of the food item.
+ * @returns A Promise resolving to the favorite item or null.
+ */
 export const getFavoriteItem = (db: ExpoSQLiteDatabase<typeof schema>, foodName: string) => {
   return db.select().from(schema.favorites).where(eq(schema.favorites.name, foodName)).get();
 };
 
-// Function to add a food item to favorites
+/**
+ * Toggles a food item's favorite status:
+ * - Adds it to favorites if not present.
+ * - Removes it if already marked as favorite.
+ *
+ * Also copies nutrition and allergens data into the favorites table.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param foodItem - The food item to toggle.
+ * @param locationName - The location name associated with the item.
+ * @param menuName - The menu name associated with the item.
+ * @param categoryName - The category name associated with the item.
+ * @returns A Promise resolving to true if added, or false if removed.
+ */
 export const toggleFavorites = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   foodItem: FoodItem,
@@ -667,6 +776,13 @@ export const toggleFavorites = async (
   return true;
 };
 
+/**
+ * Retrieves detailed information about a specific location.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param locationName - The name of the location to query.
+ * @returns A Promise resolving to a `LocationWithType` object or null if not found.
+ */
 export const getLocationDetails = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string
@@ -715,6 +831,13 @@ export const getLocationDetails = async (
   }
 };
 
+/**
+ * Retrieves complete location data including menus, categories, and food items.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param locationName - The name of the location.
+ * @returns A Promise resolving to a structured `Location` object or null.
+ */
 export const getCompleteLocationData = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string
@@ -871,6 +994,12 @@ export const getCompleteLocationData = async (
   }
 };
 
+/**
+ * Retrieves app-wide information (e.g., configuration or metadata).
+ *
+ * @param db - The Expo SQLite database instance.
+ * @returns A Promise resolving to the `AppInformation` object or null.
+ */
 export const getAppInformation = async (
   db: ExpoSQLiteDatabase<typeof schema>
 ): Promise<schema.AppInformation | null> => {
@@ -888,6 +1017,12 @@ export const getAppInformation = async (
   }
 };
 
+/**
+ * Retrieves all locations that have geographic coordinates.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @returns A Promise resolving to an array of locations with latitude and longitude.
+ */
 export const getAllLocationsWithCoordinates = async (
   db: ExpoSQLiteDatabase<typeof schema>
 ): Promise<Pick<schema.Location, 'id' | 'name' | 'latitude' | 'longitude' | 'address'>[]> => {
@@ -910,4 +1045,108 @@ export const getAllLocationsWithCoordinates = async (
     .execute();
 
   return data;
+};
+
+/**
+ * Retrieves all available notification types.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @returns A Promise resolving to an array of notification types.
+ */
+export const getNotificationTypes = async (
+  db: ExpoSQLiteDatabase<typeof schema>
+): Promise<schema.NotificationType[]> => {
+  const data = await db.select().from(schema.notification_types).execute();
+  return data;
+};
+
+/**
+ * Retrieves all notifications, ordered by the most recent.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @returns A Promise resolving to an array of notifications with their type names.
+ */
+export const getNotifications = async (
+  db: ExpoSQLiteDatabase<typeof schema>
+): Promise<(schema.Notification & { type_name: string })[]> => {
+  const data = await db
+    .select({
+      id: schema.notifications.id,
+      title: schema.notifications.title,
+      body: schema.notifications.body,
+      redirect_url: schema.notifications.redirect_url,
+      type: schema.notifications.type,
+      sent_at: schema.notifications.sent_at,
+      type_name: schema.notification_types.name,
+    })
+    .from(schema.notifications)
+    .leftJoin(
+      schema.notification_types,
+      eq(schema.notifications.type, schema.notification_types.id)
+    )
+    .orderBy(sql`datetime(${schema.notifications.sent_at}) DESC`)
+    .execute();
+
+  return data.map((row) => ({
+    id: row.id,
+    title: row.title,
+    body: row.body,
+    redirect_url: row.redirect_url,
+    type: row.type,
+    sent_at: row.sent_at,
+    type_name: row.type_name || 'system_announcement',
+  }));
+};
+
+/**
+ * Inserts a notification into the local SQLite database if it doesn't already exist.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param notificationData - The notification data to insert.
+ * @returns A Promise resolving when the insert is complete.
+ */
+export const insertNotification = async (
+  db: ExpoSQLiteDatabase<typeof schema>,
+  notificationData: {
+    id?: string;
+    title: string;
+    body: string;
+    sent_at: string;
+    redirect_url?: string;
+    type?: string;
+  }
+): Promise<void> => {
+  try {
+    const notificationId =
+      notificationData.id || `notif_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
+    // Check if notification with this ID already exists
+    const existingNotification = await db
+      .select({ id: schema.notifications.id })
+      .from(schema.notifications)
+      .where(eq(schema.notifications.id, notificationId))
+      .get();
+
+    if (existingNotification) {
+      console.log('ℹ️  Notification already exists, skipping insert.');
+      return;
+    }
+
+    await db
+      .insert(schema.notifications)
+      .values({
+        id: notificationId,
+        title: notificationData.title,
+        body: notificationData.body,
+        redirect_url: notificationData.redirect_url || null,
+        type: notificationData.type || null,
+        sent_at: notificationData.sent_at,
+      })
+      .execute();
+
+    console.log('✅ Notification inserted into SQLite database:', notificationId);
+  } catch (error) {
+    console.error('❌ Error inserting notification into SQLite:', error);
+    throw error;
+  }
 };

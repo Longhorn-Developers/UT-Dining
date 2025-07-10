@@ -8,9 +8,9 @@ import TimeSchedule from './TimeSchedule';
 
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
-import { menu, location as location_schema } from '~/db/schema';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
+import { menu, location as location_schema } from '~/services/database/schema';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { useLocationName, useMealTimes } from '~/utils/locations';
 import { generateSchedule, isLocationOpen } from '~/utils/time';
@@ -28,6 +28,7 @@ interface LocationHeaderProps {
 const LocationHeader = React.memo(
   ({ location, selectedMenu, setSelectedMenu, filters, query, setQuery }: LocationHeaderProps) => {
     const [open, setOpen] = useState(false);
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
     const db = useDatabase();
     const [timeDropdownOpen, setTimeDropdownOpen] = useState(false);
     const { locationData } = useLocationDetails(location);
@@ -68,47 +69,49 @@ const LocationHeader = React.memo(
 
     return (
       <View className="mx-6 mt-6 flex gap-y-5">
-        <TopBar variant="location" />
+        {/* Content that's hidden when search is focused */}
+        {!isSearchFocused && (
+          <>
+            <TopBar variant="location" />
 
-        <View className="gap-y-4">
-          {/* TEMPORARILY CLOSED Banner */}
-          {locationData?.force_close && (
-            <View className="rounded-lg bg-red-600 px-4 py-2">
-              <Text className="text-center text-lg font-extrabold tracking-wider text-white">
-                TEMPORARILY CLOSED
-              </Text>
-            </View>
-          )}
+            <View className="gap-y-4">
+              {/* Temporarily Closed Banner */}
+              {locationData?.force_close && (
+                <View className="rounded-lg bg-red-600 px-4 py-2">
+                  <Text className="text-center text-lg font-extrabold tracking-wider text-white">
+                    TEMPORARILY CLOSED
+                  </Text>
+                </View>
+              )}
 
-          <View>
-            <View className="w-full flex-row flex-wrap items-center  gap-x-3 gap-y-1">
-              <Text
-                className={cn(
-                  'font-sans text-3xl font-extrabold',
-                  isDarkMode ? 'text-white' : 'text-black'
-                )}>
-                {displayName}
-              </Text>
-            </View>
-            <View className="flex-row items-center gap-x-3">
-              <Text className="text-lg font-semibold text-ut-burnt-orange">
-                {open ? 'Open' : 'Closed'}
-              </Text>
+              {/* Location Header */}
+              <View>
+                <View className="mb-1 w-full flex-row flex-wrap items-center gap-x-3 gap-y-1">
+                  <Text
+                    className={cn(
+                      'font-sans text-3xl font-extrabold',
+                      isDarkMode ? 'text-white' : 'text-black'
+                    )}>
+                    {displayName}
+                  </Text>
+                </View>
+                <View className="flex-row items-center gap-x-3">
+                  <Text className="text-lg font-semibold text-ut-burnt-orange">
+                    {open ? 'Open' : 'Closed'}
+                  </Text>
 
-              <View
-                className={cn(
-                  'size-1 rounded-full',
-                  isDarkMode ? 'bg-ut-grey-dark-mode' : 'bg-ut-burnt-orange'
-                )}
-              />
+                  <View
+                    className={cn(
+                      'size-1 rounded-full',
+                      isDarkMode ? 'bg-ut-grey-dark-mode' : 'bg-ut-burnt-orange'
+                    )}
+                  />
 
-              {/* Location Type Pill */}
-              {locationData && locationData.type && (
-                <>
-                  <View>
+                  {/* Location Type Pill */}
+                  {locationData?.type && (
                     <View
                       className={cn(
-                        'self-start rounded-full px-3 py-1  ',
+                        'self-start rounded-full px-3 py-1',
                         isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-ut-grey/5'
                       )}>
                       <Text
@@ -119,28 +122,44 @@ const LocationHeader = React.memo(
                         {locationData.type}
                       </Text>
                     </View>
-                  </View>
-                </>
-              )}
+                  )}
+                </View>
+              </View>
+
+              {/* Time Schedule */}
+              <TimeSchedule
+                schedule={schedule}
+                isOpen={timeDropdownOpen}
+                onToggle={() => {
+                  setTimeDropdownOpen((prev) => !prev);
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+              />
+
+              <View
+                className={cn(
+                  'my-0 h-1 w-full border-b',
+                  isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15'
+                )}
+              />
             </View>
+          </>
+        )}
+
+        {/* Search Bar - always visible when filters exist */}
+        {filters && filters.length >= 1 && (
+          <View className="gap-y-3">
+            <SearchBar
+              query={query}
+              setQuery={setQuery}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
+            />
           </View>
+        )}
 
-          <TimeSchedule
-            schedule={schedule}
-            isOpen={timeDropdownOpen}
-            onToggle={() => {
-              setTimeDropdownOpen((prev) => !prev);
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            }}
-          />
-
-          <View
-            className={cn(
-              'my-2 h-1 w-full border-b',
-              isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15'
-            )}
-          />
-
+        {/* Filter Bar - only visible when search is not focused */}
+        {!isSearchFocused && filters && filters.length >= 1 && (
           <View className="gap-y-3">
             <View className="flex-row items-center justify-between">
               <FilterBar
@@ -152,10 +171,8 @@ const LocationHeader = React.memo(
                 showFilterButton
               />
             </View>
-
-            {filters && filters.length >= 1 && <SearchBar query={query} setQuery={setQuery} />}
           </View>
-        </View>
+        )}
       </View>
     );
   }

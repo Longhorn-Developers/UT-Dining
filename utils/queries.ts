@@ -2,9 +2,9 @@ import { eq } from 'drizzle-orm';
 import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import * as Network from 'expo-network';
 
-import * as schema from '../db/schema';
+import * as schema from '../services/database/schema';
 
-import { insertDataIntoSQLiteDB } from '~/db/database';
+import { insertDataIntoSQLiteDB } from '~/services/database/database';
 
 export const fetchMenuData = async (drizzleDb: ExpoSQLiteDatabase<typeof schema>) => {
   // If there is no internet, skip data insertion

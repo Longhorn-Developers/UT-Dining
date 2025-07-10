@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, View, Text } from 'react-native';
 import { Notifier } from 'react-native-notifier';
 
-import * as schema from '../../db/schema';
+import * as schema from '../../services/database/schema';
 import HomeHeader from '../_components/HomeHeader';
 import LocationItem from '../_components/LocationItem';
 
