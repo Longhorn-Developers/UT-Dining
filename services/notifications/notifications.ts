@@ -1,6 +1,7 @@
 import Constants from 'expo-constants';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
@@ -78,22 +79,32 @@ export function PushNotificationsInitializer() {
         .eq('device_id', deviceId)
         .single();
 
+      // If the device is not in the database, insert it
       if (!data) {
         const { error } = await supabase.from('user_devices').insert({
           device_id: deviceId,
           push_token: token,
           updated_at: new Date().toISOString(),
         });
-        if (error) console.error('❌ Error inserting push token:', error);
-        else console.log('✅ Push token registered:', token);
+
+        if (error) {
+          console.error('❌ Error inserting push token:', error);
+        } else {
+          console.log('✅ Push token registered:', token);
+        }
       } else if (data.push_token !== token) {
+        // If the push token is different, update it
         const { error } = await supabase.from('user_devices').upsert({
           device_id: deviceId,
           push_token: token,
           updated_at: new Date().toISOString(),
         });
-        if (error) console.error('❌ Error updating push token:', error);
-        else console.log('✅ Push token updated:', token);
+
+        if (error) {
+          console.error('❌ Error updating push token:', error);
+        } else {
+          console.log('✅ Push token updated:', token);
+        }
       } else {
         console.log('✅ Push token already synced.');
       }
@@ -101,41 +112,59 @@ export function PushNotificationsInitializer() {
 
     registerAndSync();
 
-    const notificationListener = Notifications.addNotificationReceivedListener((notification) => {
-      console.log('📱 Notification received:', notification);
-      setNotification(notification);
+    // Triggered when the app is in the foreground (when the app is open)
+    const notificationListener = Notifications.addNotificationReceivedListener(
+      async (notification) => {
+        console.log('📱 Notification foreground received:', JSON.stringify(notification, null, 2));
+        setNotification(notification);
 
-      if (db) {
-        insertNotification(db, {
-          id: notification.request.identifier,
-          title: notification.request.content.title ?? 'Notification',
-          body: notification.request.content.body ?? '',
-          sent_at: new Date().toISOString(),
-          redirect_url: notification.request.content.data?.redirect_url ?? null,
-          type: notification.request.content.data?.type ?? null,
-        }).catch((error) => {
-          console.error('❌ Error saving received notification to database:', error);
-        });
+        if (db) {
+          try {
+            await insertNotification(db, {
+              id: notification.request.identifier,
+              title: notification.request.content.title ?? 'Notification',
+              body: notification.request.content.body ?? '',
+              sent_at: new Date().toISOString(),
+              redirect_url: notification.request.content.data?.redirect_url ?? null,
+              type: notification.request.content.data?.type ?? null,
+            });
+          } catch (error) {
+            console.error('❌ Error saving notification to database:', error);
+          }
+        }
       }
-    });
+    );
 
-    const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log('📱 Notification response:', JSON.stringify(response, null, 2));
-      setNotification(response.notification);
+    // Triggered when the app is in the background (when the app is closed and the notification is tapped)
+    const responseListener = Notifications.addNotificationResponseReceivedListener(
+      async (response) => {
+        console.log('📱 Notification background response:', JSON.stringify(response, null, 2));
+        const notification = response.notification;
+        setNotification(notification);
 
-      if (db) {
-        insertNotification(db, {
-          id: response.notification.request.identifier,
-          title: response.notification.request.content.title ?? 'Notification',
-          body: response.notification.request.content.body ?? '',
-          sent_at: new Date().toISOString(),
-          redirect_url: response.notification.request.content.data?.redirect_url ?? null,
-          type: response.notification.request.content.data?.type ?? null,
-        }).catch((error) => {
-          console.error('❌ Error saving notification response to database:', error);
-        });
+        if (db) {
+          try {
+            await insertNotification(db, {
+              id: notification.request.identifier,
+              title: notification.request.content.title ?? 'Notification',
+              body: notification.request.content.body ?? '',
+              sent_at: new Date().toISOString(),
+              redirect_url: response.notification.request.content.data?.redirect_url ?? null,
+              type: response.notification.request.content.data?.type ?? null,
+            });
+          } catch (error) {
+            console.error('❌ Error saving notification response to database:', error);
+          }
+        }
+
+        // If there is a redirect url, navigate to it. If not, navigate to the notifications screen.
+        if (notification.request.content.data?.redirect_url) {
+          router.push(notification.request.content.data.redirect_url);
+        } else {
+          router.push('/notifications');
+        }
       }
-    });
+    );
 
     return () => {
       notificationListener.remove();
