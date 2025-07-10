@@ -29,6 +29,15 @@ export interface FoodItem {
   nutrition: schema.Nutrition;
 }
 
+/**
+ * Fetches all relevant data from Supabase tables including locations, menus, notifications, and nutrition/allergens.
+ *
+ * - Determines today's date in Central Time.
+ * - Fetches base data in parallel.
+ * - Fetches related menu categories, food items, nutrition, and allergens if menus exist.
+ *
+ * @returns A Promise resolving to an object containing all fetched data, or null if an error occurs.
+ */
 const querySupabase = async () => {
   try {
     // Calculate today's date in Central Time Zone
@@ -305,6 +314,13 @@ export const insertDataIntoSQLiteDB = async (
   }
 };
 
+/**
+ * Retrieves a list of menu names for a given location.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param locationName - The name of the location to query.
+ * @returns A Promise resolving to an array of menu names.
+ */
 export const getLocationMenuNames = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string
@@ -319,6 +335,16 @@ export const getLocationMenuNames = async (
   return data.map((row) => row.menu?.name).filter((name) => name !== undefined);
 };
 
+/**
+ * Retrieves structured menu and food data for a specific location and menu name.
+ *
+ * If an error occurs during fetching, attempts to return only basic location info.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param locationName - The name of the location to query.
+ * @param menuName - The name of the menu to query.
+ * @returns A Promise resolving to a `Location` object or null if not found.
+ */
 export const getLocationMenuData = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string,
@@ -528,6 +554,16 @@ export const getLocationMenuData = async (
   }
 };
 
+/**
+ * Retrieves a single food item by its location, menu, category, and item name.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param locationName - The location containing the item.
+ * @param menuName - The menu containing the item.
+ * @param categoryName - The category containing the item.
+ * @param itemName - The name of the food item.
+ * @returns A Promise resolving to a `FoodItem` or null if not found.
+ */
 export const getFoodItem = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string,
@@ -606,12 +642,25 @@ export const getFoodItem = async (
   return foodItem;
 };
 
+/**
+ * Retrieves all favorite food items stored in the local database.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @returns A Promise resolving to an array of favorite items.
+ */
 export const getFavorites = async (db: ExpoSQLiteDatabase<typeof schema>) => {
   const data = await db.select().from(schema.favorites).execute();
 
   return data;
 };
 
+/**
+ * Checks whether a food item is marked as a favorite.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param foodName - The name of the food item.
+ * @returns A boolean indicating if the item is a favorite.
+ */
 export const isFavoriteItem = (db: ExpoSQLiteDatabase<typeof schema>, foodName: string) => {
   const favorite = db
     .select()
@@ -622,11 +671,31 @@ export const isFavoriteItem = (db: ExpoSQLiteDatabase<typeof schema>, foodName: 
   return favorite !== null && favorite !== undefined;
 };
 
+/**
+ * Retrieves a single favorite food item by its name.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param foodName - The name of the food item.
+ * @returns A Promise resolving to the favorite item or null.
+ */
 export const getFavoriteItem = (db: ExpoSQLiteDatabase<typeof schema>, foodName: string) => {
   return db.select().from(schema.favorites).where(eq(schema.favorites.name, foodName)).get();
 };
 
-// Function to add a food item to favorites
+/**
+ * Toggles a food item's favorite status:
+ * - Adds it to favorites if not present.
+ * - Removes it if already marked as favorite.
+ *
+ * Also copies nutrition and allergens data into the favorites table.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param foodItem - The food item to toggle.
+ * @param locationName - The location name associated with the item.
+ * @param menuName - The menu name associated with the item.
+ * @param categoryName - The category name associated with the item.
+ * @returns A Promise resolving to true if added, or false if removed.
+ */
 export const toggleFavorites = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   foodItem: FoodItem,
@@ -707,6 +776,13 @@ export const toggleFavorites = async (
   return true;
 };
 
+/**
+ * Retrieves detailed information about a specific location.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param locationName - The name of the location to query.
+ * @returns A Promise resolving to a `LocationWithType` object or null if not found.
+ */
 export const getLocationDetails = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string
@@ -755,6 +831,13 @@ export const getLocationDetails = async (
   }
 };
 
+/**
+ * Retrieves complete location data including menus, categories, and food items.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param locationName - The name of the location.
+ * @returns A Promise resolving to a structured `Location` object or null.
+ */
 export const getCompleteLocationData = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string
@@ -911,6 +994,12 @@ export const getCompleteLocationData = async (
   }
 };
 
+/**
+ * Retrieves app-wide information (e.g., configuration or metadata).
+ *
+ * @param db - The Expo SQLite database instance.
+ * @returns A Promise resolving to the `AppInformation` object or null.
+ */
 export const getAppInformation = async (
   db: ExpoSQLiteDatabase<typeof schema>
 ): Promise<schema.AppInformation | null> => {
@@ -928,6 +1017,12 @@ export const getAppInformation = async (
   }
 };
 
+/**
+ * Retrieves all locations that have geographic coordinates.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @returns A Promise resolving to an array of locations with latitude and longitude.
+ */
 export const getAllLocationsWithCoordinates = async (
   db: ExpoSQLiteDatabase<typeof schema>
 ): Promise<Pick<schema.Location, 'id' | 'name' | 'latitude' | 'longitude' | 'address'>[]> => {
@@ -952,6 +1047,12 @@ export const getAllLocationsWithCoordinates = async (
   return data;
 };
 
+/**
+ * Retrieves all available notification types.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @returns A Promise resolving to an array of notification types.
+ */
 export const getNotificationTypes = async (
   db: ExpoSQLiteDatabase<typeof schema>
 ): Promise<schema.NotificationType[]> => {
@@ -959,6 +1060,12 @@ export const getNotificationTypes = async (
   return data;
 };
 
+/**
+ * Retrieves all notifications, ordered by the most recent.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @returns A Promise resolving to an array of notifications with their type names.
+ */
 export const getNotifications = async (
   db: ExpoSQLiteDatabase<typeof schema>
 ): Promise<(schema.Notification & { type_name: string })[]> => {
@@ -991,6 +1098,13 @@ export const getNotifications = async (
   }));
 };
 
+/**
+ * Inserts a notification into the local SQLite database if it doesn't already exist.
+ *
+ * @param db - The Expo SQLite database instance.
+ * @param notificationData - The notification data to insert.
+ * @returns A Promise resolving when the insert is complete.
+ */
 export const insertNotification = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   notificationData: {
