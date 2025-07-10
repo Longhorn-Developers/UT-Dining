@@ -27,18 +27,18 @@ export default function Layout() {
           backgroundColor: isDark ? '#111827' : '#ffffff',
           borderTopColor: isDark ? '#374151' : '#e5e7eb',
           borderTopWidth: 1,
-          height: 88,
-          paddingBottom: 24,
+          height: 76,
+          paddingBottom: 20,
         },
         tabBarActiveTintColor: COLORS['ut-burnt-orange'],
         tabBarInactiveTintColor: isDark ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey'],
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: '500',
-          marginTop: 2,
+          marginTop: 1,
         },
         tabBarIconStyle: {
-          marginTop: 4,
+          marginTop: 2,
         },
       }}>
       <Tabs.Screen
@@ -46,7 +46,7 @@ export default function Layout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size, focused }) => (
-            <Home size={size} color={color} strokeWidth={1.5} />
+            <Home size={size} color={color} strokeWidth={1.2} />
           ),
           tabBarActiveBackgroundColor: 'rgba(191, 87, 0, 0.05)',
         }}
@@ -59,7 +59,7 @@ export default function Layout() {
         options={{
           title: 'Map',
           tabBarIcon: ({ color, size, focused }) => (
-            <MapPin size={size} color={color} strokeWidth={1.5} />
+            <MapPin size={size} color={color} strokeWidth={1.2} />
           ),
           tabBarActiveBackgroundColor: 'rgba(191, 87, 0, 0.05)',
         }}
@@ -72,7 +72,7 @@ export default function Layout() {
         options={{
           title: 'Notifications',
           tabBarIcon: ({ color, size, focused }) => (
-            <Bell size={size} color={color} strokeWidth={1.5} />
+            <Bell size={size} color={color} strokeWidth={1.2} />
           ),
           tabBarActiveBackgroundColor: 'rgba(191, 87, 0, 0.05)',
           tabBarBadge: hasUnread ? unreadCount : undefined,
@@ -91,7 +91,7 @@ export default function Layout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, size, focused }) => (
-            <Cog size={size} color={color} strokeWidth={1.5} />
+            <Cog size={size} color={color} strokeWidth={1.2} />
           ),
           tabBarActiveBackgroundColor: 'rgba(191, 87, 0, 0.05)',
         }}
