@@ -1,8 +1,8 @@
 import { FlashList } from '@shopify/flash-list';
 import { eq, sql } from 'drizzle-orm';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { Stack, useFocusEffect } from 'expo-router';
-import { Bell, ChefHat, MapPin, Star } from 'lucide-react-native';
+import { router, Stack, useFocusEffect } from 'expo-router';
+import { Bell, ChefHat, MapPin, Star, ExternalLink } from 'lucide-react-native';
 import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, TouchableOpacity, RefreshControl } from 'react-native';
 
@@ -69,7 +69,7 @@ const NotificationItem = ({
 
   return (
     <TouchableOpacity
-      activeOpacity={0.8}
+      activeOpacity={notification.redirect_url ? 0.5 : 1}
       onPress={() => onPress(notification)}
       className={cn(
         'mx-6 rounded-lg border p-4',
@@ -90,6 +90,9 @@ const NotificationItem = ({
               {notification.title}
             </Text>
             <View className="flex-row items-center gap-x-2">
+              {notification.redirect_url && (
+                <ExternalLink size={14} color={COLORS['ut-burnt-orange']} />
+              )}
               <Text className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
                 {notification.sent_at && formatTimestamp(notification.sent_at)}
               </Text>
@@ -176,14 +179,20 @@ const Notifications = () => {
   }, [dbNotifications, lastVisited]);
 
   const handleNotificationPress = (notification: Notification) => {
-    // Handle navigation based on notification type
-    // TODO: Implement navigation to specific screens based on redirect_url
+    if (notification.redirect_url) {
+      router.push(notification.redirect_url as any);
+    }
   };
 
   const handleRefresh = async () => {
     setRefreshing(true);
     // The live query will automatically refresh the data
     setTimeout(() => setRefreshing(false), 500);
+  };
+
+  const handleReadAll = () => {
+    const now = Date.now();
+    setLastVisited(now);
   };
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -212,13 +221,20 @@ const Notifications = () => {
                     </Text>
                   </View>
                   {unreadCount > 0 && (
-                    <View className="rounded-full bg-ut-burnt-orange px-3 py-1">
-                      <Text className="text-sm font-bold text-white">{unreadCount}</Text>
+                    <View className="flex-row items-center gap-x-3">
+                      <TouchableOpacity
+                        onPress={handleReadAll}
+                        className="rounded-lg bg-ut-burnt-orange px-3 py-1">
+                        <Text className="text-xs font-semibold text-white">Read All</Text>
+                      </TouchableOpacity>
+                      <View className="rounded-full bg-ut-burnt-orange px-3 py-1">
+                        <Text className="text-sm font-bold text-white">{unreadCount}</Text>
+                      </View>
                     </View>
                   )}
                 </View>
                 <Text className={cn('font-medium', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
-                  Stay updated on your favorite foods and dining locations.
+                  Stay updated with the latest dining alerts and updates.
                 </Text>
               </View>
 
