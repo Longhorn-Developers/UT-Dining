@@ -3,7 +3,7 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import * as Haptics from 'expo-haptics';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, ActivityIndicator } from 'react-native';
 
 import CategoryHeader from './components/CategoryHeader';
 import FoodItemRow from './components/FoodItemRow';
@@ -117,9 +117,9 @@ const useFilteredItems = (
 const useSkeletonItems = () => {
   return React.useMemo(() => {
     const items = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 2; i++) {
       items.push({ type: 'skeleton_header', id: `skeleton-header-${i}` });
-      const itemCount = Math.floor(Math.random() * 6) + 3;
+      const itemCount = Math.floor(Math.random() * 2) + 3;
       for (let j = 0; j < itemCount; j++) {
         items.push({ type: 'skeleton_item', id: `skeleton-item-${i}-${j}` });
       }
@@ -135,9 +135,11 @@ const Location = () => {
   const {
     menuData: data,
     loading,
+    error,
     selectedMenu,
     setSelectedMenu,
     filters: menuFilters,
+    isSwitchingMenus,
   } = useMenuData(location);
   const { toggleCategory, flattenedItems, resetExpandedCategories } = useCategoryExpansion(data);
   const db = useDatabase();
@@ -167,20 +169,35 @@ const Location = () => {
 
   // Reset search and expanded categories when menu changes
   useEffect(() => {
-    setSearchQuery('');
-    resetExpandedCategories();
+    try {
+      setSearchQuery('');
+      if (resetExpandedCategories) {
+        resetExpandedCategories();
+      }
+    } catch (error) {
+      console.error('Error resetting menu state:', error);
+    }
   }, [selectedMenu, resetExpandedCategories]);
 
   // Determine which data to display
   const getDisplayedItems = useCallback(() => {
     if (loading) return skeletonItems;
+    if (error) return []; // Return empty array on error, EmptyState will handle the display
     return debouncedSearchQuery ||
       Object.values(activeFilters).some(
         (val) => val === true || (typeof val === 'object' && Object.values(val).some((v) => v))
       )
       ? filteredItems
       : flattenedItems;
-  }, [loading, debouncedSearchQuery, filteredItems, flattenedItems, skeletonItems, activeFilters]);
+  }, [
+    loading,
+    error,
+    debouncedSearchQuery,
+    filteredItems,
+    flattenedItems,
+    skeletonItems,
+    activeFilters,
+  ]);
 
   // In your renderItem function in [location].tsx
   const renderItem = useCallback(
@@ -209,7 +226,7 @@ const Location = () => {
           return (
             <FoodItemRow
               item={item}
-              selectedMenu={selectedMenu as string}
+              selectedMenu={selectedMenu ?? ''}
               location={location as string}
               db={db}
               favorites={favorites}
@@ -235,7 +252,9 @@ const Location = () => {
     if (loading) return null;
 
     const subtitle = () => {
-      if (debouncedSearchQuery) {
+      if (error) {
+        return 'There was an error loading the menu. Please try again.';
+      } else if (debouncedSearchQuery) {
         return 'Try a different search term.';
       } else if (
         Object.values(activeFilters).some(
@@ -248,15 +267,17 @@ const Location = () => {
       return 'Please try again later.';
     };
 
+    const title = error ? 'Error Loading Menu' : 'No items found.';
+
     return (
       <View className="mt-12 flex-1 items-center justify-center">
-        <Text className="text-xl font-bold text-ut-burnt-orange">No items found.</Text>
+        <Text className="text-xl font-bold text-ut-burnt-orange">{title}</Text>
         <Text className={cn('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
           {subtitle()}
         </Text>
       </View>
     );
-  }, [loading, debouncedSearchQuery, activeFilters, isDarkMode]);
+  }, [loading, error, debouncedSearchQuery, activeFilters, isDarkMode]);
 
   return (
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
@@ -270,11 +291,13 @@ const Location = () => {
           scrollEventThrottle={16}
           showsVerticalScrollIndicator
           data={getDisplayedItems()}
+          removeClippedSubviews
+          scrollEnabled={!isSwitchingMenus}
           ListHeaderComponent={
             <>
               <LocationHeader
                 location={location}
-                selectedMenu={selectedMenu}
+                selectedMenu={selectedMenu ?? null}
                 setSelectedMenu={setSelectedMenu}
                 filters={menuFilters}
                 query={searchQuery}
@@ -290,6 +313,27 @@ const Location = () => {
           getItemType={(item) => ('type' in item ? item.type : 'unknown')}
           keyboardShouldPersistTaps="always"
         />
+
+        {/* Loading indicator for menu switching */}
+        {isSwitchingMenus && (
+          <View
+            className="absolute inset-0 z-10 flex h-screen items-center justify-center"
+            style={{
+              backgroundColor: isDarkMode ? 'rgba(17, 24, 39, 0.7)' : 'rgba(255, 255, 255, 0.7)',
+            }}>
+            <View
+              className="flex items-center justify-center rounded-lg p-4"
+              style={{
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+                elevation: 5,
+              }}>
+              <ActivityIndicator size="small" style={{ marginBottom: 8 }} />
+            </View>
+          </View>
+        )}
 
         <ScrollToTopButton
           visible={showScrollToTop}
