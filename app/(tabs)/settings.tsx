@@ -9,8 +9,10 @@ import {
   Filter,
   Heart,
   HelpCircle,
+  History,
   LucideIcon,
   Mail,
+  MessageSquare,
   Moon,
   Shield,
   Type,
@@ -31,6 +33,7 @@ import { cn } from '~/utils/utils';
 
 interface SettingItemProps {
   title: string;
+  subtitle?: string;
   Icon?: LucideIcon;
   hasToggle?: boolean;
   toggleValue?: boolean;
@@ -43,6 +46,7 @@ interface SettingItemProps {
 
 const SettingItem = ({
   title,
+  subtitle,
   Icon,
   hasToggle = false,
   toggleValue = false,
@@ -70,9 +74,17 @@ const SettingItem = ({
           <Icon size={16} color={getColor('ut-burnt-orange', false)} />
         </View>
       )}
-      <Text className={cn('text-base font-medium', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
-        {title}
-      </Text>
+      <View>
+        <Text
+          className={cn('text-base font-medium', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+          {title}
+        </Text>
+        {subtitle && (
+          <Text className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+            {subtitle}
+          </Text>
+        )}
+      </View>
     </View>
     {hasToggle && (
       <Switch
@@ -181,7 +193,7 @@ const CreditsSection = ({ appInfo, isDarkMode }: CreditsSectionProps): JSX.Eleme
         className={cn('text-base font-medium', isDarkMode ? 'text-gray-200' : 'text-gray-700')}>
         Ethan Lanting
       </Link>
-      <Text className={isDarkMode ? 'text-gray-500' : 'text-gray-600'}>
+      <Text className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
         Lead Developer & Designer
       </Text>
     </View>
@@ -192,7 +204,7 @@ const CreditsSection = ({ appInfo, isDarkMode }: CreditsSectionProps): JSX.Eleme
           .map((contributor) => contributor.name)
           .join(', ')}
       </Text>
-      <Text className={isDarkMode ? 'text-gray-500' : 'text-gray-600'}>
+      <Text className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
         Open Source Contributors
       </Text>
     </View>
@@ -327,19 +339,6 @@ const SettingsPage = () => {
           <SectionHeader title="Quick Links" className="mt-4" isDarkMode={isDarkMode} />
           <SettingItem
             activeOpacity={0.5}
-            title="Meal Plan"
-            Icon={ChefHat}
-            hasChevron
-            isDarkMode={isDarkMode}
-            onPress={() => {
-              router.navigate('/');
-              setTimeout(() => {
-                router.push('/meal-plan');
-              }, 10);
-            }}
-          />
-          <SettingItem
-            activeOpacity={0.5}
             title="Favorites"
             Icon={Heart}
             hasChevron
@@ -348,6 +347,19 @@ const SettingsPage = () => {
               router.navigate('/');
               setTimeout(() => {
                 router.push('/favorites');
+              }, 10);
+            }}
+          />
+          <SettingItem
+            activeOpacity={0.5}
+            title="Meal Plan"
+            Icon={ChefHat}
+            hasChevron
+            isDarkMode={isDarkMode}
+            onPress={() => {
+              router.navigate('/');
+              setTimeout(() => {
+                router.push('/meal-plan');
               }, 10);
             }}
           />
@@ -389,6 +401,18 @@ const SettingsPage = () => {
           />
           <SectionHeader title="Notifications" className="mt-4" isDarkMode={isDarkMode} />
           <NotificationSettingsSection isDarkMode={isDarkMode} />
+
+          <SectionHeader title="Feedback" className="mt-4" isDarkMode={isDarkMode} />
+          <SettingItem
+            title="Submit Feedback"
+            Icon={MessageSquare}
+            hasChevron
+            isDarkMode={isDarkMode}
+            onPress={() => Linking.openURL('https://utdining.userjot.com')}
+            subtitle="Want to suggest a feature or report a bug?"
+          />
+          <SettingItem title="Changelog" Icon={History} hasChevron isDarkMode={isDarkMode} />
+
           <SectionHeader title="Information" className="mt-4" isDarkMode={isDarkMode} />
           {appInfo && <AboutSection appInfo={appInfo} isDarkMode={isDarkMode} />}
           {appInfo && <CreditsSection appInfo={appInfo} isDarkMode={isDarkMode} />}
