@@ -127,6 +127,7 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
 
         {/* Navigation button */}
         <TouchableOpacity
+          activeOpacity={0.8}
           className="mt-2 rounded-xl bg-ut-burnt-orange py-3.5 shadow-sm"
           style={{
             backgroundColor: getColor('ut-burnt-orange', isColorBlindMode),
@@ -137,6 +138,7 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
 
         {type !== 'microwave' && (
           <TouchableOpacity
+            activeOpacity={0.8}
             className={cn(
               'mt-3 rounded-xl border py-3.5 shadow-sm',
               isDarkMode ? 'border-ut-grey-dark-mode/20' : 'border-ut-grey/30'

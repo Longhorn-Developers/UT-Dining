@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
-import { router, useLocalSearchParams } from 'expo-router';
-import { ChefHat, ChevronLeft, Heart, Info } from 'lucide-react-native';
+import { Link, router, useLocalSearchParams } from 'expo-router';
+import { ChefHat, ChevronLeft, Heart, Info, MessageSquare } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { View, Image, TouchableOpacity, Text } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
@@ -26,32 +26,14 @@ const HomeTopBar = () => {
       <Image className="size-12" source={icon} />
 
       <View className="flex flex-row gap-x-5">
-        {/* <TouchableOpacity
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            NativeAlert.alert(
-              'Coming Soon!',
-              'Push notifications for your favorite food items will be available in an upcoming update.'
-            );
-          }}>
-          <Bell size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
-        </TouchableOpacity> */}
-
-        <TouchableOpacity
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push(`/meal-plan`);
-          }}>
-          <ChefHat size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push(`/favorites`);
-          }}>
-          <Heart size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
-        </TouchableOpacity>
+        <Link href="https://utdining.userjot.com/" asChild>
+          <TouchableOpacity>
+            <MessageSquare
+              size={20}
+              color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']}
+            />
+          </TouchableOpacity>
+        </Link>
       </View>
     </View>
   );
@@ -78,17 +60,17 @@ const LocationTopBar = () => {
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push(`/meal-plan`);
+            router.push(`/favorites`);
           }}>
-          <ChefHat size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
+          <Heart size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push(`/favorites`);
+            router.push(`/meal-plan`);
           }}>
-          <Heart size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
+          <ChefHat size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -156,6 +138,41 @@ const FoodTopBar = () => {
 
       <View className="flex-row gap-x-5">
         <TouchableOpacity
+          onPress={async () => {
+            if (foodItem) {
+              if (isFavorite) {
+                Notifier.showNotification({
+                  title: `${foodItem.name} removed from Favorites!`,
+                  description: 'You removed this item from your favorites.',
+                  swipeEnabled: true,
+                  Component: Alert,
+                  duration: 3000,
+                  queueMode: 'immediate',
+                });
+              } else {
+                Notifier.showNotification({
+                  title: `${foodItem.name} added to Favorites!`,
+                  description: 'You added this item to your Favorites.',
+                  swipeEnabled: true,
+                  Component: Alert,
+                  duration: 3000,
+                  queueMode: 'immediate',
+                });
+              }
+
+              const isFavorited = await toggleFavorites(db, foodItem, location, menu, category);
+              setIsFavorite(isFavorited);
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            }
+          }}>
+          <Heart
+            size={20}
+            color={getIconColor(isFavorite)}
+            fill={isFavorite ? COLORS['ut-burnt-orange'] : 'transparent'}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
           onPress={() => {
             if (foodItem) {
               toggleMealPlanItem({
@@ -200,41 +217,6 @@ const FoodTopBar = () => {
             size={20}
             color={getIconColor(isMealPlanItem)}
             fill={isMealPlanItem ? COLORS['ut-burnt-orange'] : 'transparent'}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={async () => {
-            if (foodItem) {
-              if (isFavorite) {
-                Notifier.showNotification({
-                  title: `${foodItem.name} removed from Favorites!`,
-                  description: 'You removed this item from your favorites.',
-                  swipeEnabled: true,
-                  Component: Alert,
-                  duration: 3000,
-                  queueMode: 'immediate',
-                });
-              } else {
-                Notifier.showNotification({
-                  title: `${foodItem.name} added to Favorites!`,
-                  description: 'You added this item to your Favorites.',
-                  swipeEnabled: true,
-                  Component: Alert,
-                  duration: 3000,
-                  queueMode: 'immediate',
-                });
-              }
-
-              const isFavorited = await toggleFavorites(db, foodItem, location, menu, category);
-              setIsFavorite(isFavorited);
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            }
-          }}>
-          <Heart
-            size={20}
-            color={getIconColor(isFavorite)}
-            fill={isFavorite ? COLORS['ut-burnt-orange'] : 'transparent'}
           />
         </TouchableOpacity>
         <TouchableOpacity

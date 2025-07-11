@@ -9,9 +9,10 @@ import {
   Wheat,
 } from 'lucide-react-native';
 import React from 'react';
-import { Text, TouchableOpacity, View, Image } from 'react-native';
+import { Text, Pressable, View, Image } from 'react-native';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Notifier } from 'react-native-notifier';
+import Reanimated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 import Alert from './Alert';
 import { FavoriteAction, RemoveAction, AddMealPlanAction } from './AnimatedActions';
@@ -47,112 +48,136 @@ const FoodComponent = ({
   const isMealPlan = useMealPlanStore((state) => state.isMealPlanItem(food.name as string));
   const toggleMealPlanItem = useMealPlanStore((state) => state.toggleMealPlanItem);
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
+  const scale = useSharedValue(1);
+  const opacity = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+      opacity: opacity.value,
+    };
+  });
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
+    opacity.value = withSpring(0.8, { damping: 15, stiffness: 400 });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 15, stiffness: 400 });
+    opacity.value = withSpring(1, { damping: 15, stiffness: 400 });
+  };
+
+  const handlePress = async () => {
+    router.push({
+      pathname: `/food/[food]`,
+      params: {
+        food: food.name as string,
+        menu: selectedMenu,
+        category: categoryName,
+        location,
+        favorite: isFavoriteScreen ? 'true' : 'false',
+      },
+    });
+  };
 
   return (
-    <ReanimatedSwipeable
-      containerStyle={{
-        borderRadius: 4,
-        overflow: 'hidden',
-        marginBottom: 8,
-        backgroundColor: COLORS['ut-burnt-orange'],
-      }}
-      shouldCancelWhenOutside
-      enableTrackpadTwoFingerGesture
-      // Add these properties to fix the gliding issue
-      friction={1.5} // Higher friction reduces gliding
-      overshootFriction={200} // Higher value means less overshoot
-      animationOptions={{
-        damping: 1, // Higher damping means less oscillation
-        stiffness: 11, // Higher stiffness means faster snapping
-        mass: 0.1, // Lower mass means faster settling
-        restDisplacementThreshold: 0.005, // Small threshold for considering animation "done"
-        restSpeedThreshold: 0.005, // Small threshold for considering animation "done"
-      }}
-      onSwipeableWillClose={() => {
-        // Optional haptic feedback when closing
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      }}
-      onSwipeableOpen={async (direction, swipeable) => {
-        swipeable.close();
-
-        if (direction === 'left' && canMealPlan) {
-          toggleMealPlanItem({
-            name: food.name as string,
-            locationName: location,
-            categoryName,
-            menuName: selectedMenu,
-            allergens: Object.fromEntries(
-              Object.entries(food.allergens || {}).filter(([key]) => key !== 'id')
-            ) as Record<string, boolean>,
-            nutrition: {
-              calories: food.nutrition?.calories || '',
-              protein: food.nutrition?.protein || '',
-              total_carbohydrates: food.nutrition?.total_carbohydrates || '',
-            },
-          });
-
-          Notifier.showNotification({
-            title: isMealPlan
-              ? `${food.name} removed from today's meal plan!`
-              : `${food.name} added to today's meal plan!`,
-            description: isMealPlan
-              ? 'You removed this item from your meal plan.'
-              : 'Tap the chef hat (top right) to view your\nmeal plan for today.',
-            swipeEnabled: true,
-            Component: Alert,
-            duration: 3000,
-            queueMode: 'immediate',
-          });
-        } else if (direction === 'right') {
-          await onFavorite(food);
-        }
-      }}
-      // Add these threshold properties to better define when an action is triggered
-      overshootLeft={!canMealPlan}
-      leftThreshold={canMealPlan ? 50 : Number.MAX_VALUE} // Higher threshold requires more decisive swipe
-      rightThreshold={100} // Higher threshold requires more decisive swipe
-      dragOffsetFromLeftEdge={canMealPlan ? 50 : Number.MAX_VALUE}
-      renderRightActions={(progress) =>
-        isFavorite ? <RemoveAction progress={progress} /> : <FavoriteAction progress={progress} />
-      }
-      renderLeftActions={(progress) =>
-        canMealPlan ? (
-          isMealPlan ? (
-            <RemoveAction progress={progress} />
-          ) : (
-            <AddMealPlanAction progress={progress} />
-          )
-        ) : null
-      }>
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={async () => {
-          await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          router.push({
-            pathname: `/food/[food]`,
-            params: {
-              food: food.name as string,
-              menu: selectedMenu,
-              category: categoryName,
-              location,
-              favorite: isFavoriteScreen ? 'true' : 'false',
-            },
-          });
+    <Reanimated.View style={animatedStyle}>
+      <ReanimatedSwipeable
+        containerStyle={{
+          borderRadius: 4,
+          overflow: 'hidden',
+          marginBottom: 8,
+          backgroundColor: COLORS['ut-burnt-orange'],
         }}
-        className={cn(
-          'flex-row items-center justify-between rounded border px-3 py-2',
-          isDarkMode ? 'border-gray-700 bg-gray-800' : 'bg-white',
-          isFavorite || isMealPlan ? 'border-ut-burnt-orange' : 'border-ut-grey/15'
-        )}>
-        <FoodContent
-          food={food}
-          isFavorite={isFavorite}
-          isMealPlan={isMealPlan}
-          showExtraInfo={showExtraInfo}
-          isDarkMode={isDarkMode}
-        />
-      </TouchableOpacity>
-    </ReanimatedSwipeable>
+        shouldCancelWhenOutside
+        enableTrackpadTwoFingerGesture
+        // Add these properties to fix the gliding issue
+        friction={1.5} // Higher friction reduces gliding
+        overshootFriction={200} // Higher value means less overshoot
+        animationOptions={{
+          damping: 1, // Higher damping means less oscillation
+          stiffness: 11, // Higher stiffness means faster snapping
+          mass: 0.1, // Lower mass means faster settling
+          restDisplacementThreshold: 0.005, // Small threshold for considering animation "done"
+          restSpeedThreshold: 0.005, // Small threshold for considering animation "done"
+        }}
+        onSwipeableWillClose={() => {
+          // Optional haptic feedback when closing
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }}
+        onSwipeableOpen={async (direction, swipeable) => {
+          swipeable.close();
+
+          if (direction === 'left' && canMealPlan) {
+            toggleMealPlanItem({
+              name: food.name as string,
+              locationName: location,
+              categoryName,
+              menuName: selectedMenu,
+              allergens: Object.fromEntries(
+                Object.entries(food.allergens || {}).filter(([key]) => key !== 'id')
+              ) as Record<string, boolean>,
+              nutrition: {
+                calories: food.nutrition?.calories || '',
+                protein: food.nutrition?.protein || '',
+                total_carbohydrates: food.nutrition?.total_carbohydrates || '',
+              },
+            });
+
+            Notifier.showNotification({
+              title: isMealPlan
+                ? `${food.name} removed from today's meal plan!`
+                : `${food.name} added to today's meal plan!`,
+              description: isMealPlan
+                ? 'You removed this item from your meal plan.'
+                : 'Tap the chef hat (top right) to view your\nmeal plan for today.',
+              swipeEnabled: true,
+              Component: Alert,
+              duration: 3000,
+              queueMode: 'immediate',
+            });
+          } else if (direction === 'right') {
+            await onFavorite(food);
+          }
+        }}
+        // Add these threshold properties to better define when an action is triggered
+        overshootLeft={!canMealPlan}
+        leftThreshold={canMealPlan ? 50 : Number.MAX_VALUE} // Higher threshold requires more decisive swipe
+        rightThreshold={100} // Higher threshold requires more decisive swipe
+        dragOffsetFromLeftEdge={canMealPlan ? 50 : Number.MAX_VALUE}
+        renderRightActions={(progress) =>
+          isFavorite ? <RemoveAction progress={progress} /> : <FavoriteAction progress={progress} />
+        }
+        renderLeftActions={(progress) =>
+          canMealPlan ? (
+            isMealPlan ? (
+              <RemoveAction progress={progress} />
+            ) : (
+              <AddMealPlanAction progress={progress} />
+            )
+          ) : null
+        }>
+        <Pressable
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          onPress={handlePress}
+          className={cn(
+            'flex-row items-center justify-between rounded border px-3 py-2',
+            isDarkMode ? 'border-gray-700 bg-gray-800' : 'bg-white',
+            isFavorite || isMealPlan ? 'border-ut-burnt-orange' : 'border-ut-grey/15'
+          )}>
+          <FoodContent
+            food={food}
+            isFavorite={isFavorite}
+            isMealPlan={isMealPlan}
+            showExtraInfo={showExtraInfo}
+            isDarkMode={isDarkMode}
+          />
+        </Pressable>
+      </ReanimatedSwipeable>
+    </Reanimated.View>
   );
 };
 

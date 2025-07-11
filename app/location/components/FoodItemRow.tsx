@@ -1,5 +1,5 @@
 import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { View } from 'react-native';
 import { Notifier } from 'react-native-notifier';
 
@@ -78,4 +78,4 @@ const FoodItemRow = ({ item, selectedMenu, location, db, favorites }: FoodItemRo
   );
 };
 
-export default FoodItemRow;
+export default memo(FoodItemRow);

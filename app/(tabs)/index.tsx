@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import * as Network from 'expo-network';
@@ -60,6 +60,7 @@ export default function Home() {
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
+  const queryClient = useQueryClient();
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   useDrizzleStudio(db);
@@ -103,6 +104,13 @@ export default function Home() {
       });
 
       await Promise.race([refetch(), timeoutPromise]);
+
+      await Promise.all([
+        // Invalidate all menu-related caches to ensure fresh data across the app
+        queryClient.invalidateQueries({ queryKey: ['menuNames'] }),
+        queryClient.invalidateQueries({ queryKey: ['menuData'] }),
+      ]);
+
       setRefreshKey((prev) => prev + 1);
 
       Notifier.showNotification({

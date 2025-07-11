@@ -13,28 +13,38 @@ export function useCategoryExpansion(data: Location | null) {
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
 
   // Toggle category expansion
-  const toggleCategory = (categoryId: string) => {
-    // On first toggle, set category to not expanded
-    if (expandedCategories[categoryId] === undefined) {
-      // If category is not in the list, set it to expanded
-      setExpandedCategories((prev) => ({ ...prev, [categoryId]: false }));
-      return;
-    }
+  const toggleCategory = useCallback(
+    (categoryId: string) => {
+      try {
+        // On first toggle, set category to not expanded
+        if (expandedCategories[categoryId] === undefined) {
+          // If category is not in the list, set it to expanded
+          setExpandedCategories((prev) => ({ ...prev, [categoryId]: false }));
+          return;
+        }
 
-    setExpandedCategories((prev) => ({
-      ...prev,
-      [categoryId]: !prev[categoryId],
-    }));
-  };
+        setExpandedCategories((prev) => ({
+          ...prev,
+          [categoryId]: !prev[categoryId],
+        }));
+      } catch (error) {
+        console.error('Error toggling category:', error);
+      }
+    },
+    [expandedCategories]
+  );
 
-  // Convert hierarchical data to flat list items
+  // Convert hierarchical data to flat list items with optimized memoization
   const flattenedItems = useMemo(() => {
     if (!data?.menus?.length) return [];
 
     const items: ListItem[] = [];
     const menu = data.menus[0];
 
-    menu.menu_categories.forEach((category) => {
+    // Use a stable reference for menu categories to avoid unnecessary recalculations
+    const categories = menu.menu_categories;
+
+    categories.forEach((category) => {
       // Generate unique ID for the category
       const categoryId = `${category.category_title}`;
 
@@ -62,11 +72,15 @@ export function useCategoryExpansion(data: Location | null) {
     });
 
     return items;
-  }, [data, expandedCategories]);
+  }, [data?.menus, expandedCategories]);
 
   const resetExpandedCategories = useCallback(() => {
-    // Reset to empty object which will result in all categories being expanded again
-    setExpandedCategories({});
+    try {
+      // Reset to empty object which will result in all categories being expanded again
+      setExpandedCategories({});
+    } catch (error) {
+      console.error('Error resetting expanded categories:', error);
+    }
   }, []);
 
   return { expandedCategories, toggleCategory, flattenedItems, resetExpandedCategories };
