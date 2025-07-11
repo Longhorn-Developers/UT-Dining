@@ -190,7 +190,7 @@ const CreditsSection = ({ appInfo, isDarkMode }: CreditsSectionProps): JSX.Eleme
     <View>
       <Link
         href="https://ethanlanting.dev"
-        className={cn('text-base font-medium', isDarkMode ? 'text-gray-200' : 'text-gray-700')}>
+        className={cn('text-base font-medium', isDarkMode ? 'text-gray-200' : 'text-black')}>
         Ethan Lanting
       </Link>
       <Text className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
@@ -198,7 +198,7 @@ const CreditsSection = ({ appInfo, isDarkMode }: CreditsSectionProps): JSX.Eleme
       </Text>
     </View>
     <View>
-      <Text className={cn('text-base font-medium', isDarkMode ? 'text-gray-200' : 'text-gray-700')}>
+      <Text className={cn('text-base font-medium', isDarkMode ? 'text-gray-200' : 'text-black')}>
         {appInfo.credits_contributors
           .sort((a, b) => a.order - b.order)
           .map((contributor) => contributor.name)
