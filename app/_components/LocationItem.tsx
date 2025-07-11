@@ -1,4 +1,3 @@
-import { eq } from 'drizzle-orm';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { ChevronRight } from 'lucide-react-native';
@@ -8,11 +7,12 @@ import Reanimated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-
 
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
-import { LocationWithType, menu } from '~/services/database/schema';
+import { LocationWithType } from '~/services/database/schema';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
+import { getLocationOpenStatus } from '~/utils/locationStatus';
 import { useLocationName } from '~/utils/locations';
-import { getLocationTimeMessage, isLocationOpen } from '~/utils/time';
+import { getLocationTimeMessage } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
 type LocationItemProps = {
@@ -31,20 +31,8 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
   const displayName = useLocationName(location.name ?? '', useColloquialNames);
 
   useEffect(() => {
-    const checkOpen = async () => {
-      if (location.has_menus) {
-        const res = db.select().from(menu).where(eq(menu.location_id, location.id)).get();
-        if (!res) {
-          setOpen(false);
-          return;
-        }
-      }
-
-      const isOpen = isLocationOpen(locationData);
-      setOpen(isOpen);
-    };
-
-    checkOpen();
+    const isOpen = getLocationOpenStatus(location, locationData, db, currentTime);
+    setOpen(isOpen);
   }, [locationData, currentTime]);
 
   useEffect(() => {

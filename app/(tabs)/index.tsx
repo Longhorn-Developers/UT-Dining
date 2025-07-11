@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import * as Network from 'expo-network';
@@ -17,6 +18,7 @@ import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
+import { getLocationOpenStatus } from '~/utils/locationStatus';
 import { fetchMenuData } from '~/utils/queries';
 
 // Constants
@@ -33,23 +35,44 @@ SplashScreen.setOptions({
 // Types
 export type FilterType = 'all' | string;
 
-// Utility functions
-
-// TODO: gotta fix.
-
-const filterLocationsByType = (
+const filterAndSortLocations = (
   locations: schema.LocationWithType[],
   locationTypes: schema.LocationType[],
-  filter: FilterType
+  filter: FilterType,
+  db: any,
+  currentTime: Date
 ) => {
-  if (filter === 'all') return locations;
+  // First filter by type
+  let filteredLocations = locations;
+  if (filter !== 'all') {
+    const targetType = locationTypes.find((type) => type.name === filter);
+    if (targetType) {
+      filteredLocations = locations.filter((location) => location.type_id === targetType.id);
+    }
+  }
 
-  // Find the location type that matches the filter
-  const targetType = locationTypes.find((type) => type.name === filter);
-  if (!targetType) return locations;
+  // Then sort by open/closed status while maintaining original order within each group
+  const openLocations: schema.LocationWithType[] = [];
+  const closedLocations: schema.LocationWithType[] = [];
 
-  // Filter locations by type_id
-  return locations.filter((location) => location.type_id === targetType.id);
+  filteredLocations.forEach((location) => {
+    // Get location data for each location to determine if it's open
+    const locationData = db
+      .select()
+      .from(schema.location)
+      .where(eq(schema.location.id, location.id))
+      .get();
+    const isOpen = getLocationOpenStatus(location, locationData, db, currentTime);
+
+    if (isOpen) {
+      openLocations.push(location);
+    } else {
+      closedLocations.push(location);
+    }
+  });
+
+  // Return open locations first, then closed locations
+  return [...openLocations, ...closedLocations];
 };
 
 export default function Home() {
@@ -177,7 +200,13 @@ export default function Home() {
   const locations = data?.locations || [];
   const locationTypes = data?.locationTypes || [];
 
-  const filteredLocations = filterLocationsByType(locations, locationTypes, selectedFilter);
+  const filteredLocations = filterAndSortLocations(
+    locations,
+    locationTypes,
+    selectedFilter,
+    drizzleDb,
+    currentTime
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
