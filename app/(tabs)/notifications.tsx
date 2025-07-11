@@ -72,14 +72,14 @@ const NotificationItem = ({
       activeOpacity={notification.redirect_url ? 0.5 : 1}
       onPress={() => onPress(notification)}
       className={cn(
-        'mx-6 rounded-lg border p-4',
+        'mx-6 rounded-lg p-4',
         notification.isRead
           ? isDarkMode
-            ? 'border-gray-700 bg-gray-800'
-            : 'border-gray-200 bg-gray-50'
+            ? 'bg-gray-800'
+            : 'bg-gray-50'
           : isDarkMode
-            ? 'border-orange-500/20 bg-orange-500/5'
-            : 'border-orange-200 bg-orange-50'
+            ? 'bg-orange-500/5'
+            : 'bg-orange-50'
       )}>
       <View className="flex-row items-start gap-x-3">
         <View className="mt-1">{getNotificationIcon(notification.type_name)}</View>

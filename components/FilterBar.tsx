@@ -89,15 +89,16 @@ const FilterBar = ({
           contentContainerClassName="gap-x-2">
           {sortedItems.map((item) => (
             <TouchableOpacity
+              activeOpacity={0.8}
               key={item.id}
               onPress={() => onPressItem(item.id as FilterType)}
               className={cn(
-                'self-start rounded-full border px-3 py-1',
+                'self-start rounded-full  px-3 py-1',
                 selectedItem === item.id
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange text-white'
                   : isDarkMode
                     ? 'border-gray-700 bg-gray-800 text-gray-200'
-                    : 'border-gray-200 bg-white text-ut-grey'
+                    : 'border border-gray-200 bg-white text-ut-grey'
               )}>
               <Text
                 className={cn(

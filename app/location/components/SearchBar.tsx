@@ -1,5 +1,5 @@
 import { Search, X } from 'lucide-react-native';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { View, TextInput, Text, Keyboard, TouchableOpacity } from 'react-native';
 
 import { useSettingsStore } from '~/store/useSettingsStore';
@@ -11,22 +11,22 @@ type Props = {
   setQuery: (query: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
+  isSearchFocused: boolean;
 };
 
-const SearchBar = ({ query, setQuery, onFocus, onBlur }: Props) => {
+const SearchBar = ({ query, setQuery, onFocus, onBlur, isSearchFocused }: Props) => {
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
-  const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
   const handleCancel = () => {
     Keyboard.dismiss();
     inputRef.current?.blur();
+    // Set query to empty string
+    setQuery('');
     onBlur?.();
-    setIsFocused(false);
   };
 
   const handleFocus = () => {
-    setIsFocused(true);
     onFocus?.();
   };
 
@@ -48,7 +48,6 @@ const SearchBar = ({ query, setQuery, onFocus, onBlur }: Props) => {
           value={query}
           onChangeText={setQuery}
           onFocus={handleFocus}
-          onBlur={() => setIsFocused(false)}
           placeholderTextColor={isDarkMode ? '#777' : undefined}
         />
         {query.length > 0 && (
@@ -59,7 +58,7 @@ const SearchBar = ({ query, setQuery, onFocus, onBlur }: Props) => {
           />
         )}
       </View>
-      {isFocused && (
+      {isSearchFocused && (
         <TouchableOpacity onPress={handleCancel}>
           <Text
             className={cn(

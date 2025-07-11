@@ -154,6 +154,7 @@ const LocationHeader = React.memo(
               setQuery={setQuery}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
+              isSearchFocused={isSearchFocused}
             />
           </View>
         )}

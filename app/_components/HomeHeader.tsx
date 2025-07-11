@@ -1,5 +1,7 @@
+import { router } from 'expo-router';
+import { ChefHat, Heart, LucideIcon } from 'lucide-react-native';
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 import { FilterType } from '../(tabs)';
 import * as schema from '../../services/database/schema';
@@ -7,6 +9,7 @@ import * as schema from '../../services/database/schema';
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
 import { useSettingsStore } from '~/store/useSettingsStore';
+import { getColor } from '~/utils/colors';
 import { timeOfDay } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
@@ -18,6 +21,41 @@ type HomeHeaderProps = {
   showRequeryAlert: boolean;
   locationTypes: schema.LocationType[];
 };
+
+interface QuickLinksCardProps {
+  title: string;
+  description: string;
+  Icon: LucideIcon;
+  onPress: () => void;
+  isDarkMode: boolean;
+}
+
+const QuickLinksCard = ({ title, description, Icon, onPress, isDarkMode }: QuickLinksCardProps) => (
+  <TouchableOpacity
+    className={cn(
+      'flex-1 flex-row items-center rounded-lg  px-2 py-3',
+      isDarkMode ? ' bg-gray-800' : 'border border-gray-200 bg-white',
+      'shadow-sm'
+    )}
+    onPress={onPress}
+    activeOpacity={0.7}>
+    <View
+      className={cn(
+        'mr-3 h-10 w-10 items-center justify-center rounded-full',
+        isDarkMode ? 'bg-gray-700' : 'bg-orange-100'
+      )}>
+      <Icon size={20} color={getColor('ut-burnt-orange', false)} />
+    </View>
+    <View className="flex-1">
+      <Text className={cn('text-sm font-bold', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+        {title}
+      </Text>
+      <Text className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+        {description}
+      </Text>
+    </View>
+  </TouchableOpacity>
+);
 
 const HomeHeader = ({
   currentTime,
@@ -101,6 +139,27 @@ const HomeHeader = ({
               </Text>
             )}
           </View>
+        </View>
+
+        <View className="flex-row gap-3">
+          <QuickLinksCard
+            title="Favorites"
+            description="Your saved meals"
+            Icon={Heart}
+            isDarkMode={isDarkMode}
+            onPress={() => {
+              router.push('/favorites');
+            }}
+          />
+          <QuickLinksCard
+            title="Meal Plan"
+            description="Your planned meals"
+            Icon={ChefHat}
+            isDarkMode={isDarkMode}
+            onPress={() => {
+              router.push('/meal-plan');
+            }}
+          />
         </View>
 
         <FilterBar
