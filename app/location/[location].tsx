@@ -20,6 +20,7 @@ import { useScrollToTop } from '~/hooks/useScrollToTop';
 import * as schema from '~/services/database/schema';
 import { useFiltersStore } from '~/store/useFiltersStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
+import { getTodayInCentralTime } from '~/utils/date';
 import { filterFoodItems } from '~/utils/filter';
 import { cn } from '~/utils/utils';
 
@@ -132,6 +133,7 @@ const Location = () => {
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   // Core state and data
   const { location } = useLocalSearchParams<{ location: string }>();
+  const [selectedDate, setSelectedDate] = useState(getTodayInCentralTime());
   const {
     menuData: data,
     loading,
@@ -140,7 +142,7 @@ const Location = () => {
     setSelectedMenu,
     filters: menuFilters,
     isSwitchingMenus,
-  } = useMenuData(location);
+  } = useMenuData(location, selectedDate);
   const { toggleCategory, flattenedItems, resetExpandedCategories } = useCategoryExpansion(data);
   const db = useDatabase();
 
@@ -167,7 +169,12 @@ const Location = () => {
   const { showScrollToTop, scrollButtonAnimation, handleScroll, scrollToTop } =
     useScrollToTop(listRef);
 
-  // Reset search and expanded categories when menu changes
+  // Date change handler
+  const handleDateChange = (date: string) => {
+    setSelectedDate(date);
+  };
+
+  // Reset search and expanded categories when menu or date changes
   useEffect(() => {
     try {
       setSearchQuery('');
@@ -177,7 +184,7 @@ const Location = () => {
     } catch (error) {
       console.error('Error resetting menu state:', error);
     }
-  }, [selectedMenu, resetExpandedCategories]);
+  }, [selectedMenu, selectedDate, resetExpandedCategories]);
 
   // Determine which data to display
   const getDisplayedItems = useCallback(() => {
@@ -305,6 +312,8 @@ const Location = () => {
                   resetExpandedCategories();
                   setSearchQuery(query);
                 }}
+                selectedDate={selectedDate}
+                onDateChange={handleDateChange}
               />
             </>
           }

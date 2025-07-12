@@ -1,7 +1,9 @@
+import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { ChefHat, Heart, LucideIcon } from 'lucide-react-native';
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
+import Reanimated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 import { FilterType } from '../(tabs)';
 import * as schema from '../../services/database/schema';
@@ -15,10 +17,8 @@ import { cn } from '~/utils/utils';
 
 type HomeHeaderProps = {
   currentTime: Date;
-  lastUpdated: Date | null;
   selectedFilter: string;
   setSelectedFilter: (filter: FilterType) => void;
-  showRequeryAlert: boolean;
   locationTypes: schema.LocationType[];
 };
 
@@ -30,39 +30,65 @@ interface QuickLinksCardProps {
   isDarkMode: boolean;
 }
 
-const QuickLinksCard = ({ title, description, Icon, onPress, isDarkMode }: QuickLinksCardProps) => (
-  <TouchableOpacity
-    className={cn(
-      'flex-1 flex-row items-center rounded-lg  px-2 py-3',
-      isDarkMode ? ' bg-gray-800' : 'border border-gray-200 bg-white',
-      'shadow-sm'
-    )}
-    onPress={onPress}
-    activeOpacity={0.7}>
-    <View
+const QuickLinksCard = ({ title, description, Icon, onPress, isDarkMode }: QuickLinksCardProps) => {
+  const scale = useSharedValue(1);
+  const opacity = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+      opacity: opacity.value,
+    };
+  });
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
+    opacity.value = withSpring(0.8, { damping: 15, stiffness: 400 });
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 15, stiffness: 400 });
+    opacity.value = withSpring(1, { damping: 15, stiffness: 400 });
+  };
+
+  return (
+    <Reanimated.View
       className={cn(
-        'mr-3 h-10 w-10 items-center justify-center rounded-full',
-        isDarkMode ? 'bg-gray-700' : 'bg-orange-100'
-      )}>
-      <Icon size={20} color={getColor('ut-burnt-orange', false)} />
-    </View>
-    <View className="flex-1">
-      <Text className={cn('text-sm font-bold', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
-        {title}
-      </Text>
-      <Text className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
-        {description}
-      </Text>
-    </View>
-  </TouchableOpacity>
-);
+        'flex-1  rounded-lg px-2 py-3',
+        isDarkMode ? 'bg-gray-800' : 'border border-gray-200 bg-white',
+        'shadow-sm'
+      )}
+      style={animatedStyle}>
+      <Pressable
+        className="flex-row items-center"
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={onPress}>
+        <View
+          className={cn(
+            'mr-3 h-10 w-10 items-center justify-center rounded-full',
+            isDarkMode ? 'bg-gray-700' : 'bg-orange-100'
+          )}>
+          <Icon size={20} color={getColor('ut-burnt-orange', false)} />
+        </View>
+        <View className="flex-1">
+          <Text className={cn('text-sm font-bold', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+            {title}
+          </Text>
+          <Text className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+            {description}
+          </Text>
+        </View>
+      </Pressable>
+    </Reanimated.View>
+  );
+};
 
 const HomeHeader = ({
   currentTime,
-  lastUpdated,
   selectedFilter,
   setSelectedFilter,
-  showRequeryAlert,
   locationTypes,
 }: HomeHeaderProps) => {
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
@@ -119,25 +145,6 @@ const HomeHeader = ({
             <Text className={cn('font-medium', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
               {getSubtitleMessage()}
             </Text>
-            {showRequeryAlert && (
-              <Text className="text-[9px] font-semibold italic text-ut-burnt-orange">
-                Data is outdated. Pull down to refresh.
-              </Text>
-            )}
-
-            {!showRequeryAlert && lastUpdated && (
-              <Text
-                className={cn('text-[9px] italic', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
-                Last updated:{' '}
-                {lastUpdated.toLocaleString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  hour12: true,
-                })}
-              </Text>
-            )}
           </View>
         </View>
 
