@@ -105,8 +105,8 @@ export function getLocationTimeMessage(
     if (currentMinutes >= openM && currentMinutes < closeM) {
       const diffMins = closeM - currentMinutes;
       return diffMins < 60
-        ? `Closes in ${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'}`
-        : `Closes in ${Math.ceil(diffMins / 60)} ${Math.ceil(diffMins / 60) > 1 ? 'hours' : 'hour'}`;
+        ? `Open for ${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'}`
+        : `Open for ${Math.ceil(diffMins / 60)} ${Math.ceil(diffMins / 60) > 1 ? 'hours' : 'hour'}`;
     }
   }
 

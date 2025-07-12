@@ -2,7 +2,8 @@ import { isSameDay, addDays, subDays } from 'date-fns';
 import * as Haptics from 'expo-haptics';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
+import Reanimated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 import { useSettingsStore } from '~/store/useSettingsStore';
 import {
@@ -34,6 +35,24 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onDateChang
   const isPreviousDisabled = isSameDay(currentDate, minDate) || currentDate < minDate;
   const isNextDisabled = isSameDay(currentDate, maxDate) || currentDate > maxDate;
 
+  // Animation values for previous button
+  const previousScale = useSharedValue(1);
+  const previousOpacity = useSharedValue(1);
+
+  // Animation values for next button
+  const nextScale = useSharedValue(1);
+  const nextOpacity = useSharedValue(1);
+
+  const previousAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: previousScale.value }],
+    opacity: previousOpacity.value,
+  }));
+
+  const nextAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: nextScale.value }],
+    opacity: nextOpacity.value,
+  }));
+
   const handlePreviousDay = async () => {
     if (isPreviousDisabled) return;
 
@@ -52,11 +71,34 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onDateChang
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
+  const handlePreviousPressIn = () => {
+    if (isPreviousDisabled) return;
+    previousScale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
+    previousOpacity.value = withSpring(0.8, { damping: 15, stiffness: 400 });
+  };
+
+  const handlePreviousPressOut = () => {
+    if (isPreviousDisabled) return;
+    previousScale.value = withSpring(1, { damping: 15, stiffness: 400 });
+    previousOpacity.value = withSpring(1, { damping: 15, stiffness: 400 });
+  };
+
+  const handleNextPressIn = () => {
+    if (isNextDisabled) return;
+    nextScale.value = withSpring(0.95, { damping: 15, stiffness: 400 });
+    nextOpacity.value = withSpring(0.8, { damping: 15, stiffness: 400 });
+  };
+
+  const handleNextPressOut = () => {
+    if (isNextDisabled) return;
+    nextScale.value = withSpring(1, { damping: 15, stiffness: 400 });
+    nextOpacity.value = withSpring(1, { damping: 15, stiffness: 400 });
+  };
+
   return (
     <View className="flex-row items-center justify-between px-4 py-2">
-      <TouchableOpacity
-        onPress={handlePreviousDay}
-        disabled={isPreviousDisabled}
+      <Reanimated.View
+        style={previousAnimatedStyle}
         className={cn(
           'flex h-8 w-8 items-center justify-center rounded-full',
           isPreviousDisabled
@@ -66,15 +108,21 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onDateChang
             : isDarkMode
               ? 'bg-gray-700'
               : 'bg-gray-100'
-        )}
-        activeOpacity={isPreviousDisabled ? 1 : 0.7}>
-        <ChevronLeft
-          size={20}
-          color={
-            isPreviousDisabled ? (isDarkMode ? '#4B5563' : '#9CA3AF') : isDarkMode ? '#fff' : '#000'
-          }
-        />
-      </TouchableOpacity>
+        )}>
+        <Pressable
+          onPress={handlePreviousDay}
+          onPressIn={handlePreviousPressIn}
+          onPressOut={handlePreviousPressOut}
+          disabled={isPreviousDisabled}
+          className="h-full w-full items-center justify-center">
+          <ChevronLeft
+            size={20}
+            color={
+              isPreviousDisabled ? (isDarkMode ? '#4B5563' : '#9CA3AF') : isDarkMode ? '#fff' : '#000'
+            }
+          />
+        </Pressable>
+      </Reanimated.View>
 
       <View className="flex-1 items-center">
         <Text className={cn('text-lg font-semibold', isDarkMode ? 'text-white' : 'text-black')}>
@@ -82,9 +130,8 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onDateChang
         </Text>
       </View>
 
-      <TouchableOpacity
-        onPress={handleNextDay}
-        disabled={isNextDisabled}
+      <Reanimated.View
+        style={nextAnimatedStyle}
         className={cn(
           'flex h-8 w-8 items-center justify-center rounded-full',
           isNextDisabled
@@ -94,15 +141,21 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onDateChang
             : isDarkMode
               ? 'bg-gray-700'
               : 'bg-gray-100'
-        )}
-        activeOpacity={isNextDisabled ? 1 : 0.7}>
-        <ChevronRight
-          size={20}
-          color={
-            isNextDisabled ? (isDarkMode ? '#4B5563' : '#9CA3AF') : isDarkMode ? '#fff' : '#000'
-          }
-        />
-      </TouchableOpacity>
+        )}>
+        <Pressable
+          onPress={handleNextDay}
+          onPressIn={handleNextPressIn}
+          onPressOut={handleNextPressOut}
+          disabled={isNextDisabled}
+          className="h-full w-full items-center justify-center">
+          <ChevronRight
+            size={20}
+            color={
+              isNextDisabled ? (isDarkMode ? '#4B5563' : '#9CA3AF') : isDarkMode ? '#fff' : '#000'
+            }
+          />
+        </Pressable>
+      </Reanimated.View>
     </View>
   );
 };

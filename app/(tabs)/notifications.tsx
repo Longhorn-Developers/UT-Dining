@@ -184,12 +184,6 @@ const Notifications = () => {
     }
   };
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    // The live query will automatically refresh the data
-    setTimeout(() => setRefreshing(false), 500);
-  };
-
   const handleReadAll = () => {
     const now = Date.now();
     setLastVisited(now);
@@ -253,13 +247,6 @@ const Notifications = () => {
             <NotificationItem notification={item} onPress={handleNotificationPress} />
           )}
           ItemSeparatorComponent={() => <View className="h-3" />}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              tintColor={COLORS['ut-burnt-orange']}
-            />
-          }
           ListEmptyComponent={
             <View className="mt-12 flex items-center justify-center px-6">
               <Text className="mt-4 text-lg font-bold text-ut-burnt-orange">
