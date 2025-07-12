@@ -87,7 +87,6 @@ export default function Home() {
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
-  const queryClient = useQueryClient();
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   useDrizzleStudio(db);

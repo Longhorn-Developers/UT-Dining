@@ -4,7 +4,7 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { router, Stack, useFocusEffect } from 'expo-router';
 import { Bell, ChefHat, MapPin, Star, ExternalLink } from 'lucide-react-native';
 import React, { useState, useCallback, useMemo } from 'react';
-import { View, Text, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 import { Container } from '~/components/Container';
 import { useDatabase } from '~/hooks/useDatabase';
@@ -121,7 +121,6 @@ const NotificationItem = ({
 };
 
 const Notifications = () => {
-  const [refreshing, setRefreshing] = useState(false);
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   const db = useDatabase();
   const { lastVisited, setLastVisited } = useNotificationsStore();

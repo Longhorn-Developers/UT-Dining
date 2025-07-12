@@ -118,7 +118,13 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onDateChang
           <ChevronLeft
             size={20}
             color={
-              isPreviousDisabled ? (isDarkMode ? '#4B5563' : '#9CA3AF') : isDarkMode ? '#fff' : '#000'
+              isPreviousDisabled
+                ? isDarkMode
+                  ? '#4B5563'
+                  : '#9CA3AF'
+                : isDarkMode
+                  ? '#fff'
+                  : '#000'
             }
           />
         </Pressable>
