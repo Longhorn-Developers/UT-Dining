@@ -1,4 +1,5 @@
 import { format, addDays, subDays, startOfDay, isToday, isSameDay } from 'date-fns';
+import { toZonedTime, formatInTimeZone } from 'date-fns-tz';
 
 export function formatDateForDisplay(date: Date): string {
   if (isToday(date)) {
@@ -23,15 +24,30 @@ export function formatDateForAPI(date: Date): string {
   return format(date, 'yyyy-MM-dd');
 }
 
-export function getCentralTimeDate() {
-  const now = new Date();
-  const centralTimeOffset = -6; // Central Time Zone offset
-  return new Date(now.getTime() + centralTimeOffset * 60 * 60 * 1000);
+export function getCentralTimeDate(): Date {
+  // Get current time in Central Time Zone (automatically handles DST)
+  const centralTimeZone = 'America/Chicago';
+  return toZonedTime(new Date(), centralTimeZone);
 }
 
 export function getTodayInCentralTime(): string {
   const centralTime = getCentralTimeDate();
   return formatDateForAPI(centralTime);
+}
+
+export function formatInCentralTime(date: Date, formatString: string): string {
+  const centralTimeZone = 'America/Chicago';
+  return formatInTimeZone(date, centralTimeZone, formatString);
+}
+
+export function convertToCentralTime(date: Date): Date {
+  const centralTimeZone = 'America/Chicago';
+  return toZonedTime(date, centralTimeZone);
+}
+
+export function convertFromCentralTime(centralDate: Date): Date {
+  const centralTimeZone = 'America/Chicago';
+  return toZonedTime(centralDate, centralTimeZone);
 }
 
 export function addDaysToDate(date: Date, days: number): Date {
