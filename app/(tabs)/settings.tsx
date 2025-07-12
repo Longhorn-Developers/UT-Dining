@@ -12,6 +12,7 @@ import {
   History,
   LucideIcon,
   Mail,
+  MapPin,
   MessageSquare,
   Moon,
   Shield,
@@ -23,6 +24,7 @@ import { SheetProvider, SheetManager } from 'react-native-actions-sheet';
 
 import { Container } from '~/components/Container';
 import { useDatabase } from '~/hooks/useDatabase';
+import { useLocationPermissions } from '~/hooks/useLocationPermissions';
 import { useNotificationPermissions } from '~/hooks/useNotificationPermissions';
 import { getAppInformation } from '~/services/database/database';
 import { AppInformation } from '~/services/database/schema';
@@ -284,6 +286,64 @@ const NotificationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): J
   );
 };
 
+const LocationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): JSX.Element => {
+  const { isGranted, isDenied, isUndetermined, requestPermissions } = useLocationPermissions();
+
+  const handleLocationAction = async () => {
+    if (isUndetermined) {
+      await requestPermissions();
+    } else if (isDenied) {
+      Linking.openSettings();
+    }
+  };
+
+  const getStatusText = () => {
+    if (isGranted) return 'Location Enabled';
+    if (isDenied) return 'Location Disabled';
+    return 'Location Access Disabled';
+  };
+
+  const getDescriptionText = () => {
+    if (isGranted) return 'Used to show your location on the map';
+    if (isDenied) return 'Currently disabled - tap to open Settings';
+    return 'Tap to enable location access';
+  };
+
+  return (
+    <TouchableOpacity
+      className={cn(
+        'flex-row items-center justify-between border-b py-3',
+        isDarkMode ? 'border-gray-700' : 'border-gray-100'
+      )}
+      onPress={handleLocationAction}
+      activeOpacity={isGranted ? 1 : 0.7}>
+      <View className="flex-row items-center">
+        <View
+          className={cn(
+            'mr-3 h-8 w-8 items-center justify-center rounded-full',
+            isDarkMode ? 'bg-gray-800' : 'bg-orange-100'
+          )}>
+          <MapPin size={16} color={getColor('ut-burnt-orange', false)} />
+        </View>
+        <View className="flex-1">
+          <Text
+            className={cn('text-base font-medium', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+            {getStatusText()}
+          </Text>
+          <Text className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+            {getDescriptionText()}
+          </Text>
+        </View>
+
+        {isDenied ||
+          (isUndetermined && (
+            <Ionicons name="chevron-forward" size={18} color={isDarkMode ? '#888' : '#9CA3AF'} />
+          ))}
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 const VersionInfo = ({ isDarkMode, appInfo }: VersionInfoProps): JSX.Element => {
   const deviceId = getOrCreateDeviceId();
 
@@ -400,8 +460,9 @@ const SettingsPage = () => {
             onToggle={toggleColloquialNames}
             isDarkMode={isDarkMode}
           />
-          <SectionHeader title="Notifications" className="mt-4" isDarkMode={isDarkMode} />
+          <SectionHeader title="App Permissions" className="mt-4" isDarkMode={isDarkMode} />
           <NotificationSettingsSection isDarkMode={isDarkMode} />
+          <LocationSettingsSection isDarkMode={isDarkMode} />
 
           <SectionHeader title="Feedback" className="mt-4" isDarkMode={isDarkMode} />
           <SettingItem
