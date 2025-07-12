@@ -18,6 +18,7 @@ import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
+import { getTodayInCentralTime } from '~/utils/date';
 import { getLocationOpenStatus } from '~/utils/locationStatus';
 import { fetchMenuData } from '~/utils/queries';
 
@@ -55,6 +56,9 @@ const filterAndSortLocations = (
   const openLocations: schema.LocationWithType[] = [];
   const closedLocations: schema.LocationWithType[] = [];
 
+  // Get today's date for menu checking
+  const todayDate = getTodayInCentralTime();
+
   filteredLocations.forEach((location) => {
     // Get location data for each location to determine if it's open
     const locationData = db
@@ -62,7 +66,7 @@ const filterAndSortLocations = (
       .from(schema.location)
       .where(eq(schema.location.id, location.id))
       .get();
-    const isOpen = getLocationOpenStatus(location, locationData, db, currentTime);
+    const isOpen = getLocationOpenStatus(location, locationData, db, currentTime, todayDate);
 
     if (isOpen) {
       openLocations.push(location);
@@ -238,10 +242,8 @@ export default function Home() {
           ListHeaderComponent={
             <HomeHeader
               currentTime={currentTime}
-              lastUpdated={null}
               selectedFilter={selectedFilter}
               setSelectedFilter={setSelectedFilter}
-              showRequeryAlert={false}
               locationTypes={locationTypes}
             />
           }

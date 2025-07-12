@@ -12,7 +12,7 @@ export const fetchMenuData = async (drizzleDb: ExpoSQLiteDatabase<typeof schema>
     throw new Error('No internet connection');
   }
 
-  await insertDataIntoSQLiteDB(drizzleDb, true); // Always force refresh for query
+  await insertDataIntoSQLiteDB(drizzleDb); // Always force refresh for query
 
   // Fetch locations and location types concurrently
   const [data, types] = await Promise.all([

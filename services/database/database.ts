@@ -4,6 +4,7 @@ import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import { allergens, food_item, location, menu, menu_category, nutrition } from './schema';
 import * as schema from './schema';
 
+import { getTodayInCentralTime } from '~/utils/date';
 import { supabase } from '~/utils/supabase';
 
 export interface Location extends schema.Location {
@@ -32,19 +33,17 @@ export interface FoodItem {
 /**
  * Fetches all relevant data from Supabase tables including locations, menus, notifications, and nutrition/allergens.
  *
- * - Determines today's date in Central Time.
+ * - Uses provided date or defaults to today's date in Central Time.
  * - Fetches base data in parallel.
  * - Fetches related menu categories, food items, nutrition, and allergens if menus exist.
  *
+ * @param date - Optional date string in YYYY-MM-DD format. Defaults to today in Central Time.
  * @returns A Promise resolving to an object containing all fetched data, or null if an error occurs.
  */
-const querySupabase = async () => {
+const querySupabase = async (date?: string) => {
   try {
-    // Calculate today's date in Central Time Zone
-    const today = new Date();
-    const centralTimeOffset = -6; // Central Time Zone offset
-    const centralTime = new Date(today.getTime() + centralTimeOffset * 60 * 60 * 1000);
-    const formattedDate = centralTime.toISOString().split('T')[0];
+    // Use provided date or default to today's date in Central Time Zone
+    const formattedDate = date || getTodayInCentralTime();
 
     // Fetch base data in parallel (independent queries)
     const [
@@ -57,7 +56,7 @@ const querySupabase = async () => {
     ] = await Promise.all([
       supabase.from('location').select('*'),
       supabase.from('location_type').select('*'),
-      supabase.from('menu').select('*').eq('date', formattedDate),
+      supabase.from('menu').select('*'),
       supabase.from('app_information').select('*'),
       supabase.from('notifications').select('*'),
       supabase.from('notification_types').select('*'),
@@ -234,15 +233,15 @@ const querySupabase = async () => {
  * Inserts Supabase data into local SQLite database
  *
  * @param db - The Expo SQLite database instance.
- * @param force - A flag indicating whether to force the operation
+ * @param date - Optional date string in YYYY-MM-DD format. Defaults to today in Central Time.
  */
 export const insertDataIntoSQLiteDB = async (
   db: ExpoSQLiteDatabase<typeof schema>,
-  force = false
+  date?: string
 ) => {
   // Always fetch and insert data when called (TanStack Query will control when this runs)
   console.log('📡 Fetching fresh data from Supabase...');
-  const data = await querySupabase();
+  const data = await querySupabase(date);
 
   if (data) {
     try {
@@ -319,17 +318,21 @@ export const insertDataIntoSQLiteDB = async (
  *
  * @param db - The Expo SQLite database instance.
  * @param locationName - The name of the location to query.
+ * @param date - Optional date string in YYYY-MM-DD format. Defaults to today in Central Time.
  * @returns A Promise resolving to an array of menu names.
  */
 export const getLocationMenuNames = async (
   db: ExpoSQLiteDatabase<typeof schema>,
-  locationName: string
+  locationName: string,
+  date?: string
 ) => {
+  const targetDate = date || getTodayInCentralTime();
+
   const data = await db
     .select({ menu: schema.menu })
     .from(schema.location)
     .leftJoin(schema.menu, eq(schema.menu.location_id, schema.location.id))
-    .where(eq(schema.location.name, locationName))
+    .where(sql`${schema.location.name} = ${locationName} AND ${schema.menu.date} = ${targetDate}`)
     .execute();
 
   return data.map((row) => row.menu?.name).filter((name) => name !== undefined);
@@ -343,14 +346,18 @@ export const getLocationMenuNames = async (
  * @param db - The Expo SQLite database instance.
  * @param locationName - The name of the location to query.
  * @param menuName - The name of the menu to query.
+ * @param date - Optional date string in YYYY-MM-DD format. Defaults to today in Central Time.
  * @returns A Promise resolving to a `Location` object or null if not found.
  */
 export const getLocationMenuData = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string,
-  menuName: string
+  menuName: string,
+  date?: string
 ) => {
   try {
+    const targetDate = date || getTodayInCentralTime();
+
     const data = await db
       .select({
         // Complete location information
@@ -415,8 +422,8 @@ export const getLocationMenuData = async (
       .leftJoin(schema.nutrition, eq(schema.nutrition.id, schema.food_item.nutrition_id))
       .leftJoin(schema.location_type, eq(schema.location_type.id, schema.location.type_id))
       .where(
-        // Filter by both location name and menu name
-        sql`${schema.location.name} = ${locationName} AND ${schema.menu.name} = ${menuName}`
+        // Filter by location name, menu name, and date
+        sql`${schema.location.name} = ${locationName} AND ${schema.menu.name} = ${menuName} AND ${schema.menu.date} = ${targetDate}`
       )
       .execute();
 

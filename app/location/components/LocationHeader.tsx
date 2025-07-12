@@ -3,6 +3,7 @@ import * as Haptics from 'expo-haptics';
 import React, { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 
+import DateNavigator from './DateNavigator';
 import SearchBar from './SearchBar';
 import TimeSchedule from './TimeSchedule';
 
@@ -23,10 +24,21 @@ interface LocationHeaderProps {
   filters: { title: string; id: string }[];
   query: string;
   setQuery: (query: string) => void;
+  selectedDate: string;
+  onDateChange: (date: string) => void;
 }
 
 const LocationHeader = React.memo(
-  ({ location, selectedMenu, setSelectedMenu, filters, query, setQuery }: LocationHeaderProps) => {
+  ({
+    location,
+    selectedMenu,
+    setSelectedMenu,
+    filters,
+    query,
+    setQuery,
+    selectedDate,
+    onDateChange,
+  }: LocationHeaderProps) => {
     const [open, setOpen] = useState(false);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const db = useDatabase();
@@ -142,6 +154,9 @@ const LocationHeader = React.memo(
                   isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15'
                 )}
               />
+
+              {/* Date Navigator */}
+              <DateNavigator selectedDate={selectedDate} onDateChange={onDateChange} />
             </View>
           </>
         )}

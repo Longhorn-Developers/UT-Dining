@@ -10,6 +10,7 @@ import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { LocationWithType } from '~/services/database/schema';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
+import { getTodayInCentralTime } from '~/utils/date';
 import { getLocationOpenStatus } from '~/utils/locationStatus';
 import { useLocationName } from '~/utils/locations';
 import { getLocationTimeMessage } from '~/utils/time';
@@ -31,7 +32,8 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
   const displayName = useLocationName(location.name ?? '', useColloquialNames);
 
   useEffect(() => {
-    const isOpen = getLocationOpenStatus(location, locationData, db, currentTime);
+    const todayDate = getTodayInCentralTime();
+    const isOpen = getLocationOpenStatus(location, locationData, db, currentTime, todayDate);
     setOpen(isOpen);
   }, [locationData, currentTime]);
 

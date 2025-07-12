@@ -356,7 +356,7 @@ export type Database = {
           id: string;
           redirect_url: string | null;
           scheduled_at: string | null;
-          sent: boolean | null;
+          sent: boolean;
           title: string | null;
           type: string;
         };
@@ -366,7 +366,7 @@ export type Database = {
           id?: string;
           redirect_url?: string | null;
           scheduled_at?: string | null;
-          sent?: boolean | null;
+          sent?: boolean;
           title?: string | null;
           type: string;
         };
@@ -376,7 +376,7 @@ export type Database = {
           id?: string;
           redirect_url?: string | null;
           scheduled_at?: string | null;
-          sent?: boolean | null;
+          sent?: boolean;
           title?: string | null;
           type?: string;
         };
