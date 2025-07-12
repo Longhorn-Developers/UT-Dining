@@ -132,12 +132,6 @@ export default function Home() {
 
       await Promise.race([refetch(), timeoutPromise]);
 
-      await Promise.all([
-        // Invalidate all menu-related caches to ensure fresh data across the app
-        queryClient.invalidateQueries({ queryKey: ['menuNames'] }),
-        queryClient.invalidateQueries({ queryKey: ['menuData'] }),
-      ]);
-
       setRefreshKey((prev) => prev + 1);
 
       Notifier.showNotification({

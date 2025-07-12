@@ -7,6 +7,58 @@ import * as schema from './schema';
 import { getTodayInCentralTime } from '~/utils/date';
 import { supabase } from '~/utils/supabase';
 
+/**
+ * Splits an array into chunks of specified size
+ */
+function chunkArray<T>(array: T[], chunkSize: number = 1000): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+
+/**
+ * Fetches data from Supabase in chunks to avoid hitting the 1000 item limit
+ */
+async function fetchInChunks(
+  tableName: 'food_item' | 'nutrition' | 'allergens' | 'menu_category',
+  column: string,
+  ids: any[],
+  chunkSize: number = 1000
+): Promise<{ data: any[] | null; error: any }> {
+  if (ids.length === 0) {
+    return { data: [], error: null };
+  }
+
+  const chunks = chunkArray(ids, chunkSize);
+  const results: any[] = [];
+
+  console.log(
+    `📊 Fetching ${tableName} in ${chunks.length} chunks of ${chunkSize} items each (${ids.length} total)`
+  );
+
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i];
+    console.log(`  📄 Processing chunk ${i + 1}/${chunks.length} with ${chunk.length} items`);
+
+    const result = await supabase.from(tableName).select('*').in(column, chunk);
+
+    if (result.error) {
+      console.error(`❌ Error in chunk ${i + 1}/${chunks.length}:`, result.error);
+      return { data: null, error: result.error };
+    }
+
+    if (result.data) {
+      results.push(...result.data);
+      console.log(`  ✅ Chunk ${i + 1}/${chunks.length} completed: ${result.data.length} records`);
+    }
+  }
+
+  console.log(`✅ ${tableName} chunked fetch completed: ${results.length} total records`);
+  return { data: results, error: null };
+}
+
 export interface Location extends schema.Location {
   location_name: schema.Location['name'];
   type: schema.LocationType['name'];
@@ -116,11 +168,8 @@ const querySupabase = async (date?: string) => {
     // Extract IDs for subsequent queries
     const menuIds = menuData.map((menu) => menu.id);
 
-    // Fetch menu categories
-    const menuCategoryResult = await supabase
-      .from('menu_category')
-      .select('*')
-      .in('menu_id', menuIds);
+    // Fetch menu categories (with chunking to avoid 1000 item limit)
+    const menuCategoryResult = await fetchInChunks('menu_category', 'menu_id', menuIds);
 
     if (menuCategoryResult.error) {
       console.error('❌ Error fetching menu_category:', menuCategoryResult.error);
@@ -146,11 +195,8 @@ const querySupabase = async (date?: string) => {
 
     const menuCategoryIds = menuCategoryData.map((category) => category.id);
 
-    // Fetch food items
-    const foodItemResult = await supabase
-      .from('food_item')
-      .select('*')
-      .in('menu_category_id', menuCategoryIds);
+    // Fetch food items (with chunking to avoid 1000 item limit)
+    const foodItemResult = await fetchInChunks('food_item', 'menu_category_id', menuCategoryIds);
 
     if (foodItemResult.error) {
       console.error('❌ Error fetching food_item:', foodItemResult.error);
@@ -184,15 +230,15 @@ const querySupabase = async (date?: string) => {
       .map((item: any) => item.allergens_id)
       .filter((id) => id !== null);
 
-    // Fetch nutrition and allergens data in parallel
+    // Fetch nutrition and allergens data in parallel (with chunking to avoid 1000 item limit)
     const nutritionPromise =
       nutritionIds.length > 0
-        ? supabase.from('nutrition').select('*').in('id', nutritionIds)
+        ? fetchInChunks('nutrition', 'id', nutritionIds)
         : Promise.resolve({ data: [], error: null });
 
     const allergensPromise =
       allergenIds.length > 0
-        ? supabase.from('allergens').select('*').in('id', allergenIds)
+        ? fetchInChunks('allergens', 'id', allergenIds)
         : Promise.resolve({ data: [], error: null });
 
     const [nutritionResult, allergensResult] = await Promise.all([

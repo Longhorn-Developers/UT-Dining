@@ -2,7 +2,7 @@ import { FlashList } from '@shopify/flash-list';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import * as Haptics from 'expo-haptics';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 
 import CategoryHeader from './components/CategoryHeader';
@@ -186,8 +186,8 @@ const Location = () => {
     }
   }, [selectedMenu, selectedDate, resetExpandedCategories]);
 
-  // Determine which data to display
-  const getDisplayedItems = useCallback(() => {
+  // Memoize the displayed items to prevent unnecessary recalculations
+  const displayedItems = useMemo(() => {
     if (loading) return skeletonItems;
     if (error) return []; // Return empty array on error, EmptyState will handle the display
     return debouncedSearchQuery ||
@@ -297,7 +297,7 @@ const Location = () => {
           onScroll={handleScroll}
           scrollEventThrottle={16}
           showsVerticalScrollIndicator
-          data={getDisplayedItems()}
+          data={displayedItems}
           removeClippedSubviews
           scrollEnabled={!isSwitchingMenus}
           ListHeaderComponent={
