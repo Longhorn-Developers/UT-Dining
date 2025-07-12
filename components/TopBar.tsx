@@ -142,8 +142,8 @@ const FoodTopBar = () => {
             if (foodItem) {
               if (isFavorite) {
                 Notifier.showNotification({
-                  title: `${foodItem.name} removed from Favorites!`,
-                  description: 'You removed this item from your favorites.',
+                  title: `${foodItem.name} removed.`,
+                  description: `No longer in Favorites.`,
                   swipeEnabled: true,
                   Component: Alert,
                   duration: 3000,
@@ -151,8 +151,8 @@ const FoodTopBar = () => {
                 });
               } else {
                 Notifier.showNotification({
-                  title: `${foodItem.name} added to Favorites!`,
-                  description: 'You added this item to your Favorites.',
+                  title: `${foodItem.name} added!`,
+                  description: `Added to Favorites.`,
                   swipeEnabled: true,
                   Component: Alert,
                   duration: 3000,
@@ -192,8 +192,8 @@ const FoodTopBar = () => {
 
               if (isMealPlanItem) {
                 Notifier.showNotification({
-                  title: `${foodItem.name} removed from today's meal plan!`,
-                  description: 'You removed this item from your meal plan.',
+                  title: `${foodItem.name} removed from today.`,
+                  description: `You've updated your meal plan.`,
                   swipeEnabled: true,
                   Component: Alert,
                   duration: 3000,
@@ -201,8 +201,8 @@ const FoodTopBar = () => {
                 });
               } else {
                 Notifier.showNotification({
-                  title: `${foodItem.name} added to today's meal plan!`,
-                  description: 'You added this item to your meal plan.',
+                  title: `${foodItem.name} saved for today!`,
+                  description: `Added to today's meal plan.`,
                   swipeEnabled: true,
                   Component: Alert,
                   duration: 3000,

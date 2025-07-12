@@ -256,7 +256,7 @@ const NotificationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): J
         isDarkMode ? 'border-gray-700' : 'border-gray-100'
       )}
       onPress={handleNotificationAction}
-      activeOpacity={isGranted ? 1 : 0.5}>
+      activeOpacity={isGranted ? 1 : 0.7}>
       <View className="flex-row items-center">
         <View
           className={cn(
@@ -338,7 +338,7 @@ const SettingsPage = () => {
           </Text>
           <SectionHeader title="Quick Links" className="mt-4" isDarkMode={isDarkMode} />
           <SettingItem
-            activeOpacity={0.5}
+            activeOpacity={0.7}
             title="Favorites"
             Icon={Heart}
             hasChevron
@@ -351,7 +351,7 @@ const SettingsPage = () => {
             }}
           />
           <SettingItem
-            activeOpacity={0.5}
+            activeOpacity={0.7}
             title="Meal Plan"
             Icon={ChefHat}
             hasChevron
@@ -364,6 +364,7 @@ const SettingsPage = () => {
             }}
           />
           <SettingItem
+            activeOpacity={0.7}
             title="Filters"
             Icon={Filter}
             hasChevron
@@ -404,6 +405,7 @@ const SettingsPage = () => {
 
           <SectionHeader title="Feedback" className="mt-4" isDarkMode={isDarkMode} />
           <SettingItem
+            activeOpacity={0.7}
             title="Submit Feedback"
             Icon={MessageSquare}
             hasChevron
@@ -411,7 +413,14 @@ const SettingsPage = () => {
             onPress={() => Linking.openURL('https://utdining.userjot.com')}
             subtitle="Want to suggest a feature or report a bug?"
           />
-          <SettingItem title="Changelog" Icon={History} hasChevron isDarkMode={isDarkMode} />
+          <SettingItem
+            activeOpacity={0.7}
+            title="Changelog"
+            Icon={History}
+            hasChevron
+            isDarkMode={isDarkMode}
+            onPress={() => Linking.openURL('https://utdining.userjot.com/updates')}
+          />
 
           <SectionHeader title="Information" className="mt-4" isDarkMode={isDarkMode} />
           {appInfo && <AboutSection appInfo={appInfo} isDarkMode={isDarkMode} />}

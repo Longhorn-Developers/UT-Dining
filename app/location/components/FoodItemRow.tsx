@@ -46,13 +46,9 @@ const FoodItemRow = ({ item, selectedMenu, location, db, favorites }: FoodItemRo
           const newFavoriteState = !isFavorite;
 
           // Prepare notification content before showing
-          const title = newFavoriteState
-            ? `${food.name} added to Favorites!`
-            : `${food.name} removed from Favorites!`;
+          const title = newFavoriteState ? `${food.name} added!` : `${food.name} removed.`;
 
-          const description = newFavoriteState
-            ? 'Tap the heart (top right) to view your saved favorites.'
-            : 'You removed this item from your favorites.';
+          const description = newFavoriteState ? 'Added to Favorites.' : 'No longer in Favorites.';
 
           // Use setTimeout to ensure UI updates before showing notification
           setTimeout(() => {

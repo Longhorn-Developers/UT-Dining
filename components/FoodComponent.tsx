@@ -128,11 +128,11 @@ const FoodComponent = ({
 
             Notifier.showNotification({
               title: isMealPlan
-                ? `${food.name} removed from today's meal plan!`
-                : `${food.name} added to today's meal plan!`,
+                ? `${food.name} removed from today.`
+                : `${food.name} saved for today!`,
               description: isMealPlan
-                ? 'You removed this item from your meal plan.'
-                : 'Tap the chef hat (top right) to view your\nmeal plan for today.',
+                ? `You've updated your meal plan.`
+                : `Added to today's meal plan.`,
               swipeEnabled: true,
               Component: Alert,
               duration: 3000,
