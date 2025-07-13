@@ -62,7 +62,6 @@ const GenericLocation = () => {
           headerShown: false,
         }}
       />
-      {/* Pull Down Indicator (outside FlatList) */}
       <View
         style={{
           alignItems: 'center',
@@ -79,13 +78,15 @@ const GenericLocation = () => {
           }}
         />
       </View>
-      <Container disableInsets className="mx-0 mb-12">
+      <Container disableInsets className="mx-0">
         <FlatList
           data={[{}]} // dummy item just to satisfy FlatList
           keyExtractor={(_, index) => `main-content-${index}`}
           className="w-full px-6" // <-- tailwind for width: 100%
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             padding: 0,
+            paddingBottom: 100,
             alignItems: 'center',
             width: '100%', // now this 100% is relative to the FlatList's real width
           }}
