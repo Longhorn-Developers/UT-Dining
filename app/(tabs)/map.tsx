@@ -13,6 +13,7 @@ import {
   Store,
   Utensils,
   Soup,
+  Truck,
 } from 'lucide-react-native';
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { View, TouchableOpacity, Alert, Dimensions, Animated } from 'react-native';
@@ -40,7 +41,8 @@ const ICON_MAP = {
   'Coffee Shop': Coffee,
   'Convenience Store': Store,
   'Dining Hall': Utensils,
-  Restaurant: Soup,
+  'Food & Drink': Soup,
+  'Food Truck': Truck,
 };
 
 const ICON_MAP_COLORS = {
@@ -60,9 +62,13 @@ const ICON_MAP_COLORS = {
     default: COLORS['ut-burnt-orange'], // Burnt Orange
     colorBlind: '#5A2200', // Very dark brownish orange for strong contrast
   },
-  Restaurant: {
+  'Food & Drink': {
     default: '#D97706', // Amber
     colorBlind: '#C2185B', // Dark burnt brown for clear separation from amber/orange
+  },
+  'Food Truck': {
+    default: '#43A047', // Bright warm red
+    colorBlind: '#7B1FA2', // Deep burgundy for clear separation
   },
 };
 

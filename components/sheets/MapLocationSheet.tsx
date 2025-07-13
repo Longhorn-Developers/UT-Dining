@@ -93,7 +93,7 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
                 />
                 <Text
                   className={cn(
-                    'ml-1 text-base',
+                    'ml-1 pr-4 text-base',
                     isDarkMode ? 'text-ut-grey-dark-mode' : 'text-ut-grey'
                   )}>
                   {address}
