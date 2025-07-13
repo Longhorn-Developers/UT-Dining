@@ -121,7 +121,11 @@ const Favorites = () => {
               ) : (
                 <>
                   {favorites.length === 0 && (
-                    <Text className="text-lg font-bold text-ut-burnt-orange">
+                    <Text
+                      className={cn(
+                        'text-lg font-bold',
+                        isDarkMode ? 'text-white' : 'text-ut-burnt-orange'
+                      )}>
                       No Favorites Yet!
                     </Text>
                   )}
