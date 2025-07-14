@@ -124,7 +124,7 @@ export default function Layout() {
       apiKey={POSTHOG_CONFIG.apiKey}
       options={POSTHOG_CONFIG.options}
       autocapture={POSTHOG_CONFIG.autocapture}
-      debug>
+      debug={POSTHOG_CONFIG.debug}>
       <AppContent />
     </PostHogProvider>
   );
