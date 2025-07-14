@@ -30,12 +30,19 @@ Browse menus, check dining hours, and find the perfect meal on campus.
 
 ## Features
 
-- **Real-time Menu Updates**: View current menus for all UT Austin dining locations
+- **Real-time Menu Updates**: View current menus for UT Austin dining locations
+- **Menu History & Planning**: View past menus and upcoming menus for the week
+- **Interactive Campus Map**: Find and navigate to dining halls, food trucks, microwaves, coffee shops, and convenience stores across campus
 - **Favorites**: Save your favorite food items and get notified when they appear on menus
 - **Meal Planning**: Create daily meal plans with nutrition tracking
 - **Allergen Information**: Filter food items based on dietary restrictions and allergens
-- **Location Information**: Check operating hours, location details, and whether dining halls are currently open
-- **Microwave Map**: Find microwaves on campus to heat up your food
+- **Comprehensive Location Info**: Check operating hours, payment methods, and real-time status for all dining locations
+- **Push Notifications**: Stay updated with the latest dining alerts and updates
+- **Offline Support w/ Caching**: Access menus, location info, and your favorites even without an internet connection
+- **Accessibility Features**:
+  - Dark Mode: Enhanced visibility in low-light conditions
+  - Color Blind Mode: Improved color accessibility
+  - Colloquial Names: Toggle between official and common location names
 
 ## Tech Stack
 
@@ -45,6 +52,9 @@ Browse menus, check dining hours, and find the perfect meal on campus.
 - **Database**:
   - Remote: [Supabase](https://supabase.com/)
   - Local: [SQLite](https://docs.expo.dev/versions/latest/sdk/sqlite/) with [Drizzle ORM](https://orm.drizzle.team/) (learn more [here](https://expo.dev/blog/modern-sqlite-for-react-native-apps))
+- **Data Fetching**: [TanStack Query](https://tanstack.com/query/latest) (React Query)
+- **Persistent Storage**: [MMKV](https://github.com/mrousavy/react-native-mmkv)
+- **Analytics**: [PostHog](https://posthog.com/) with session replay and auto-capture
 - **Styling**: [NativeWind](https://www.nativewind.dev/) (Tailwind CSS for React Native)
 - **Icons**: [Lucide React Native](https://lucide.dev/guide/packages/lucide-react-native)
 
@@ -52,7 +62,7 @@ Browse menus, check dining hours, and find the perfect meal on campus.
 
 <img src="https://github.com/user-attachments/assets/f1264b22-d0ad-44e8-9342-ec53ec94d37b"><br>
 
-At the core of the system is a remote **Render** instance, which is scheduled to run every 24 hours at 7:00 AM UTC _(or 1:00 AM CST)_. This instance is responsible for scraping the dining menus from UT Austin, sourced from [this page](https://hf-foodpro.austin.utexas.edu/foodpro/location.aspx). Once the menus are scraped, the data is stored in a **Supabase** database.
+At the core of the system is a remote **Render** instance, which is scheduled to run every 24 hours at 7:00 AM UTC _(or 1:00 AM CST)_. This instance is responsible for scraping the dining menus from UT Austin, sourced from [this page](https://hf-foodpro.austin.utexas.edu/foodpro/location.aspx). Once the menus are scraped, the data is stored in a **Supabase** database. The web scraper can be found in the [UT Dining Scraper](https://github.com/ethanl06/ut-dining-scraper) repository.
 
 Every 24 hours, the **Expo** mobile application fetches the latest menu data from the database, keeping the application up-to-date. To optimize performance and reduce loading times, the data is cached locally in an **SQLite** database using **Drizzle ORM**. This local cache allows the app to quickly retrieve the necessary information, ensuring a smooth, **offline-first** user experience.
 
@@ -135,12 +145,15 @@ We recommend using the following VSCode extensions to improve your development e
    cp .env-example .env
    ```
 
-   Update with your Supabase `API URL` and `anon key` credentials:
+   Update with your Supabase credentials and optionally add PostHog analytics:
 
    ```sh
     EXPO_PUBLIC_SUPABASE_URL=<supabase-url>
     EXPO_PUBLIC_SUPABASE_ANON_KEY=<supabase-anon-key>
+    EXPO_PUBLIC_POSTHOG_API_KEY=<posthog-api-key> # Optional - for analytics tracking
    ```
+
+   > **Note**: The PostHog API key is optional. If not provided, analytics will be disabled. Analytics are automatically disabled in development mode.
 
 5. **Create an Expo Account**
 
@@ -172,7 +185,17 @@ We recommend using the following VSCode extensions to improve your development e
 
    > **Note**: The build process may take some time. Please wait until it completes.
 
-7. **Download to physical device (OPTIONAL)**
+7. **Analytics Setup (OPTIONAL)**
+
+   If you want to enable analytics tracking for your development environment:
+
+   1. Create a free account at [PostHog](https://posthog.com/)
+   2. Create a new project and copy your API key
+   3. Add the API key to your `.env` file as `EXPO_PUBLIC_POSTHOG_API_KEY`
+
+   > **Note**: Analytics are automatically disabled in development mode for privacy. Session replay and auto-capture will only work in production builds.
+
+8. **Download to physical device (OPTIONAL)**
 
    If you want to test the app on a physical device, connect your device to your computer
    with a USB cable and run the following command:
@@ -193,7 +216,7 @@ We recommend using the following VSCode extensions to improve your development e
 
    This will install the development build onto your device.
 
-8. **Start the Development Server**
+9. **Start the Development Server**
 
    ```sh
    pnpm run start
@@ -215,12 +238,12 @@ We recommend using the following VSCode extensions to improve your development e
 
    While the development server is running, press `Shift + M` in the terminal and select `expo-drizzle-studio-plugin` to open Drizzle Studio in your browser. You can use this tool to inspect the SQLite database and troubleshoot any issues related to the local cache with SQLite and Drizzle ORM. Read more about Drizzle Studio [here](https://orm.drizzle.team/drizzle-studio/overview).
 
-9. **Launch Emulators**
+10. **Launch Emulators**
 
-   To open the app on an emulator, press either of the following keys in the terminal:
+To open the app on an emulator, press either of the following keys in the terminal:
 
-   - `i` to open on iOS simulator
-   - `a` to open on Android emulator
+- `i` to open on iOS simulator
+- `a` to open on Android emulator
 
 ## Project Structure
 
@@ -230,10 +253,14 @@ ut-dining/
 ├── assets/            # Images and static assets
 ├── components/        # Global reusable UI components
 ├── data/              # Static data and constants
-├── db/                # SQLite Database schema and utilities
 ├── drizzle/           # Drizzle ORM migrations and metadata
 ├── hooks/             # Custom React hooks
-├── store/             # Zustand state management
+├── services/          # Service layer (analytics, database, notifications, device)
+│   ├── analytics/     # PostHog analytics configuration
+│   ├── database/      # SQLite schema and database utilities
+│   ├── device/        # Device-specific functionality
+│   └── notifications/ # Push notification services
+├── store/             # Zustand state management with MMKV persistence
 ├── supabase/          # Supabase local client and utilities
 ├── types/             # TypeScript type definitions
 └── utils/             # Helper functions and utilities
