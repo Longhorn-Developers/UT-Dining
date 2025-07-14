@@ -18,8 +18,8 @@ import migrations from '../drizzle/migrations';
 import * as schema from '../services/database/schema';
 
 import '../global.css';
-import { PushNotificationsInitializer } from '~/services/notifications/notifications';
 import { POSTHOG_API_KEY, POSTHOG_CONFIG } from '~/services/analytics/posthog';
+import { PushNotificationsInitializer } from '~/services/notifications/notifications';
 
 export const DATABASE_NAME = 'database.db';
 
