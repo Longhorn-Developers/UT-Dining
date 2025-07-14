@@ -2,6 +2,7 @@ import { FlashList } from '@shopify/flash-list';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import * as Haptics from 'expo-haptics';
 import { Stack, useLocalSearchParams } from 'expo-router';
+import { usePostHog } from 'posthog-react-native';
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 
@@ -146,6 +147,8 @@ const Location = () => {
   const { toggleCategory, flattenedItems, resetExpandedCategories } = useCategoryExpansion(data);
   const db = useDatabase();
 
+  const posthog = usePostHog();
+
   const { data: favorites } = useLiveQuery(db.select().from(schema.favorites));
 
   // Get active filters from filters store
@@ -185,6 +188,12 @@ const Location = () => {
       console.error('Error resetting menu state:', error);
     }
   }, [selectedMenu, selectedDate, resetExpandedCategories]);
+
+  useEffect(() => {
+    if (posthog) {
+      posthog.screen(location);
+    }
+  }, []);
 
   // Memoize the displayed items to prevent unnecessary recalculations
   const displayedItems = useMemo(() => {

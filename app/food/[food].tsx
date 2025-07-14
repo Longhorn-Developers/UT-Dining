@@ -1,7 +1,8 @@
 import { FlashList } from '@shopify/flash-list';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { BicepsFlexed, Flame, Wheat } from 'lucide-react-native';
-import React from 'react';
+import { usePostHog } from 'posthog-react-native';
+import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { SheetProvider } from 'react-native-actions-sheet';
 
@@ -13,6 +14,7 @@ import NutritionRow from './components/NutritionRow';
 import { Container } from '~/components/Container';
 import TopBar from '~/components/TopBar';
 import { useFoodData } from '~/hooks/useFoodData';
+import { getSafePostHog } from '~/services/analytics/posthog';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
@@ -36,9 +38,18 @@ const FoodScreen = () => {
     favorite === 'true'
   );
 
+  const analytics = getSafePostHog(usePostHog());
+
   // Filter out serving size from nutrition data
   const nutritionDataFiltered = nutritionData.filter((item) => item.key !== 'Serving Size');
 
+  useEffect(() => {
+    analytics.screen(`${food}`, {
+      location,
+      menu,
+      category,
+    });
+  }, []);
   return (
     <SheetProvider context="food">
       <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
