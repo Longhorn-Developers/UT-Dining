@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
@@ -6,7 +6,7 @@ import * as Network from 'expo-network';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useSQLiteContext } from 'expo-sqlite';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, View, Text } from 'react-native';
 import { Notifier } from 'react-native-notifier';
 
@@ -16,6 +16,8 @@ import LocationItem from '../_components/LocationItem';
 
 import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
+import OnboardingScreen from '~/components/onboarding/OnboardingScreen';
+import { useOnboardingStore } from '~/store/useOnboardingStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { getTodayInCentralTime } from '~/utils/date';
@@ -84,6 +86,7 @@ export default function Home() {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
   const [refreshing, setRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const isOnboardingComplete = useOnboardingStore((state) => state.isOnboardingComplete);
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db, { schema });
@@ -91,7 +94,7 @@ export default function Home() {
 
   useDrizzleStudio(db);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000); // 1 minute
@@ -164,36 +167,6 @@ export default function Home() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: isDarkMode ? '#111827' : '#fff',
-        }}>
-        <ActivityIndicator size="small" />
-      </View>
-    );
-  }
-
-  if (isError) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: isDarkMode ? '#111827' : '#fff',
-        }}>
-        <Text style={{ color: isDarkMode ? '#fff' : '#000' }}>
-          Failed to load data. Please try again.
-        </Text>
-      </View>
-    );
-  }
-
   const locations = data?.locations || [];
   const locationTypes = data?.locationTypes || [];
 
@@ -209,38 +182,52 @@ export default function Home() {
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       <Stack.Screen options={{ title: 'Home' }} />
       <Container disableBottomPadding onLayout={onLayoutRootView}>
-        <FlatList
-          extraData={[currentTime, selectedFilter, refreshKey]}
-          data={filteredLocations}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              tintColor={isDarkMode ? COLORS['ut-grey-dark-mode'] : '#8E8E93'}
-            />
-          }
-          contentContainerClassName="flex gap-y-3 pb-8"
-          renderItem={({ item }) => {
-            return (
-              <LocationItem
-                key={`${item.id}-${refreshKey}`}
-                location={item}
-                currentTime={currentTime}
+        <OnboardingScreen isOnboardingComplete={isOnboardingComplete} />
+
+        {isLoading ? (
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator size="small" />
+          </View>
+        ) : isError ? (
+          <View className="flex-1 items-center justify-center">
+            <Text style={{ color: isDarkMode ? '#fff' : '#000' }}>
+              Failed to load data. Please try again.
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            extraData={[currentTime, selectedFilter, refreshKey]}
+            data={filteredLocations}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                tintColor={isDarkMode ? COLORS['ut-grey-dark-mode'] : '#8E8E93'}
               />
-            );
-          }}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={1}
-          showsVerticalScrollIndicator={false}
-          ListHeaderComponent={
-            <HomeHeader
-              currentTime={currentTime}
-              selectedFilter={selectedFilter}
-              setSelectedFilter={setSelectedFilter}
-              locationTypes={locationTypes}
-            />
-          }
-        />
+            }
+            contentContainerClassName="flex gap-y-3 pb-8"
+            renderItem={({ item }) => {
+              return (
+                <LocationItem
+                  key={`${item.id}-${refreshKey}`}
+                  location={item}
+                  currentTime={currentTime}
+                />
+              );
+            }}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={1}
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={
+              <HomeHeader
+                currentTime={currentTime}
+                selectedFilter={selectedFilter}
+                setSelectedFilter={setSelectedFilter}
+                locationTypes={locationTypes}
+              />
+            }
+          />
+        )}
       </Container>
     </View>
   );

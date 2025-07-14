@@ -15,6 +15,7 @@ import {
   MapPin,
   MessageSquare,
   Moon,
+  RefreshCcw,
   Shield,
   Type,
 } from 'lucide-react-native';
@@ -29,6 +30,7 @@ import { useNotificationPermissions } from '~/hooks/useNotificationPermissions';
 import { getAppInformation } from '~/services/database/database';
 import { AppInformation } from '~/services/database/schema';
 import { getOrCreateDeviceId } from '~/services/device/deviceId';
+import { useOnboardingStore } from '~/store/useOnboardingStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
 import { cn } from '~/utils/utils';
@@ -370,7 +372,7 @@ const SettingsPage = () => {
     isColorBlindMode,
     toggleColorBlindMode,
   } = useSettingsStore();
-
+  const { resetOnboarding } = useOnboardingStore();
   const db = useDatabase();
   const [appInfo, setAppInfo] = React.useState<AppInformation | null>(null);
 
@@ -482,6 +484,29 @@ const SettingsPage = () => {
             isDarkMode={isDarkMode}
             onPress={() => Linking.openURL('https://utdining.userjot.com/updates')}
           />
+
+          {__DEV__ && (
+            <>
+              <SectionHeader
+                title="Development (only visible in dev mode)"
+                className="mt-4"
+                isDarkMode={isDarkMode}
+              />
+              <SettingItem
+                activeOpacity={0.7}
+                title="Reset Onboarding"
+                Icon={RefreshCcw}
+                hasChevron
+                isDarkMode={isDarkMode}
+                onPress={() => {
+                  console.log(
+                    '⚠️  Resetting onboarding. Go to the home screen to see the onboarding again.'
+                  );
+                  resetOnboarding();
+                }}
+              />
+            </>
+          )}
 
           <SectionHeader title="Information" className="mt-4" isDarkMode={isDarkMode} />
           {appInfo && <AboutSection appInfo={appInfo} isDarkMode={isDarkMode} />}
