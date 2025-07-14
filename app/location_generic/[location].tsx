@@ -1,6 +1,7 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { Clock, MapPin } from 'lucide-react-native';
-import React, { useState } from 'react';
+import { usePostHog } from 'posthog-react-native';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -16,18 +17,20 @@ import { Container } from '~/components/Container';
 import { PAYMENT_INFO_ICONS } from '~/data/PaymentInfo';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
+import { getSafePostHog } from '~/services/analytics/posthog';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { getLocationName } from '~/utils/locations';
 import { generateSchedule, isLocationOpen } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
-const GenericLocation = () => {
+export default function LocationGenericScreen() {
   const { location } = useLocalSearchParams<{ location: string }>();
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   const useColloquialNames = useSettingsStore((state) => state.useColloquialNames);
   const db = useDatabase();
   const [imageLoading, setImageLoading] = useState(true);
+  const analytics = getSafePostHog(usePostHog());
 
   const { locationData } = useLocationDetails(location || '');
   const displayName = getLocationName(db, location || '', useColloquialNames);
@@ -39,6 +42,11 @@ const GenericLocation = () => {
   const paymentMethods = Array.isArray(locationData?.methods_of_payment)
     ? locationData.methods_of_payment
     : [];
+
+  // Only track screen view if PostHog is enabled
+  useEffect(() => {
+    analytics.screen(location);
+  }, []);
 
   if (!location || !locationData) {
     return (
@@ -268,6 +276,4 @@ const GenericLocation = () => {
       </Container>
     </View>
   );
-};
-
-export default GenericLocation;
+}

@@ -2,7 +2,8 @@ import * as Haptics from 'expo-haptics';
 import * as Linking from 'expo-linking';
 import { router } from 'expo-router';
 import { CircleAlert, MapPin } from 'lucide-react-native';
-import React from 'react';
+import { usePostHog } from 'posthog-react-native';
+import React, { useEffect } from 'react';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import ActionSheet, { ActionSheetRef, ScrollView, useSheetRef } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS, getColor } from '~/utils/colors';
 import { cn } from '~/utils/utils';
+import { getSafePostHog } from '~/services/analytics/posthog';
 
 type MapLocationProps = {
   sheetId: string;
@@ -31,6 +33,7 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
   const insets = useSafeAreaInsets();
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   const isColorBlindMode = useSettingsStore((state) => state.isColorBlindMode);
+  const analytics = getSafePostHog(usePostHog());
 
   const handleOpenMaps = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -41,6 +44,10 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
         : `https://www.google.com/maps/place/${encodedAddress}`;
     Linking.openURL(url);
   };
+
+  useEffect(() => {
+    analytics.screen(`${name}-map-sheet`);
+  }, []);
 
   return (
     <ActionSheet

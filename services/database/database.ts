@@ -34,13 +34,13 @@ async function fetchInChunks(
   const chunks = chunkArray(ids, chunkSize);
   const results: any[] = [];
 
-  console.log(
-    `📊 Fetching ${tableName} in ${chunks.length} chunks of ${chunkSize} items each (${ids.length} total)`
-  );
+  // console.log(
+  //   `📊 Fetching ${tableName} in ${chunks.length} chunks of ${chunkSize} items each (${ids.length} total)`
+  // );
 
   for (let i = 0; i < chunks.length; i++) {
     const chunk = chunks[i];
-    console.log(`  📄 Processing chunk ${i + 1}/${chunks.length} with ${chunk.length} items`);
+    // console.log(`  📄 Processing chunk ${i + 1}/${chunks.length} with ${chunk.length} items`);
 
     const result = await supabase.from(tableName).select('*').in(column, chunk);
 
@@ -51,11 +51,11 @@ async function fetchInChunks(
 
     if (result.data) {
       results.push(...result.data);
-      console.log(`  ✅ Chunk ${i + 1}/${chunks.length} completed: ${result.data.length} records`);
+      // console.log(`  ✅ Chunk ${i + 1}/${chunks.length} completed: ${result.data.length} records`);
     }
   }
 
-  console.log(`✅ ${tableName} chunked fetch completed: ${results.length} total records`);
+  // console.log(`✅ ${tableName} chunked fetch completed: ${results.length} total records`);
   return { data: results, error: null };
 }
 
