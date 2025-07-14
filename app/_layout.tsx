@@ -3,6 +3,7 @@ import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { Stack } from 'expo-router';
 import { openDatabaseSync, SQLiteProvider } from 'expo-sqlite';
+import { PostHogProvider } from 'posthog-react-native';
 import { Suspense, useEffect } from 'react';
 import { ActivityIndicator } from 'react-native';
 import { SheetProvider } from 'react-native-actions-sheet';
@@ -18,6 +19,7 @@ import * as schema from '../services/database/schema';
 
 import '../global.css';
 import { PushNotificationsInitializer } from '~/services/notifications/notifications';
+import { POSTHOG_API_KEY, POSTHOG_CONFIG } from '~/services/analytics/posthog';
 
 export const DATABASE_NAME = 'database.db';
 
@@ -31,7 +33,7 @@ const expoDb = openDatabaseSync(DATABASE_NAME);
 const db = drizzle<typeof schema>(expoDb);
 const queryClient = new QueryClient();
 
-export default function Layout() {
+const AppContent = () => {
   const { success, error } = useMigrations(db, migrations);
   useSyncQueries({ queryClient });
 
@@ -107,5 +109,23 @@ export default function Layout() {
         </SQLiteProvider>
       </Suspense>
     </QueryClientProvider>
+  );
+};
+
+export default function Layout() {
+  // If no PostHog API key is provided, render app without PostHog
+  if (!POSTHOG_API_KEY) {
+    return <AppContent />;
+  }
+
+  // If PostHog API key is provided, wrap app with PostHog provider
+  return (
+    <PostHogProvider
+      apiKey={POSTHOG_CONFIG.apiKey}
+      options={POSTHOG_CONFIG.options}
+      autocapture={POSTHOG_CONFIG.autocapture}
+      debug>
+      <AppContent />
+    </PostHogProvider>
   );
 }

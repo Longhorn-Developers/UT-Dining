@@ -44,6 +44,7 @@ export default {
         },
       ],
       'expo-notifications',
+      'expo-localization',
     ],
     experiments: {
       typedRoutes: true,
