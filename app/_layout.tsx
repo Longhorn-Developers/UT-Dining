@@ -18,8 +18,9 @@ import migrations from '../drizzle/migrations';
 import * as schema from '../services/database/schema';
 
 import '../global.css';
-import { PushNotificationsInitializer } from '~/services/notifications/notifications';
+import { VersionCheckProvider } from '~/components/VersionCheckProvider';
 import { POSTHOG_API_KEY, POSTHOG_CONFIG } from '~/services/analytics/posthog';
+import { PushNotificationsInitializer } from '~/services/notifications/notifications';
 
 export const DATABASE_NAME = 'database.db';
 
@@ -55,54 +56,56 @@ const AppContent = () => {
           <GestureHandlerRootView>
             <NotifierWrapper useRNScreensOverlay>
               <SheetProvider>
-                <PushNotificationsInitializer />
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                    contentStyle: {
-                      backgroundColor: 'white',
-                    },
-                    gestureEnabled: true,
-                  }}>
-                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <VersionCheckProvider>
+                  <PushNotificationsInitializer />
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      contentStyle: {
+                        backgroundColor: 'white',
+                      },
+                      gestureEnabled: true,
+                    }}>
+                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-                  <Stack.Screen
-                    name="location_generic/[location]"
-                    options={{
-                      presentation: 'modal',
-                      sheetGrabberVisible: true,
-                      headerShown: false,
-                    }}
-                  />
-                  <Stack.Screen
-                    name="food/[food]"
-                    options={{
-                      presentation: 'modal',
-                      sheetGrabberVisible: true,
-                      headerShown: false,
-                    }}
-                  />
+                    <Stack.Screen
+                      name="location_generic/[location]"
+                      options={{
+                        presentation: 'modal',
+                        sheetGrabberVisible: true,
+                        headerShown: false,
+                      }}
+                    />
+                    <Stack.Screen
+                      name="food/[food]"
+                      options={{
+                        presentation: 'modal',
+                        sheetGrabberVisible: true,
+                        headerShown: false,
+                      }}
+                    />
 
-                  <Stack.Screen
-                    name="favorites"
-                    options={{
-                      headerShown: false,
-                    }}
-                  />
+                    <Stack.Screen
+                      name="favorites"
+                      options={{
+                        headerShown: false,
+                      }}
+                    />
 
-                  <Stack.Screen
-                    name="meal-plan"
-                    options={{
-                      headerShown: false,
-                    }}
-                  />
-                  <Stack.Screen
-                    name="location/[location]"
-                    options={{
-                      headerShown: false,
-                    }}
-                  />
-                </Stack>
+                    <Stack.Screen
+                      name="meal-plan"
+                      options={{
+                        headerShown: false,
+                      }}
+                    />
+                    <Stack.Screen
+                      name="location/[location]"
+                      options={{
+                        headerShown: false,
+                      }}
+                    />
+                  </Stack>
+                </VersionCheckProvider>
               </SheetProvider>
             </NotifierWrapper>
           </GestureHandlerRootView>
