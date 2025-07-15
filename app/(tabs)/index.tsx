@@ -86,6 +86,7 @@ export default function Home() {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
   const [refreshing, setRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [layoutLoaded, setLayoutLoaded] = useState(false);
   const isOnboardingComplete = useOnboardingStore((state) => state.isOnboardingComplete);
 
   const db = useSQLiteContext();
@@ -162,10 +163,15 @@ export default function Home() {
 
   // Handle splash screen
   const onLayoutRootView = () => {
-    if (!isLoading && !isFetching) {
+    setLayoutLoaded(true);
+  };
+
+  useEffect(() => {
+    if (layoutLoaded && !isLoading && !isFetching) {
+      console.log('✅ Splash screen hidden');
       SplashScreen.hide();
     }
-  };
+  }, [layoutLoaded, isLoading, isFetching]);
 
   const locations = data?.locations || [];
   const locationTypes = data?.locationTypes || [];

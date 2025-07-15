@@ -23,8 +23,11 @@ interface OnboardingState {
 
 export const ONBOARDING_STEPS = {
   WELCOME: 'welcome',
+  DATA_COLLECTION: 'data_collection',
+  FEATURES_MENUS: 'features_menus',
+  FEATURES_MAP: 'features_map',
+  FEATURES_FAVORITES: 'features_favorites',
   PERMISSIONS: 'permissions',
-  FEATURES: 'features',
   COMPLETE: 'complete',
 } as const;
 

@@ -1,15 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import React, { useCallback } from 'react';
-import {
-  Text,
-  NativeSyntheticEvent,
-  Modal,
-  View,
-  TouchableOpacity,
-  useWindowDimensions,
-  Pressable,
-} from 'react-native';
+import { Text, Modal, View, TouchableOpacity, useWindowDimensions, Pressable } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedRef,
@@ -22,7 +14,10 @@ import Animated, {
 import { Container } from '../Container';
 import { ProgressIndicator } from './ProgressIndicator';
 import CompleteScreen from './screens/CompleteScreen';
-import FeaturesScreen from './screens/FeaturesScreen';
+import DataCollectionScreen from './screens/DataCollectionScreen';
+import FavoritesFeatureScreen from './screens/FavoritesFeatureScreen';
+import MapFeatureScreen from './screens/MapFeatureScreen';
+import MenusFeatureScreen from './screens/MenusFeatureScreen';
 import PermissionsScreen from './screens/PermissionsScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 
@@ -32,8 +27,11 @@ import { cn } from '~/utils/utils';
 
 const ONBOARDING_SCREENS = [
   ONBOARDING_STEPS.WELCOME,
+  ONBOARDING_STEPS.DATA_COLLECTION,
+  ONBOARDING_STEPS.FEATURES_MENUS,
+  ONBOARDING_STEPS.FEATURES_MAP,
+  ONBOARDING_STEPS.FEATURES_FAVORITES,
   ONBOARDING_STEPS.PERMISSIONS,
-  ONBOARDING_STEPS.FEATURES,
   ONBOARDING_STEPS.COMPLETE,
 ];
 
@@ -48,6 +46,7 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
   const currentStepShared = useSharedValue(0);
   const isScrolling = useSharedValue(false);
   const { currentStep, setCurrentStep, completeOnboarding } = useOnboardingStore();
+  const [hasDataSelection, setHasDataSelection] = React.useState(false);
 
   const scrollHandler = useAnimatedScrollHandler({
     onBeginDrag: () => {
@@ -96,10 +95,18 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
     switch (stepId) {
       case ONBOARDING_STEPS.WELCOME:
         return <WelcomeScreen key={index} width={width} />;
+      case ONBOARDING_STEPS.DATA_COLLECTION:
+        return (
+          <DataCollectionScreen key={index} width={width} onSelectionChange={setHasDataSelection} />
+        );
+      case ONBOARDING_STEPS.FEATURES_MENUS:
+        return <MenusFeatureScreen key={index} width={width} />;
+      case ONBOARDING_STEPS.FEATURES_MAP:
+        return <MapFeatureScreen key={index} width={width} />;
+      case ONBOARDING_STEPS.FEATURES_FAVORITES:
+        return <FavoritesFeatureScreen key={index} width={width} />;
       case ONBOARDING_STEPS.PERMISSIONS:
         return <PermissionsScreen key={index} width={width} />;
-      case ONBOARDING_STEPS.FEATURES:
-        return <FeaturesScreen key={index} width={width} />;
       case ONBOARDING_STEPS.COMPLETE:
         return <CompleteScreen key={index} width={width} handleComplete={handleComplete} />;
       default:
@@ -156,7 +163,6 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
           <View className="flex-1 items-center justify-center px-4">
             <ProgressIndicator
               step={currentStep}
-              scrollX={scrollX}
               totalSteps={ONBOARDING_SCREENS.length}
               stepWidth={width}
               className="w-[180px]"
@@ -185,7 +191,11 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
             className="w-full rounded-full bg-ut-burnt-orange p-3"
             style={[animatedStyle]}>
             <Text className="py-2 text-center font-semibold text-white">
-              {currentStep === ONBOARDING_SCREENS.length - 1 ? 'Get Started' : 'Next'}
+              {currentStep === ONBOARDING_SCREENS.length - 1 
+                ? 'Get Started' 
+                : currentStep === 1 && !hasDataSelection 
+                  ? 'Skip' 
+                  : 'Next'}
             </Text>
           </AnimatedPressable>
         </View>

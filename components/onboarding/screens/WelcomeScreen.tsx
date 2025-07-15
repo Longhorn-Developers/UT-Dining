@@ -1,5 +1,8 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+
+import { COLORS } from '~/utils/colors';
 
 type Props = {
   width: number;
@@ -7,12 +10,38 @@ type Props = {
 
 const WelcomeScreen = ({ width }: Props) => {
   return (
-    <View style={{ width }} className="flex-1 items-center justify-center px-6">
-      <Text className="mb-4 text-center text-4xl font-bold">Welcome to UT Dining!</Text>
-      <Text className="mb-8 text-center text-lg text-gray-600">
-        Discover dining halls, menus, and hours across campus with ease.
-      </Text>
-      <View className="mb-8 h-32 w-32 rounded-full bg-orange-500" />
+    <View style={{ width }} className="flex-1 px-6 py-8">
+      <View className="flex-1 items-center justify-center">
+        {/* Image/Video placeholder */}
+        <View className="mb-8 h-64 w-64 items-center justify-center rounded-3xl bg-gray-100">
+          <Ionicons name="restaurant" size={80} color={COLORS['ut-burnt-orange']} />
+          <Text className="mt-4 text-sm text-gray-500">Welcome Image/Video</Text>
+        </View>
+
+        <View className="mb-8">
+          <Text className="mb-4 text-center text-4xl font-bold text-gray-900">
+            Welcome to UT Dining!
+          </Text>
+          <Text className="text-center text-lg leading-6 text-gray-600">
+            Your ultimate companion for discovering dining halls, menus, and hours across campus
+          </Text>
+        </View>
+      </View>
+
+      <View className="mb-4 flex-row items-center justify-center space-x-8">
+        <View className="items-center">
+          <Ionicons name="restaurant-outline" size={24} color={COLORS['ut-burnt-orange']} />
+          <Text className="mt-1 text-xs text-gray-600">50+ Locations</Text>
+        </View>
+        <View className="items-center">
+          <Ionicons name="time-outline" size={24} color={COLORS['ut-burnt-orange']} />
+          <Text className="mt-1 text-xs text-gray-600">Real-time Updates</Text>
+        </View>
+        <View className="items-center">
+          <Ionicons name="heart-outline" size={24} color={COLORS['ut-burnt-orange']} />
+          <Text className="mt-1 text-xs text-gray-600">Save Favorites</Text>
+        </View>
+      </View>
     </View>
   );
 };
