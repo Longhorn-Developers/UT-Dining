@@ -266,8 +266,8 @@ INSERT INTO "auth"."refresh_tokens" ("instance_id", "id", "token", "user_id", "r
 -- Data for Name: app_information; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."app_information" ("id", "about_title", "about_description", "credits_contributors", "support_links", "created_at", "updated_at") VALUES
-	('987e7606-c084-4b71-b583-f972b8f31b0f', 'About UT Dining', 'UT Dining is your companion app for exploring dining options at the University of Texas at Austin. Browse menus, check dining hours, and find the perfect meal on campus.', '[{"id": "1752383801390", "name": "Vina Do", "order": 1}, {"id": "1751429646841", "name": "Austin Tran", "order": 2}, {"id": "1751429683238", "name": "Chetan Gorantla", "order": 3}, {"id": "1751429651538", "name": "Ali Vayani", "order": 4}, {"id": "1751429639255", "name": "David Nguyen", "order": 5}]', '[{"id": "17514297261920", "url": "mailto:ethanlanting@gmail.com", "label": "Contact Support", "order": 1}, {"id": "17514297261921", "url": "https://longhorn-developers.github.io/ut-dining-website/faq", "label": "FAQ", "order": 2}, {"id": "17514297261922", "url": "https://longhorn-developers.github.io/ut-dining-website/privacy-policy", "label": "Privacy Policy", "order": 3}, {"id": "17514297261923", "url": "https://github.com/Longhorn-Developers/UT-Dining", "label": "Source Code", "order": 4}]', '2025-07-02 04:12:54.44+00', '2025-07-13 05:17:32.03');
+INSERT INTO "public"."app_information" ("id", "about_title", "about_description", "credits_contributors", "support_links", "created_at", "updated_at", "app_version") VALUES
+	('987e7606-c084-4b71-b583-f972b8f31b0f', 'About UT Dining', 'UT Dining is your companion app for exploring dining options at the University of Texas at Austin. Browse menus, check dining hours, and find the perfect meal on campus.', '[{"id": "1752383801390", "name": "Vina Do", "order": 1}, {"id": "1751429646841", "name": "Austin Tran", "order": 2}, {"id": "1751429683238", "name": "Chetan Gorantla", "order": 3}, {"id": "1751429651538", "name": "Ali Vayani", "order": 4}, {"id": "1751429639255", "name": "David Nguyen", "order": 5}]', '[{"id": "17514297261920", "url": "mailto:ethanlanting@gmail.com", "label": "Contact Support", "order": 1}, {"id": "17514297261921", "url": "https://longhorn-developers.github.io/ut-dining-website/faq", "label": "FAQ", "order": 2}, {"id": "17514297261922", "url": "https://longhorn-developers.github.io/ut-dining-website/privacy-policy", "label": "Privacy Policy", "order": 3}, {"id": "17514297261923", "url": "https://github.com/Longhorn-Developers/UT-Dining", "label": "Source Code", "order": 4}]', '2025-07-02 04:12:54.44+00', '2025-07-13 05:17:32.03', '1.1.0');
 
 
 --
@@ -542,35 +542,35 @@ SELECT pg_catalog.setval('"auth"."refresh_tokens_id_seq"', 48, true);
 -- Name: allergens_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."allergens_id_seq"', 4675, true);
+SELECT pg_catalog.setval('"public"."allergens_id_seq"', 4859, true);
 
 
 --
 -- Name: food_item_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."food_item_id_seq"', 4675, true);
+SELECT pg_catalog.setval('"public"."food_item_id_seq"', 4859, true);
 
 
 --
 -- Name: menu_category_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."menu_category_id_seq"', 686, true);
+SELECT pg_catalog.setval('"public"."menu_category_id_seq"', 716, true);
 
 
 --
 -- Name: menu_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."menu_id_seq"', 117, true);
+SELECT pg_catalog.setval('"public"."menu_id_seq"', 120, true);
 
 
 --
 -- Name: nutrition_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"public"."nutrition_id_seq"', 4675, true);
+SELECT pg_catalog.setval('"public"."nutrition_id_seq"', 4859, true);
 
 
 --
