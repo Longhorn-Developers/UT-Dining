@@ -186,6 +186,7 @@ export const app_information = sqliteTable('app_information', {
   about_description: text('about_description'),
   credits_contributors: text('credits_contributors', { mode: 'json' }),
   support_links: text('support_links', { mode: 'json' }),
+  app_version: text('app_version'),
 });
 
 export type Location = typeof location.$inferSelect;

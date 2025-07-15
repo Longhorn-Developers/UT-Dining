@@ -1,0 +1,1 @@
+ALTER TABLE `app_information` ADD `app_version` text;
