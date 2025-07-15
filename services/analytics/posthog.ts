@@ -52,7 +52,7 @@ if (!POSTHOG_API_KEY) {
   );
 } else if (POSTHOG_CONFIG.options.disabled) {
   console.log(
-    'ℹ️  PostHog analytics disabled in development mode. To enable analytics in development, set disabled: false in POSTHOG_CONFIG options.'
+    'ℹ️  PostHog analytics disabled in development mode. To enable analytics in development, set `disabled: false` in POSTHOG_CONFIG options.'
   );
 } else if (!POSTHOG_CONFIG.debug) {
   console.log('✅ PostHog analytics enabled (debug disabled)');

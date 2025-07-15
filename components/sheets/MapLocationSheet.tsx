@@ -8,10 +8,10 @@ import { Platform, Text, TouchableOpacity, View } from 'react-native';
 import ActionSheet, { ActionSheetRef, ScrollView, useSheetRef } from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { getSafePostHog } from '~/services/analytics/posthog';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS, getColor } from '~/utils/colors';
 import { cn } from '~/utils/utils';
-import { getSafePostHog } from '~/services/analytics/posthog';
 
 type MapLocationProps = {
   sheetId: string;
