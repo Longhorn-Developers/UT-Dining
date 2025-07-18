@@ -1,17 +1,17 @@
-import { isSameDay, addDays, subDays } from 'date-fns';
+import { addDays, isSameDay, subDays } from 'date-fns';
 import * as Haptics from 'expo-haptics';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
-import React from 'react';
-import { View, Text, Pressable } from 'react-native';
-import Reanimated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import type React from 'react';
+import { Pressable, Text, View } from 'react-native';
+import Reanimated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { useSettingsStore } from '~/store/useSettingsStore';
 import {
   addDaysToDate,
-  subtractDaysFromDate,
-  formatDateForDisplay,
   createDateFromString,
+  formatDateForDisplay,
   getCentralTimeDate,
+  subtractDaysFromDate,
 } from '~/utils/date';
 import { cn } from '~/utils/utils';
 
@@ -107,14 +107,16 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onDateChang
               : 'bg-gray-200 opacity-50'
             : isDarkMode
               ? 'bg-gray-700'
-              : 'bg-gray-100'
-        )}>
+              : 'bg-gray-100',
+        )}
+      >
         <Pressable
           onPress={handlePreviousDay}
           onPressIn={handlePreviousPressIn}
           onPressOut={handlePreviousPressOut}
           disabled={isPreviousDisabled}
-          className="h-full w-full items-center justify-center">
+          className="h-full w-full items-center justify-center"
+        >
           <ChevronLeft
             size={20}
             color={
@@ -131,7 +133,7 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onDateChang
       </Reanimated.View>
 
       <View className="flex-1 items-center">
-        <Text className={cn('text-lg font-semibold', isDarkMode ? 'text-white' : 'text-black')}>
+        <Text className={cn('font-semibold text-lg', isDarkMode ? 'text-white' : 'text-black')}>
           {displayDate}
         </Text>
       </View>
@@ -146,14 +148,16 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onDateChang
               : 'bg-gray-200 opacity-50'
             : isDarkMode
               ? 'bg-gray-700'
-              : 'bg-gray-100'
-        )}>
+              : 'bg-gray-100',
+        )}
+      >
         <Pressable
           onPress={handleNextDay}
           onPressIn={handleNextPressIn}
           onPressOut={handleNextPressOut}
           disabled={isNextDisabled}
-          className="h-full w-full items-center justify-center">
+          className="h-full w-full items-center justify-center"
+        >
           <ChevronRight
             size={20}
             color={

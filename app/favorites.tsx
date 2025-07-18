@@ -1,9 +1,9 @@
 import { FlashList } from '@shopify/flash-list';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { Stack, router } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { Heart } from 'lucide-react-native';
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { Notifier } from 'react-native-notifier';
 
 import Alert from '~/components/Alert';
@@ -29,12 +29,12 @@ const Favorites = () => {
         setLoading(false);
       }, 100);
     }
-  }, []);
+  }, [favorites]);
 
   // Sort favorites by date added (newest first)
   const sortedFavorites = useMemo(() => {
     return [...favorites].sort(
-      (a, b) => new Date(b.date_added).getTime() - new Date(a.date_added).getTime()
+      (a, b) => new Date(b.date_added).getTime() - new Date(a.date_added).getTime(),
     );
   }, [favorites]);
 
@@ -52,7 +52,8 @@ const Favorites = () => {
           <View>
             <View className="flex-row items-center gap-x-2">
               <Text
-                className={cn('text-3xl font-extrabold', isDarkMode ? 'text-white' : 'text-black')}>
+                className={cn('font-extrabold text-3xl', isDarkMode ? 'text-white' : 'text-black')}
+              >
                 Your Favorites
               </Text>
               <Heart size={20} color={COLORS['ut-burnt-orange']} fill={COLORS['ut-burnt-orange']} />
@@ -66,7 +67,7 @@ const Favorites = () => {
           <View
             className={cn(
               'my-1 w-full border-b',
-              isDarkMode ? 'border-gray-700' : 'border-ut-grey/15'
+              isDarkMode ? 'border-gray-700' : 'border-ut-grey/15',
             )}
           />
         </View>
@@ -81,8 +82,8 @@ const Favorites = () => {
                   name: item.name,
                   // These are empty because we don't have full nutrition data in favorites
                   // You could modify to store this if needed
-                  nutrition: {} as any,
-                  allergens: {} as any,
+                  nutrition: undefined,
+                  allergens: undefined,
                   link: '',
                 }}
                 location={item.location_name}
@@ -108,7 +109,7 @@ const Favorites = () => {
                     food,
                     item.location_name,
                     item.menu_name,
-                    item.category_name
+                    item.category_name,
                   );
                 }}
               />
@@ -117,15 +118,16 @@ const Favorites = () => {
           ListEmptyComponent={
             <View className="mt-12 flex items-center justify-center">
               {loading ? (
-                <Text className="text-xl font-bold text-ut-burnt-orange">Loading...</Text>
+                <Text className="font-bold text-ut-burnt-orange text-xl">Loading...</Text>
               ) : (
                 <>
                   {favorites.length === 0 && (
                     <Text
                       className={cn(
-                        'text-lg font-bold',
-                        isDarkMode ? 'text-white' : 'text-ut-burnt-orange'
-                      )}>
+                        'font-bold text-lg',
+                        isDarkMode ? 'text-white' : 'text-ut-burnt-orange',
+                      )}
+                    >
                       No Favorites Yet!
                     </Text>
                   )}
@@ -133,15 +135,17 @@ const Favorites = () => {
                   <Text
                     className={cn(
                       'mb-6 max-w-64 text-center',
-                      isDarkMode ? 'text-gray-300' : 'text-ut-grey'
-                    )}>
+                      isDarkMode ? 'text-gray-300' : 'text-ut-grey',
+                    )}
+                  >
                     Find your favorite dishes by browsing dining locations.
                   </Text>
                   <TouchableOpacity
                     onPress={() => {
                       router.dismissTo('/');
                     }}
-                    className="rounded-full bg-ut-burnt-orange px-4 py-2">
+                    className="rounded-full bg-ut-burnt-orange px-4 py-2"
+                  >
                     <Text className="font-bold text-white">Browse Dining Locations</Text>
                   </TouchableOpacity>
                 </>

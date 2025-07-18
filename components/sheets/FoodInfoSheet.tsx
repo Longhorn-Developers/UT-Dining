@@ -1,11 +1,10 @@
 import { InfoIcon } from 'lucide-react-native';
-import React from 'react';
-import { Text, View, Image } from 'react-native';
-import ActionSheet, { SheetProps } from 'react-native-actions-sheet';
+import { Image, Text, View } from 'react-native';
+import ActionSheet, { type SheetProps } from 'react-native-actions-sheet';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ALLERGEN_ICONS, ALLERGEN_EXCEPTIONS } from '~/data/AllergenInfo';
+import { ALLERGEN_EXCEPTIONS, ALLERGEN_ICONS } from '~/data/AllergenInfo';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
@@ -49,14 +48,15 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
       containerStyle={{ backgroundColor: isDarkMode ? '#111827' : 'white' }}
       gestureEnabled
       safeAreaInsets={insets}
-      useBottomSafeAreaPadding>
+      useBottomSafeAreaPadding
+    >
       <ScrollView showsVerticalScrollIndicator={false} className="max-h-[60vh]">
         <View className="p-6">
           {/* Header */}
           <View>
             <View className="mb-2 flex-row items-center gap-x-2">
               <InfoIcon color={COLORS['ut-burnt-orange']} />
-              <Text className={cn('text-3xl font-bold', isDarkMode ? 'text-white' : 'text-black')}>
+              <Text className={cn('font-bold text-3xl', isDarkMode ? 'text-white' : 'text-black')}>
                 Food Legend
               </Text>
             </View>
@@ -64,7 +64,7 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
 
           {/* Allergens Section */}
           <View>
-            <Text className={cn('text-xl font-semibold', isDarkMode ? 'text-white' : 'text-black')}>
+            <Text className={cn('font-semibold text-xl', isDarkMode ? 'text-white' : 'text-black')}>
               Allergens
             </Text>
             <Text className={cn('mb-3 text-sm', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
@@ -76,8 +76,9 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
                   <View
                     className={cn(
                       'mb-1 rounded-full border p-3',
-                      isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
-                    )}>
+                      isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50',
+                    )}
+                  >
                     <Image
                       source={item.icon}
                       className="size-10 rounded-full"
@@ -86,9 +87,10 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
                   </View>
                   <Text
                     className={cn(
-                      'text-center text-xs font-medium',
-                      isDarkMode ? 'text-gray-300' : 'text-ut-grey'
-                    )}>
+                      'text-center font-medium text-xs',
+                      isDarkMode ? 'text-gray-300' : 'text-ut-grey',
+                    )}
+                  >
                     {item.displayName}
                   </Text>
                 </View>
@@ -100,13 +102,13 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
           <View
             className={cn(
               'mb-4 w-full border-b',
-              isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15'
+              isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15',
             )}
           />
 
           {/* Dietary Section */}
           <View>
-            <Text className={cn('text-xl font-semibold', isDarkMode ? 'text-white' : 'text-black')}>
+            <Text className={cn('font-semibold text-xl', isDarkMode ? 'text-white' : 'text-black')}>
               Dietary Preferences
             </Text>
             <Text className={cn('mb-3 text-sm', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
@@ -118,15 +120,17 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
                   <View
                     className={cn(
                       'mb-1 rounded-full border p-3',
-                      isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
-                    )}>
+                      isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50',
+                    )}
+                  >
                     <Image source={item.icon} className="size-10" resizeMode="contain" />
                   </View>
                   <Text
                     className={cn(
-                      'text-center text-xs font-medium',
-                      isDarkMode ? 'text-gray-300' : 'text-ut-grey'
-                    )}>
+                      'text-center font-medium text-xs',
+                      isDarkMode ? 'text-gray-300' : 'text-ut-grey',
+                    )}
+                  >
                     {item.displayName}
                   </Text>
                 </View>

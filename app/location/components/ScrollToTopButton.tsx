@@ -1,6 +1,5 @@
 import { ArrowUp } from 'lucide-react-native';
-import React from 'react';
-import { TouchableOpacity, Animated } from 'react-native';
+import { Animated, TouchableOpacity } from 'react-native';
 
 interface ScrollToTopButtonProps {
   visible: boolean;
@@ -23,11 +22,13 @@ const ScrollToTopButton = ({ visible, animationValue, onPress }: ScrollToTopButt
         bottom: 40,
         right: 40,
         pointerEvents: visible ? 'auto' : 'none',
-      }}>
+      }}
+    >
       <TouchableOpacity
         onPress={onPress}
         className="size-12 items-center justify-center rounded-full bg-ut-burnt-orange shadow-md"
-        activeOpacity={0.8}>
+        activeOpacity={0.8}
+      >
         <ArrowUp size={24} color="white" />
       </TouchableOpacity>
     </Animated.View>

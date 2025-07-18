@@ -1,4 +1,4 @@
-import * as Notifications from 'expo-notifications';
+import type * as Notifications from 'expo-notifications';
 import { create } from 'zustand';
 
 interface PushNotificationsState {

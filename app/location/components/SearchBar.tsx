@@ -1,6 +1,6 @@
 import { Search, X } from 'lucide-react-native';
-import React, { useRef } from 'react';
-import { View, TextInput, Text, Keyboard, TouchableOpacity } from 'react-native';
+import { useRef } from 'react';
+import { Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
@@ -35,14 +35,15 @@ const SearchBar = ({ query, setQuery, onFocus, onBlur, isSearchFocused }: Props)
       <View
         className={cn(
           'flex-1 flex-row items-center rounded-lg border px-3 py-2.5',
-          isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-ut-grey/15 bg-white'
-        )}>
+          isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-ut-grey/15 bg-white',
+        )}
+      >
         <Search size={18} color={isDarkMode ? '#aaa' : COLORS['ut-grey']} />
         <TextInput
           ref={inputRef}
           className={cn(
             'ml-2 min-h-4 flex-1 text-base leading-tight',
-            isDarkMode ? 'text-white' : 'placeholder:text-gray-400'
+            isDarkMode ? 'text-white' : 'placeholder:text-gray-400',
           )}
           placeholder="Search for food name..."
           value={query}
@@ -62,9 +63,10 @@ const SearchBar = ({ query, setQuery, onFocus, onBlur, isSearchFocused }: Props)
         <TouchableOpacity onPress={handleCancel}>
           <Text
             className={cn(
-              'text-base font-medium',
-              isDarkMode ? 'text-white' : 'text-ut-burnt-orange'
-            )}>
+              'font-medium text-base',
+              isDarkMode ? 'text-white' : 'text-ut-burnt-orange',
+            )}
+          >
             Cancel
           </Text>
         </TouchableOpacity>

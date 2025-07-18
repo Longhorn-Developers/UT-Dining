@@ -1,12 +1,12 @@
-import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
-import React, { useState, useEffect, memo } from 'react';
+import type { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
+import { memo, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { Notifier } from 'react-native-notifier';
 
 import Alert from '~/components/Alert';
 import FoodComponent from '~/components/FoodComponent';
-import { FoodItem, toggleFavorites } from '~/services/database/database';
-import * as schema from '~/services/database/schema';
+import { type FoodItem, toggleFavorites } from '~/services/database/database';
+import type * as schema from '~/services/database/schema';
 
 // Define interfaces for the props
 interface FoodItemProps {
@@ -21,7 +21,7 @@ interface FoodItemRowProps {
   selectedMenu: string;
   location: string;
   db: ExpoSQLiteDatabase<typeof schema>;
-  favorites: { name: string; [key: string]: any }[];
+  favorites: schema.Favorite[];
 }
 
 const FoodItemRow = ({ item, selectedMenu, location, db, favorites }: FoodItemRowProps) => {

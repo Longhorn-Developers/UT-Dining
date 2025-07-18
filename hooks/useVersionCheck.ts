@@ -1,12 +1,10 @@
 import * as Application from 'expo-application';
 import { usePostHog } from 'posthog-react-native';
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Linking, Platform, AppState } from 'react-native';
-
-import { useDatabase } from './useDatabase';
-
+import { Alert, AppState, Linking, Platform } from 'react-native';
 import { getSafePostHog } from '~/services/analytics/posthog';
 import { getAppInformation } from '~/services/database/database';
+import { useDatabase } from './useDatabase';
 
 const APP_STORE_URL = Platform.select({
   ios: 'https://apps.apple.com/us/app/ut-dining/id6743042002',
@@ -45,7 +43,7 @@ export const useVersionCheck = () => {
             setIsAlertVisible(false);
             posthog?.capture('update_button_pressed', {
               platform: Platform.OS,
-              app_store_url: APP_STORE_URL,
+              app_store_url: APP_STORE_URL ?? '', // Fix: ensure string type for analytics event
             });
 
             if (APP_STORE_URL) {
@@ -72,7 +70,7 @@ export const useVersionCheck = () => {
             ]
           : []),
       ],
-      { cancelable: __DEV__ }
+      { cancelable: __DEV__ },
     );
     setHasShownAlert(true);
   }, [posthog]);
@@ -102,7 +100,7 @@ export const useVersionCheck = () => {
               '☁️  New version available. Current version:',
               currentVersion,
               'Latest version:',
-              appInfo.app_version
+              appInfo.app_version,
             );
             showUpdateAlert();
           } else {

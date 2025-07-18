@@ -1,6 +1,6 @@
 import * as Location from 'expo-location';
 import { useFocusEffect } from 'expo-router';
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export function useLocationPermissions() {
   const [permissionStatus, setPermissionStatus] = useState<Location.PermissionStatus | null>(null);
@@ -27,7 +27,7 @@ export function useLocationPermissions() {
   useFocusEffect(
     useCallback(() => {
       checkPermissions();
-    }, [checkPermissions])
+    }, [checkPermissions]),
   );
 
   const requestPermissions = async () => {
