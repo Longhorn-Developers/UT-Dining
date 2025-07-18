@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react-native';
 import React, { useEffect } from 'react';
-import { View, Animated } from 'react-native';
+import { Animated, View } from 'react-native';
 
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
@@ -31,12 +31,12 @@ const SkeletonItem = React.memo(({ isHeader = false }: SkeletonItemProps) => {
           duration: 750,
           useNativeDriver: false,
         }),
-      ])
+      ]),
     ).start();
 
     // Clean up animation on unmount
     return () => shimmerAnimation.stopAnimation();
-  }, []);
+  }, [shimmerAnimation]);
 
   const backgroundColor = shimmerAnimation.interpolate({
     inputRange: [0, 1],

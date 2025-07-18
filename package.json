@@ -8,9 +8,9 @@
     "ios": "APP_VARIANT=development expo run:ios",
     "start": "APP_VARIANT=development expo start --dev-client",
     "prebuild": "expo prebuild",
-    "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
-    "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
-    "check-types": "tsc --noEmit",
+    "lint": "biome check",
+    "lint:fix": "biome check --write",
+    "type-check": "tsc --noEmit",
     "web": "expo start --web",
     "prepare": "husky"
   },
@@ -81,25 +81,17 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.9",
+    "@biomejs/biome": "^2.1.2",
+    "@types/deno": "^2.3.0",
     "@types/react": "~18.3.18",
     "@types/uuid": "^10.0.0",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
-    "eslint": "^8.57.1",
-    "eslint-config-universe": "^12.1.0",
-    "prettier": "^3.5.3",
-    "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "^3.4.17",
     "tanstack-query-dev-tools-expo-plugin": "^0.1.1",
-    "typescript": "~5.3.3"
+    "typescript": "^5.8.3"
   },
   "resolutions": {
     "@react-navigation/core": "7.11.0",
     "esbuild": "^0.25.6"
-  },
-  "eslintConfig": {
-    "extends": "universe/native",
-    "root": true
   },
   "expo": {
     "doctor": {

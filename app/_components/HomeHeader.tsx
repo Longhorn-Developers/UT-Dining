@@ -1,19 +1,16 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import { ChefHat, Heart, LucideIcon } from 'lucide-react-native';
-import React from 'react';
-import { View, Text, Pressable } from 'react-native';
-import Reanimated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-
-import { FilterType } from '../(tabs)';
-import * as schema from '../../services/database/schema';
-
+import { ChefHat, Heart, type LucideIcon } from 'lucide-react-native';
+import { Pressable, Text, View } from 'react-native';
+import Reanimated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
 import { timeOfDay } from '~/utils/time';
 import { cn } from '~/utils/utils';
+import type * as schema from '../../services/database/schema';
+import type { FilterType } from '../(tabs)';
 
 type HomeHeaderProps = {
   currentTime: Date;
@@ -55,25 +52,28 @@ const QuickLinksCard = ({ title, description, Icon, onPress, isDarkMode }: Quick
   return (
     <Reanimated.View
       className={cn(
-        'flex-1  rounded-lg px-2 py-3',
+        'flex-1 rounded-lg px-2 py-3',
         isDarkMode ? 'bg-gray-800' : 'border border-gray-200 bg-white',
-        'shadow-sm'
+        'shadow-sm',
       )}
-      style={animatedStyle}>
+      style={animatedStyle}
+    >
       <Pressable
         className="flex-row items-center"
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        onPress={onPress}>
+        onPress={onPress}
+      >
         <View
           className={cn(
             'mr-3 h-10 w-10 items-center justify-center rounded-full',
-            isDarkMode ? 'bg-gray-700' : 'bg-orange-100'
-          )}>
+            isDarkMode ? 'bg-gray-700' : 'bg-orange-100',
+          )}
+        >
           <Icon size={20} color={getColor('ut-burnt-orange', false)} />
         </View>
         <View className="flex-1">
-          <Text className={cn('text-sm font-bold', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+          <Text className={cn('font-bold text-sm', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
             {title}
           </Text>
           <Text className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
@@ -136,9 +136,10 @@ const HomeHeader = ({
         <View>
           <Text
             className={cn(
-              'font-sans text-3xl font-extrabold',
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            )}>
+              'font-extrabold font-sans text-3xl',
+              isDarkMode ? 'text-white' : 'text-gray-900',
+            )}
+          >
             {getGreetingMessage()}
           </Text>
           <View className="flex-row items-center justify-between">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { DAILY_VALUES, INDENTED_NUTRITION } from '~/data/AllergenInfo';
 import { cn } from '~/utils/utils';
@@ -18,8 +18,9 @@ const NutritionRow = React.memo(({ item, isDarkMode }: NutritionRowProps) => {
       <View
         className={cn(
           'mb-2 flex-row justify-between',
-          INDENTED_NUTRITION.has(item.key) ? 'pl-4' : ''
-        )}>
+          INDENTED_NUTRITION.has(item.key) ? 'pl-4' : '',
+        )}
+      >
         <View className="flex-row gap-x-0.5">
           {item.key === 'Trans Fat' ? (
             <>
@@ -27,15 +28,17 @@ const NutritionRow = React.memo(({ item, isDarkMode }: NutritionRowProps) => {
                 className={cn(
                   'italic',
                   INDENTED_NUTRITION.has(item.key) && 'font-normal',
-                  isDarkMode ? 'text-gray-300' : 'text-black'
-                )}>
+                  isDarkMode ? 'text-gray-300' : 'text-black',
+                )}
+              >
                 Trans
               </Text>
               <Text
                 className={cn(
                   INDENTED_NUTRITION.has(item.key) && 'font-normal',
-                  isDarkMode ? 'text-gray-300' : 'text-black'
-                )}>
+                  isDarkMode ? 'text-gray-300' : 'text-black',
+                )}
+              >
                 {' Fat'}
               </Text>
             </>
@@ -43,8 +46,9 @@ const NutritionRow = React.memo(({ item, isDarkMode }: NutritionRowProps) => {
             <Text
               className={cn(
                 INDENTED_NUTRITION.has(item.key) ? 'font-normal' : 'font-bold',
-                isDarkMode ? 'text-gray-300' : 'text-black'
-              )}>
+                isDarkMode ? 'text-gray-300' : 'text-black',
+              )}
+            >
               {item.key}
             </Text>
           )}

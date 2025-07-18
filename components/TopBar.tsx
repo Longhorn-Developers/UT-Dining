@@ -1,13 +1,10 @@
 import * as Haptics from 'expo-haptics';
 import { Link, router, useLocalSearchParams } from 'expo-router';
 import { ChefHat, ChevronLeft, Heart, Info, MessageSquare } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
-import { View, Image, TouchableOpacity, Text } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 import { Notifier } from 'react-native-notifier';
-
-import Alert from './Alert';
-
 import { useDatabase } from '~/hooks/useDatabase';
 import { useFoodData } from '~/hooks/useFoodData';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
@@ -15,6 +12,7 @@ import { isFavoriteItem, toggleFavorites } from '~/services/database/database';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
+import Alert from './Alert';
 
 const icon = require('../assets/image.png');
 
@@ -51,9 +49,10 @@ const LocationTopBar = () => {
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           router.back();
-        }}>
+        }}
+      >
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
-        <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>
+        <Text className="font-semibold text-lg text-ut-burnt-orange">Back</Text>
       </TouchableOpacity>
 
       <View className="flex flex-row gap-x-5">
@@ -61,7 +60,8 @@ const LocationTopBar = () => {
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/favorites`);
-          }}>
+          }}
+        >
           <Heart size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
@@ -69,7 +69,8 @@ const LocationTopBar = () => {
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push(`/meal-plan`);
-          }}>
+          }}
+        >
           <ChefHat size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
 
@@ -84,7 +85,8 @@ const LocationTopBar = () => {
                 location: locationData,
               },
             });
-          }}>
+          }}
+        >
           <Info size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
       </View>
@@ -112,7 +114,7 @@ const FoodTopBar = () => {
     const result = isFavoriteItem(db, foodItem?.name as string);
 
     setIsFavorite(result);
-  }, [foodItem]);
+  }, [foodItem, db]);
 
   if (!foodItem) {
     return null;
@@ -130,10 +132,11 @@ const FoodTopBar = () => {
         onPress={() => {
           router.back();
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        }}>
+        }}
+      >
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
 
-        <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>
+        <Text className="font-semibold text-lg text-ut-burnt-orange">Back</Text>
       </TouchableOpacity>
 
       <View className="flex-row gap-x-5">
@@ -164,7 +167,8 @@ const FoodTopBar = () => {
               setIsFavorite(isFavorited);
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             }
-          }}>
+          }}
+        >
           <Heart
             size={20}
             color={getIconColor(isFavorite)}
@@ -181,7 +185,7 @@ const FoodTopBar = () => {
                 categoryName: category,
                 menuName: menu,
                 allergens: Object.fromEntries(
-                  Object.entries(foodItem.allergens).filter(([key]) => key !== 'id')
+                  Object.entries(foodItem.allergens || {}).filter(([key]) => key !== 'id'),
                 ) as Record<string, boolean>,
                 nutrition: {
                   calories: foodItem.nutrition?.calories || '0',
@@ -212,7 +216,8 @@ const FoodTopBar = () => {
             }
 
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          }}>
+          }}
+        >
           <ChefHat
             size={20}
             color={getIconColor(isMealPlanItem)}
@@ -225,7 +230,8 @@ const FoodTopBar = () => {
               context: 'food',
             });
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }}>
+          }}
+        >
           <Info size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
         </TouchableOpacity>
       </View>
@@ -241,10 +247,11 @@ const BackTopBar = () => {
         onPress={() => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           router.back();
-        }}>
+        }}
+      >
         <ChevronLeft size={24} color={COLORS['ut-burnt-orange']} />
 
-        <Text className="text-lg font-semibold text-ut-burnt-orange">Back</Text>
+        <Text className="font-semibold text-lg text-ut-burnt-orange">Back</Text>
       </TouchableOpacity>
     </View>
   );

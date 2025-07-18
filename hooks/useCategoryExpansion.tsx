@@ -1,6 +1,6 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { FoodItem, Location } from '~/services/database/database';
+import type { FoodItem, Location } from '~/services/database/database';
 
 // Add a new flag to mark hidden items
 export type ListItem =
@@ -31,7 +31,7 @@ export function useCategoryExpansion(data: Location | null) {
         console.error('Error toggling category:', error);
       }
     },
-    [expandedCategories]
+    [expandedCategories],
   );
 
   // Convert hierarchical data to flat list items with optimized memoization

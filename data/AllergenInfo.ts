@@ -1,4 +1,4 @@
-import { ImageSourcePropType } from 'react-native';
+import type { ImageSourcePropType } from 'react-native';
 
 const BeefIcon = require('../assets/allergen-icons/Beef.webp');
 const EggIcon = require('../assets/allergen-icons/Eggs.webp');

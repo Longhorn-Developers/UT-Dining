@@ -1,11 +1,9 @@
 import { eq, sql } from 'drizzle-orm';
-import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
-
-import { allergens, food_item, location, menu, menu_category, nutrition } from './schema';
-import * as schema from './schema';
-
+import type { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import { getTodayInCentralTime } from '~/utils/date';
 import { supabase } from '~/utils/supabase';
+import * as schema from './schema';
+import { allergens, food_item, location, menu, menu_category, nutrition } from './schema';
 
 /**
  * Splits an array into chunks of specified size
@@ -18,21 +16,31 @@ function chunkArray<T>(array: T[], chunkSize: number = 1000): T[][] {
   return chunks;
 }
 
+// Type mapping for table names to their corresponding schema types
+type TableTypeMap = {
+  food_item: schema.FoodItem;
+  nutrition: schema.Nutrition;
+  allergens: schema.Allergens;
+  menu_category: schema.MenuCategory;
+};
+
+type TableTypeMapKeys = keyof TableTypeMap;
+
 /**
  * Fetches data from Supabase in chunks to avoid hitting the 1000 item limit
  */
-async function fetchInChunks(
-  tableName: 'food_item' | 'nutrition' | 'allergens' | 'menu_category',
+async function fetchInChunks<T extends TableTypeMapKeys>(
+  tableName: T,
   column: string,
-  ids: any[],
-  chunkSize: number = 1000
-): Promise<{ data: any[] | null; error: any }> {
+  ids: (string | number)[],
+  chunkSize: number = 1000,
+) {
   if (ids.length === 0) {
     return { data: [], error: null };
   }
 
   const chunks = chunkArray(ids, chunkSize);
-  const results: any[] = [];
+  const results: TableTypeMap[T][] = [];
 
   // console.log(
   //   `📊 Fetching ${tableName} in ${chunks.length} chunks of ${chunkSize} items each (${ids.length} total)`
@@ -42,7 +50,10 @@ async function fetchInChunks(
     const chunk = chunks[i];
     // console.log(`  📄 Processing chunk ${i + 1}/${chunks.length} with ${chunk.length} items`);
 
-    const result = await supabase.from(tableName).select('*').in(column, chunk);
+    const result = await supabase
+      .from(tableName as TableTypeMapKeys)
+      .select('*')
+      .in(column, chunk);
 
     if (result.error) {
       console.error(`❌ Error in chunk ${i + 1}/${chunks.length}:`, result.error);
@@ -50,7 +61,7 @@ async function fetchInChunks(
     }
 
     if (result.data) {
-      results.push(...result.data);
+      results.push(...(result.data as TableTypeMap[T][]));
       // console.log(`  ✅ Chunk ${i + 1}/${chunks.length} completed: ${result.data.length} records`);
     }
   }
@@ -78,8 +89,8 @@ export interface MenuCategory {
 export interface FoodItem {
   name: schema.FoodItem['name'];
   link: schema.FoodItem['link'];
-  allergens: schema.Allergens;
-  nutrition: schema.Nutrition;
+  allergens?: schema.Allergens;
+  nutrition?: schema.Nutrition;
 }
 
 /**
@@ -223,12 +234,8 @@ const querySupabase = async (date?: string) => {
     }
 
     // Extract nutrition and allergen IDs from food items
-    const nutritionIds = foodItemData
-      .map((item: any) => item.nutrition_id)
-      .filter((id) => id !== null);
-    const allergenIds = foodItemData
-      .map((item: any) => item.allergens_id)
-      .filter((id) => id !== null);
+    const nutritionIds = foodItemData.map((item) => item.nutrition_id).filter((id) => id !== null);
+    const allergenIds = foodItemData.map((item) => item.allergens_id).filter((id) => id !== null);
 
     // Fetch nutrition and allergens data in parallel (with chunking to avoid 1000 item limit)
     const nutritionPromise =
@@ -283,7 +290,7 @@ const querySupabase = async (date?: string) => {
  */
 export const insertDataIntoSQLiteDB = async (
   db: ExpoSQLiteDatabase<typeof schema>,
-  date?: string
+  date?: string,
 ) => {
   // Always fetch and insert data when called (TanStack Query will control when this runs)
   console.log('📡 Fetching fresh data from Supabase...');
@@ -309,28 +316,36 @@ export const insertDataIntoSQLiteDB = async (
       const insertPromises = [];
 
       if (data.location.length > 0) {
-        insertPromises.push(db.insert(location).values(data.location as any));
+        insertPromises.push(db.insert(location).values(data.location as schema.Location[]));
       }
       if (data.location_type.length > 0) {
-        insertPromises.push(db.insert(schema.location_type).values(data.location_type as any));
+        insertPromises.push(
+          db.insert(schema.location_type).values(data.location_type as schema.LocationType[]),
+        );
       }
       if (data.menu.length > 0) {
-        insertPromises.push(db.insert(menu).values(data.menu as any));
+        insertPromises.push(db.insert(menu).values(data.menu as schema.Menu[]));
       }
       if (data.menu_category.length > 0) {
-        insertPromises.push(db.insert(menu_category).values(data.menu_category as any));
+        insertPromises.push(
+          db.insert(menu_category).values(data.menu_category as schema.MenuCategory[]),
+        );
       }
       if (data.food_item.length > 0) {
-        insertPromises.push(db.insert(food_item).values(data.food_item as any));
+        insertPromises.push(db.insert(food_item).values(data.food_item as schema.FoodItem[]));
       }
       if (data.nutrition.length > 0) {
-        insertPromises.push(db.insert(nutrition).values(data.nutrition as any));
+        insertPromises.push(db.insert(nutrition).values(data.nutrition as schema.Nutrition[]));
       }
       if (data.allergens.length > 0) {
-        insertPromises.push(db.insert(allergens).values(data.allergens as any));
+        insertPromises.push(db.insert(allergens).values(data.allergens as schema.Allergens[]));
       }
       if (data.app_information.length > 0) {
-        insertPromises.push(db.insert(schema.app_information).values(data.app_information as any));
+        insertPromises.push(
+          db
+            .insert(schema.app_information)
+            .values(data.app_information as (typeof schema.app_information.$inferInsert)[]),
+        );
       }
       if (data.notifications && data.notifications.length > 0) {
         // For each notification, determine what sent_at value to use. If the notification is scheduled, sent_at will each scheduled_at value. If the notification is not scheduled, sent_at will be created_at value.
@@ -340,7 +355,9 @@ export const insertDataIntoSQLiteDB = async (
           }
           return { ...notification, sent_at: notification.created_at };
         });
-        insertPromises.push(db.insert(schema.notifications).values(notificationsWithSentAt as any));
+        insertPromises.push(
+          db.insert(schema.notifications).values(notificationsWithSentAt as schema.Notification[]),
+        );
       }
       if (data.notification_types && data.notification_types.length > 0) {
         insertPromises.push(db.insert(schema.notification_types).values(data.notification_types));
@@ -370,7 +387,7 @@ export const insertDataIntoSQLiteDB = async (
 export const getLocationMenuNames = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string,
-  date?: string
+  date?: string,
 ) => {
   const targetDate = date || getTodayInCentralTime();
 
@@ -399,7 +416,7 @@ export const getLocationMenuData = async (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string,
   menuName: string,
-  date?: string
+  date?: string,
 ) => {
   try {
     const targetDate = date || getTodayInCentralTime();
@@ -469,7 +486,7 @@ export const getLocationMenuData = async (
       .leftJoin(schema.location_type, eq(schema.location_type.id, schema.location.type_id))
       .where(
         // Filter by location name, menu name, and date
-        sql`${schema.location.name} = ${locationName} AND ${schema.menu.name} = ${menuName} AND ${schema.menu.date} = ${targetDate}`
+        sql`${schema.location.name} = ${locationName} AND ${schema.menu.name} = ${menuName} AND ${schema.menu.date} = ${targetDate}`,
       )
       .execute();
 
@@ -519,7 +536,11 @@ export const getLocationMenuData = async (
 
       // Add food item to the category if it exists
       if (row.food_name) {
-        const foodItems = categoryMap.get(row.category_title)!;
+        const foodItems = categoryMap.get(row.category_title);
+
+        if (!foodItems) {
+          throw new Error(`Food items array not found for category: ${row.category_title}`);
+        }
 
         // Check if food item already exists to avoid duplicates
         const existingItem = foodItems.find((item) => item.name === row.food_name);
@@ -622,7 +643,7 @@ export const getFoodItem = async (
   locationName: string,
   menuName: string,
   categoryName: string,
-  itemName: string
+  itemName: string,
 ): Promise<FoodItem | null> => {
   const data = await db
     .select({
@@ -672,10 +693,10 @@ export const getFoodItem = async (
     .leftJoin(schema.allergens, eq(schema.allergens.id, schema.food_item.allergens_id))
     .leftJoin(schema.nutrition, eq(schema.nutrition.id, schema.food_item.nutrition_id))
     .where(
-      sql`${schema.location.name} = ${locationName} 
+      sql`${schema.location.name} = ${locationName}
           AND ${schema.menu.name} = ${menuName}
           AND ${schema.menu_category.title} = ${categoryName}
-          AND ${schema.food_item.name} = ${itemName}`
+          AND ${schema.food_item.name} = ${itemName}`,
     )
     .execute();
 
@@ -754,7 +775,7 @@ export const toggleFavorites = async (
   foodItem: FoodItem,
   locationName: string,
   menuName: string,
-  categoryName: string
+  categoryName: string,
 ) => {
   if (isFavoriteItem(db, foodItem.name as string)) {
     // Remove the item from favorites
@@ -767,17 +788,23 @@ export const toggleFavorites = async (
   }
 
   // Get nutrition and allergens data
-  const nutrition = db
-    .select()
-    .from(schema.nutrition)
-    .where(eq(schema.nutrition.id, foodItem.nutrition.id))
-    .get();
+  const nutrition =
+    foodItem.nutrition?.id !== undefined
+      ? db
+          .select()
+          .from(schema.nutrition)
+          .where(eq(schema.nutrition.id, foodItem.nutrition.id))
+          .get()
+      : undefined;
 
-  const allergens = db
-    .select()
-    .from(schema.allergens)
-    .where(eq(schema.allergens.id, foodItem.allergens.id))
-    .get();
+  const allergens =
+    foodItem.allergens?.id !== undefined
+      ? db
+          .select()
+          .from(schema.allergens)
+          .where(eq(schema.allergens.id, foodItem.allergens.id))
+          .get()
+      : undefined;
 
   // Insert into favorites table
   await db
@@ -838,7 +865,7 @@ export const toggleFavorites = async (
  */
 export const getLocationDetails = async (
   db: ExpoSQLiteDatabase<typeof schema>,
-  locationName: string
+  locationName: string,
 ): Promise<schema.LocationWithType | null> => {
   try {
     const locationData = await db
@@ -893,7 +920,7 @@ export const getLocationDetails = async (
  */
 export const getCompleteLocationData = async (
   db: ExpoSQLiteDatabase<typeof schema>,
-  locationName: string
+  locationName: string,
 ): Promise<Location | null> => {
   try {
     const data = await db
@@ -1006,12 +1033,14 @@ export const getCompleteLocationData = async (
         });
       }
 
-      const menu = menuMap.get(row.menu_name)!;
+      const menu = menuMap.get(row.menu_name);
+
+      if (!menu) continue;
 
       // Group food items by category within this menu
       if (row.category_title) {
         let category = menu.menu_categories.find(
-          (cat) => cat.category_title === row.category_title
+          (cat) => cat.category_title === row.category_title,
         );
 
         if (!category) {
@@ -1054,7 +1083,7 @@ export const getCompleteLocationData = async (
  * @returns A Promise resolving to the `AppInformation` object or null.
  */
 export const getAppInformation = async (
-  db: ExpoSQLiteDatabase<typeof schema>
+  db: ExpoSQLiteDatabase<typeof schema>,
 ): Promise<schema.AppInformation | null> => {
   try {
     const data = await db.select().from(schema.app_information).execute();
@@ -1077,7 +1106,7 @@ export const getAppInformation = async (
  * @returns A Promise resolving to an array of locations with latitude and longitude.
  */
 export const getAllLocationsWithCoordinates = async (
-  db: ExpoSQLiteDatabase<typeof schema>
+  db: ExpoSQLiteDatabase<typeof schema>,
 ): Promise<Pick<schema.Location, 'id' | 'name' | 'latitude' | 'longitude' | 'address'>[]> => {
   const data = await db
     .select({
@@ -1092,7 +1121,7 @@ export const getAllLocationsWithCoordinates = async (
     })
     .from(schema.location)
     .where(
-      sql`${schema.location.latitude} IS NOT NULL AND ${schema.location.longitude} IS NOT NULL`
+      sql`${schema.location.latitude} IS NOT NULL AND ${schema.location.longitude} IS NOT NULL`,
     )
     .leftJoin(schema.location_type, eq(schema.location.type_id, schema.location_type.id))
     .execute();
@@ -1107,7 +1136,7 @@ export const getAllLocationsWithCoordinates = async (
  * @returns A Promise resolving to an array of notification types.
  */
 export const getNotificationTypes = async (
-  db: ExpoSQLiteDatabase<typeof schema>
+  db: ExpoSQLiteDatabase<typeof schema>,
 ): Promise<schema.NotificationType[]> => {
   const data = await db.select().from(schema.notification_types).execute();
   return data;
@@ -1120,7 +1149,7 @@ export const getNotificationTypes = async (
  * @returns A Promise resolving to an array of notifications with their type names.
  */
 export const getNotifications = async (
-  db: ExpoSQLiteDatabase<typeof schema>
+  db: ExpoSQLiteDatabase<typeof schema>,
 ): Promise<(schema.Notification & { type_name: string })[]> => {
   const data = await db
     .select({
@@ -1135,7 +1164,7 @@ export const getNotifications = async (
     .from(schema.notifications)
     .leftJoin(
       schema.notification_types,
-      eq(schema.notifications.type, schema.notification_types.id)
+      eq(schema.notifications.type, schema.notification_types.id),
     )
     .orderBy(sql`datetime(${schema.notifications.sent_at}) DESC`)
     .execute();
@@ -1167,7 +1196,7 @@ export const insertNotification = async (
     sent_at: string;
     redirect_url?: string;
     type?: string;
-  }
+  },
 ): Promise<void> => {
   try {
     const notificationId =

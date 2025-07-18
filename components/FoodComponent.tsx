@@ -1,28 +1,25 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import {
-  HeartIcon,
+  BicepsFlexed,
   ChefHatIcon,
   ChevronRight,
   Flame,
-  BicepsFlexed,
+  HeartIcon,
   Wheat,
 } from 'lucide-react-native';
-import React from 'react';
-import { Text, Pressable, View, Image } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Notifier } from 'react-native-notifier';
-import Reanimated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
-
-import Alert from './Alert';
-import { FavoriteAction, RemoveAction, AddMealPlanAction } from './AnimatedActions';
-
+import Reanimated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { ALLERGEN_ICONS } from '~/data/AllergenInfo';
-import { FoodItem } from '~/services/database/database';
+import type { FoodItem } from '~/services/database/database';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
+import Alert from './Alert';
+import { AddMealPlanAction, FavoriteAction, RemoveAction } from './AnimatedActions';
 
 const FoodComponent = ({
   food,
@@ -117,7 +114,7 @@ const FoodComponent = ({
               categoryName,
               menuName: selectedMenu,
               allergens: Object.fromEntries(
-                Object.entries(food.allergens || {}).filter(([key]) => key !== 'id')
+                Object.entries(food.allergens || {}).filter(([key]) => key !== 'id'),
               ) as Record<string, boolean>,
               nutrition: {
                 calories: food.nutrition?.calories || '',
@@ -158,7 +155,8 @@ const FoodComponent = ({
               <AddMealPlanAction progress={progress} />
             )
           ) : null
-        }>
+        }
+      >
         <Pressable
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
@@ -166,8 +164,9 @@ const FoodComponent = ({
           className={cn(
             'flex-row items-center justify-between rounded border px-3 py-2',
             isDarkMode ? 'border-gray-700 bg-gray-800' : 'bg-white',
-            isFavorite || isMealPlan ? 'border-ut-burnt-orange' : 'border-ut-grey/15'
-          )}>
+            isFavorite || isMealPlan ? 'border-ut-burnt-orange' : 'border-ut-grey/15',
+          )}
+        >
           <FoodContent
             food={food}
             isFavorite={isFavorite}
@@ -200,9 +199,10 @@ const FoodContent = ({
       <View className="flex-row items-center gap-2">
         <Text
           className={cn(
-            'line-clamp-2 max-w-[16rem] text-lg font-medium leading-6',
-            isDarkMode ? 'text-white' : 'text-black'
-          )}>
+            'line-clamp-2 max-w-[16rem] font-medium text-lg leading-6',
+            isDarkMode ? 'text-white' : 'text-black',
+          )}
+        >
           {food.name}
         </Text>
         {isFavorite && showExtraInfo && (
@@ -218,9 +218,10 @@ const FoodContent = ({
               <Flame fill={COLORS['ut-burnt-orange']} size={10} color={COLORS['ut-burnt-orange']} />
               <Text
                 className={cn(
-                  'text-xs font-medium',
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                )}>
+                  'font-medium text-xs',
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700',
+                )}
+              >
                 {food.nutrition?.calories} kcal
               </Text>
             </View>
@@ -232,9 +233,10 @@ const FoodContent = ({
               />
               <Text
                 className={cn(
-                  'text-xs font-medium',
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                )}>
+                  'font-medium text-xs',
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700',
+                )}
+              >
                 {food.nutrition?.protein} Protein
               </Text>
             </View>
@@ -242,9 +244,10 @@ const FoodContent = ({
               <Wheat fill={COLORS['ut-burnt-orange']} size={10} color={COLORS['ut-burnt-orange']} />
               <Text
                 className={cn(
-                  'text-xs font-medium',
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                )}>
+                  'font-medium text-xs',
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700',
+                )}
+              >
                 {food.nutrition?.total_carbohydrates} Carbs
               </Text>
             </View>
@@ -261,7 +264,7 @@ const FoodContent = ({
                       className="size-3 rounded-full"
                       resizeMode="contain"
                     />
-                  ) : null
+                  ) : null,
               )}
           </View>
         </>

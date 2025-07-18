@@ -10,7 +10,7 @@ import {
   Heart,
   HelpCircle,
   History,
-  LucideIcon,
+  type LucideIcon,
   Mail,
   MapPin,
   MessageSquare,
@@ -19,15 +19,15 @@ import {
   Type,
 } from 'lucide-react-native';
 import React from 'react';
-import { View, Text, Switch, TouchableOpacity, Linking, ScrollView } from 'react-native';
-import { SheetProvider, SheetManager } from 'react-native-actions-sheet';
+import { Linking, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { SheetManager, SheetProvider } from 'react-native-actions-sheet';
 
 import { Container } from '~/components/Container';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationPermissions } from '~/hooks/useLocationPermissions';
 import { useNotificationPermissions } from '~/hooks/useNotificationPermissions';
 import { getAppInformation } from '~/services/database/database';
-import { AppInformation } from '~/services/database/schema';
+import type { AppInformation } from '~/services/database/schema';
 import { getOrCreateDeviceId } from '~/services/device/deviceId';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
@@ -61,24 +61,27 @@ const SettingItem = ({
   <TouchableOpacity
     className={cn(
       'flex-row items-center justify-between border-b py-3',
-      isDarkMode ? 'border-gray-700' : 'border-gray-100'
+      isDarkMode ? 'border-gray-700' : 'border-gray-100',
     )}
     onPress={onPress}
     disabled={!hasChevron && !onPress}
-    activeOpacity={activeOpacity}>
+    activeOpacity={activeOpacity}
+  >
     <View className="flex-row items-center">
       {Icon && (
         <View
           className={cn(
             'mr-3 h-8 w-8 items-center justify-center rounded-full',
-            isDarkMode ? 'bg-gray-800' : 'bg-orange-100'
-          )}>
+            isDarkMode ? 'bg-gray-800' : 'bg-orange-100',
+          )}
+        >
           <Icon size={16} color={getColor('ut-burnt-orange', false)} />
         </View>
       )}
       <View>
         <Text
-          className={cn('text-base font-medium', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+          className={cn('font-medium text-base', isDarkMode ? 'text-gray-100' : 'text-gray-800')}
+        >
           {title}
         </Text>
         {subtitle && (
@@ -111,10 +114,11 @@ interface SectionHeaderProps {
 const SectionHeader = ({ title, className, isDarkMode }: SectionHeaderProps) => (
   <Text
     className={cn(
-      'py-2 text-sm font-semibold uppercase tracking-wider',
+      'py-2 font-semibold text-sm uppercase tracking-wider',
       isDarkMode ? 'text-gray-400' : 'text-gray-500',
-      className
-    )}>
+      className,
+    )}
+  >
     {title}
   </Text>
 );
@@ -126,9 +130,11 @@ interface AboutSectionProps {
 
 const AboutSection = ({ appInfo, isDarkMode }: AboutSectionProps) => (
   <View
-    className={cn('mt-2 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50')}>
+    className={cn('mt-2 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50')}
+  >
     <Text
-      className={cn('mb-2 text-lg font-semibold', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+      className={cn('mb-2 font-semibold text-lg', isDarkMode ? 'text-gray-100' : 'text-gray-800')}
+    >
       {appInfo.about_title}
     </Text>
     <Text className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
@@ -154,19 +160,19 @@ const HelpSupportSection = ({ appInfo, isDarkMode }: HelpSupportSectionProps): J
 
   return (
     <View
-      className={cn('mt-4 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50')}>
+      className={cn('mt-4 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50')}
+    >
       <Text
-        className={cn(
-          'mb-2 text-lg font-semibold',
-          isDarkMode ? 'text-gray-100' : 'text-gray-800'
-        )}>
+        className={cn('mb-2 font-semibold text-lg', isDarkMode ? 'text-gray-100' : 'text-gray-800')}
+      >
         Help & Support
       </Text>
       {supportLinks.map((link) => (
         <TouchableOpacity
           key={link.id}
           className="mb-2 flex-row items-center"
-          onPress={() => Linking.openURL(link.url)}>
+          onPress={() => Linking.openURL(link.url)}
+        >
           {LABEL_TO_ICON[link.label as keyof typeof LABEL_TO_ICON]}
           <Text className="ml-2 text-ut-burnt-orange">{link.label}</Text>
         </TouchableOpacity>
@@ -184,15 +190,17 @@ const CreditsSection = ({ appInfo, isDarkMode }: CreditsSectionProps): JSX.Eleme
   <View
     className={cn(
       'mt-4 gap-y-2 rounded-lg p-4',
-      isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50'
-    )}>
-    <Text className={cn('text-lg font-semibold', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+      isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50',
+    )}
+  >
+    <Text className={cn('font-semibold text-lg', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
       Credits
     </Text>
     <View>
       <Link
         href="https://ethanlanting.dev"
-        className={cn('text-base font-medium', isDarkMode ? 'text-gray-200' : 'text-black')}>
+        className={cn('font-medium text-base', isDarkMode ? 'text-gray-200' : 'text-black')}
+      >
         Ethan Lanting
       </Link>
       <Text className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
@@ -200,7 +208,7 @@ const CreditsSection = ({ appInfo, isDarkMode }: CreditsSectionProps): JSX.Eleme
       </Text>
     </View>
     <View>
-      <Text className={cn('text-base font-medium', isDarkMode ? 'text-gray-200' : 'text-black')}>
+      <Text className={cn('font-medium text-base', isDarkMode ? 'text-gray-200' : 'text-black')}>
         {appInfo.credits_contributors
           .sort((a, b) => a.order - b.order)
           .map((contributor) => contributor.name)
@@ -215,7 +223,8 @@ const CreditsSection = ({ appInfo, isDarkMode }: CreditsSectionProps): JSX.Eleme
         Adopted by{' '}
         <Link
           href="https://github.com/Longhorn-Developers"
-          className="font-medium not-italic text-ut-burnt-orange underline">
+          className="font-medium text-ut-burnt-orange not-italic underline"
+        >
           Longhorn Developers
         </Link>
       </Text>
@@ -225,7 +234,7 @@ const CreditsSection = ({ appInfo, isDarkMode }: CreditsSectionProps): JSX.Eleme
 
 interface VersionInfoProps {
   isDarkMode: boolean;
-  appInfo?: any;
+  appInfo: AppInformation | null;
 }
 
 const NotificationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): JSX.Element => {
@@ -255,21 +264,24 @@ const NotificationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): J
     <TouchableOpacity
       className={cn(
         'flex-row items-center justify-between border-b py-3',
-        isDarkMode ? 'border-gray-700' : 'border-gray-100'
+        isDarkMode ? 'border-gray-700' : 'border-gray-100',
       )}
       onPress={handleNotificationAction}
-      activeOpacity={isGranted ? 1 : 0.7}>
+      activeOpacity={isGranted ? 1 : 0.7}
+    >
       <View className="flex-row items-center">
         <View
           className={cn(
             'mr-3 h-8 w-8 items-center justify-center rounded-full',
-            isDarkMode ? 'bg-gray-800' : 'bg-orange-100'
-          )}>
+            isDarkMode ? 'bg-gray-800' : 'bg-orange-100',
+          )}
+        >
           <Bell size={16} color={getColor('ut-burnt-orange', false)} />
         </View>
         <View className="flex-1">
           <Text
-            className={cn('text-base font-medium', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+            className={cn('font-medium text-base', isDarkMode ? 'text-gray-100' : 'text-gray-800')}
+          >
             {getStatusText()}
           </Text>
           <Text className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
@@ -313,21 +325,24 @@ const LocationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): JSX.E
     <TouchableOpacity
       className={cn(
         'flex-row items-center justify-between border-b py-3',
-        isDarkMode ? 'border-gray-700' : 'border-gray-100'
+        isDarkMode ? 'border-gray-700' : 'border-gray-100',
       )}
       onPress={handleLocationAction}
-      activeOpacity={isGranted ? 1 : 0.7}>
+      activeOpacity={isGranted ? 1 : 0.7}
+    >
       <View className="flex-row items-center">
         <View
           className={cn(
             'mr-3 h-8 w-8 items-center justify-center rounded-full',
-            isDarkMode ? 'bg-gray-800' : 'bg-orange-100'
-          )}>
+            isDarkMode ? 'bg-gray-800' : 'bg-orange-100',
+          )}
+        >
           <MapPin size={16} color={getColor('ut-burnt-orange', false)} />
         </View>
         <View className="flex-1">
           <Text
-            className={cn('text-base font-medium', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
+            className={cn('font-medium text-base', isDarkMode ? 'text-gray-100' : 'text-gray-800')}
+          >
             {getStatusText()}
           </Text>
           <Text className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
@@ -344,7 +359,7 @@ const LocationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): JSX.E
   );
 };
 
-const VersionInfo = ({ isDarkMode, appInfo }: VersionInfoProps): JSX.Element => {
+const VersionInfo = ({ isDarkMode }: VersionInfoProps): JSX.Element => {
   const deviceId = getOrCreateDeviceId();
 
   return (
@@ -388,12 +403,14 @@ const SettingsPage = () => {
     <SheetProvider context="settings">
       <Container
         className={cn('m-0', isDarkMode ? 'bg-[#111827]' : 'bg-white')}
-        disableBottomPadding>
+        disableBottomPadding
+      >
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : 'white' }}
-          contentContainerStyle={{ padding: 24 }}>
-          <Text className={cn('text-3xl font-extrabold', isDarkMode ? 'text-white' : 'text-black')}>
+          contentContainerStyle={{ padding: 24 }}
+        >
+          <Text className={cn('font-extrabold text-3xl', isDarkMode ? 'text-white' : 'text-black')}>
             Settings
           </Text>
           <SectionHeader title="Quick Links" className="mt-4" isDarkMode={isDarkMode} />

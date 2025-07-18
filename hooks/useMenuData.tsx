@@ -1,10 +1,12 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState, useEffect, useMemo, useRef } from 'react';
-
-import { useDatabase } from './useDatabase';
-
-import { getLocationMenuNames, getLocationMenuData, Location } from '~/services/database/database';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  getLocationMenuData,
+  getLocationMenuNames,
+  type Location,
+} from '~/services/database/database';
 import { getTodayInCentralTime } from '~/utils/date';
+import { useDatabase } from './useDatabase';
 
 export function useMenuData(location: string, date?: string) {
   const db = useDatabase();
@@ -65,7 +67,7 @@ export function useMenuData(location: string, date?: string) {
   // Reset selected menu when date changes
   useEffect(() => {
     setSelectedMenu(null);
-  }, [targetDate]);
+  }, []);
 
   // Track menu switching state
   useEffect(() => {
@@ -94,7 +96,7 @@ export function useMenuData(location: string, date?: string) {
         title: menuName || '',
         id: menuName || '',
       })),
-    [menuNames]
+    [menuNames],
   );
 
   const loading = isLoadingMenuNames || isLoadingMenuData;

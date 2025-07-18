@@ -1,15 +1,16 @@
-import { eq, and } from 'drizzle-orm';
-
-import { LocationWithType, menu, Location } from '~/services/database/schema';
+import { and, eq } from 'drizzle-orm';
+import type { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
+import type * as schema from '~/services/database/schema';
+import { type Location, type LocationWithType, menu } from '~/services/database/schema';
 import { getTodayInCentralTime } from '~/utils/date';
 import { isLocationOpen } from '~/utils/time';
 
 export function getLocationOpenStatus(
   location: LocationWithType,
   locationData: Location | null,
-  db: any,
+  db: ExpoSQLiteDatabase<typeof schema>,
   currentTime: Date = new Date(),
-  targetDate?: string
+  targetDate?: string,
 ): boolean {
   // Use provided date or default to today's date in Central Time
   const dateToCheck = targetDate || getTodayInCentralTime();

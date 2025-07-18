@@ -11,7 +11,7 @@ interface DietaryFilters {
   [key: string]: boolean;
 }
 
-interface FiltersState {
+export interface FiltersState {
   filters: {
     favorites: boolean;
     mealPlan: boolean;
@@ -91,6 +91,6 @@ export const useFiltersStore = create<FiltersState>()(
     {
       name: 'filters-storage',
       storage: createJSONStorage(() => zustandStorage),
-    }
-  )
+    },
+  ),
 );

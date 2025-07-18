@@ -2,24 +2,24 @@ import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import { Stack } from 'expo-router';
 import {
-  ChevronLeft,
-  Microwave,
-  Locate,
-  ChevronUp,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
-  MapPin,
+  ChevronUp,
   Coffee,
-  Store,
-  Utensils,
+  Locate,
+  MapPin,
+  Microwave,
   Soup,
+  Store,
   Truck,
+  Utensils,
 } from 'lucide-react-native';
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { View, TouchableOpacity, Alert, Dimensions, Animated } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Alert, Animated, Dimensions, TouchableOpacity, View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
-import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import type { Region } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 
 import { Container } from '~/components/Container';
 import { MICROWAVE_LOCATIONS } from '~/data/MicrowaveLocations';
@@ -29,11 +29,35 @@ import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
 
+// Type for merged location data (dining + microwave locations)
+type MergedLocation = {
+  name: string;
+  address: string;
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  type: 'dining' | 'microwave';
+  hasMenu: boolean;
+};
+
 const initialRegion = {
   latitude: 30.285548,
   longitude: -97.737384,
   latitudeDelta: 0.01,
   longitudeDelta: 0.01,
+};
+
+// Helper function to check if two coordinates are the same (within small tolerance)
+const coordinatesMatch = (
+  coord1: { latitude: number; longitude: number },
+  coord2: { latitude: number; longitude: number },
+) => {
+  const COORDINATE_TOLERANCE = 1e-6;
+  return (
+    Math.abs(coord1.latitude - coord2.latitude) < COORDINATE_TOLERANCE &&
+    Math.abs(coord1.longitude - coord2.longitude) < COORDINATE_TOLERANCE
+  );
 };
 
 const ICON_MAP = {
@@ -104,7 +128,8 @@ const MarkerIcon = ({
     <Animated.View
       style={{
         transform: [{ scale: squishAnimation }],
-      }}>
+      }}
+    >
       <TouchableOpacity
         onPress={handlePress}
         activeOpacity={0.9}
@@ -120,7 +145,8 @@ const MarkerIcon = ({
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.3,
           shadowRadius: 2,
-        }}>
+        }}
+      >
         <IconComponent size={20} color="white" />
       </TouchableOpacity>
     </Animated.View>
@@ -219,7 +245,8 @@ const EdgeIndicator = ({ direction, onPress }: { direction: Direction; onPress: 
           transform: [{ scale: scaleAnimation }, { scale: squishAnimation }],
         },
         getPositionStyle(),
-      ]}>
+      ]}
+    >
       <TouchableOpacity
         activeOpacity={0.7}
         onPress={handlePress}
@@ -236,7 +263,8 @@ const EdgeIndicator = ({ direction, onPress }: { direction: Direction; onPress: 
           shadowRadius: 4,
           alignItems: 'center',
           justifyContent: 'center',
-        }}>
+        }}
+      >
         <View style={{ alignItems: 'center' }}>{getIcon()}</View>
       </TouchableOpacity>
     </Animated.View>
@@ -262,9 +290,9 @@ const MapMarkers = ({
 }) => {
   return (
     <>
-      {locations.map((location, index) => (
+      {locations.map((location) => (
         <Marker
-          key={location.name + index}
+          key={location.name}
           coordinate={location.coordinates}
           tracksViewChanges={false}
           onPress={() => {
@@ -280,7 +308,8 @@ const MapMarkers = ({
                 ...(location.note ? { note: location.note } : {}),
               },
             });
-          }}>
+          }}
+        >
           <MarkerIcon
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -312,7 +341,9 @@ const MapPage = () => {
   const [hasLocationPermission, setHasLocationPermission] = useState(false);
   const [currentRegion, setCurrentRegion] = useState<Region>(initialRegion);
   const db = useDatabase();
-  const [dbLocations, setDbLocations] = useState<any[]>([]);
+  const [dbLocations, setDbLocations] = useState<
+    Awaited<ReturnType<typeof getAllLocationsWithCoordinates>>
+  >([]);
   const isColorBlindMode = useSettingsStore((state) => state.isColorBlindMode);
   useEffect(() => {
     (async () => {
@@ -321,7 +352,7 @@ const MapPage = () => {
         Alert.alert(
           'Location Permission Denied',
           'Enable location services to see your position on the map.',
-          [{ text: 'OK' }]
+          [{ text: 'OK' }],
         );
         return;
       }
@@ -340,7 +371,7 @@ const MapPage = () => {
         },
         (newLocation: Location.LocationObject) => {
           setUserLocation(newLocation);
-        }
+        },
       );
 
       return () => {
@@ -359,40 +390,35 @@ const MapPage = () => {
     fetchDbLocations();
   }, [db]);
 
-  // Merge static and DB locations, deduplicate by lat/lng (prefer DB)
-  const mergedLocations = React.useMemo(() => {
-    const dbLocs = dbLocations.map((loc) => {
-      // Check if this DB location matches a static microwave location
-      const isMicrowave = MICROWAVE_LOCATIONS.some(
-        (staticLoc) =>
-          Math.abs(Number(loc.latitude) - staticLoc.coordinates.latitude) < 1e-6 &&
-          Math.abs(Number(loc.longitude) - staticLoc.coordinates.longitude) < 1e-6
-      );
-      return {
-        name: (loc.name ?? '') as string,
-        address: (loc.address ?? '') as string,
+  // Merge database dining locations with static microwave locations
+  const mergedLocations: MergedLocation[] = React.useMemo(() => {
+    // Transform database locations to consistent format, filtering out null names
+    const databaseLocations = dbLocations
+      .filter((loc) => loc.name !== null)
+      .map((loc) => ({
+        name: loc.name as string,
+        address: loc.address,
         coordinates: {
           latitude: Number(loc.latitude),
           longitude: Number(loc.longitude),
         },
-        description: loc.description,
-        type: isMicrowave ? 'microwave' : loc.type,
-        hasMenu: loc.has_menus,
-      };
-    });
-    const staticLocs = MICROWAVE_LOCATIONS.filter(
-      (staticLoc) =>
-        !dbLocs.some(
-          (dbLoc) =>
-            Math.abs(dbLoc.coordinates.latitude - staticLoc.coordinates.latitude) < 1e-6 &&
-            Math.abs(dbLoc.coordinates.longitude - staticLoc.coordinates.longitude) < 1e-6
-        )
-    ).map((staticLoc) => ({
-      ...staticLoc,
-      type: 'microwave',
+        type: 'dining' as const,
+        hasMenu: true,
+      }));
+
+    // Add microwave locations that don't overlap with database locations
+    const uniqueMicrowaveLocations = MICROWAVE_LOCATIONS.filter(
+      (microwaveLocation) =>
+        !databaseLocations.some((dbLocation) =>
+          coordinatesMatch(dbLocation.coordinates, microwaveLocation.coordinates),
+        ),
+    ).map((microwaveLocation) => ({
+      ...microwaveLocation,
+      type: 'microwave' as const,
       hasMenu: false,
     }));
-    return [...dbLocs, ...staticLocs];
+
+    return [...databaseLocations, ...uniqueMicrowaveLocations];
   }, [dbLocations]);
 
   const handleRegionChangeComplete = (region: Region) => {
@@ -403,8 +429,8 @@ const MapPage = () => {
   const outOfViewLocations = useMemo(() => {
     // Calculate distance from initial campus center
     const distanceFromCampus = Math.sqrt(
-      Math.pow(currentRegion.latitude - initialRegion.latitude, 2) +
-        Math.pow(currentRegion.longitude - initialRegion.longitude, 2)
+      (currentRegion.latitude - initialRegion.latitude) ** 2 +
+        (currentRegion.longitude - initialRegion.longitude) ** 2,
     );
 
     // Threshold to determine if user has scrolled away from main campus area
@@ -472,7 +498,7 @@ const MapPage = () => {
           ? { direction: direction as Direction, count: locations.length }
           : max;
       },
-      { direction: 'north' as Direction, count: 0 }
+      { direction: 'north' as Direction, count: 0 },
     );
 
     // Return only the direction with the most locations
@@ -483,7 +509,7 @@ const MapPage = () => {
 
   const navigateToDirection = (
     direction: Direction,
-    deltas?: { latitudeDelta: number; longitudeDelta: number }
+    deltas?: { latitudeDelta: number; longitudeDelta: number },
   ) => {
     const locationsInDirection = outOfViewLocations[direction];
     if (locationsInDirection.length === 0) return;
@@ -493,12 +519,12 @@ const MapPage = () => {
     // Find the closest location in that direction
     const closest = locationsInDirection.reduce((closest, current) => {
       const closestDistance = Math.sqrt(
-        Math.pow(closest.coordinates.latitude - currentRegion.latitude, 2) +
-          Math.pow(closest.coordinates.longitude - currentRegion.longitude, 2)
+        (closest.coordinates.latitude - currentRegion.latitude) ** 2 +
+          (closest.coordinates.longitude - currentRegion.longitude) ** 2,
       );
       const currentDistance = Math.sqrt(
-        Math.pow(current.coordinates.latitude - currentRegion.latitude, 2) +
-          Math.pow(current.coordinates.longitude - currentRegion.longitude, 2)
+        (current.coordinates.latitude - currentRegion.latitude) ** 2 +
+          (current.coordinates.longitude - currentRegion.longitude) ** 2,
       );
       return currentDistance < closestDistance ? current : closest;
     });
@@ -511,7 +537,7 @@ const MapPage = () => {
         latitudeDelta: deltas?.latitudeDelta ?? 0.0015,
         longitudeDelta: deltas?.longitudeDelta ?? 0.0015,
       },
-      500
+      500,
     );
   };
 
@@ -527,7 +553,7 @@ const MapPage = () => {
         latitudeDelta: 0.00125,
         longitudeDelta: 0.00125,
       },
-      500
+      500,
     );
   };
 
@@ -549,7 +575,8 @@ const MapPage = () => {
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       <Container
         disableInsets
-        className={cn('mx-0 gap-6', isDarkMode ? 'bg-gray-900' : 'bg-white')}>
+        className={cn('mx-0 gap-6', isDarkMode ? 'bg-gray-900' : 'bg-white')}
+      >
         <Stack.Screen
           options={{
             title: 'Map',
@@ -570,7 +597,8 @@ const MapPage = () => {
           onRegionChangeComplete={handleRegionChangeComplete}
           userInterfaceStyle={isDarkMode ? 'dark' : 'light'}
           loadingEnabled
-          loadingBackgroundColor={isDarkMode ? 'rgba(17,24,39,0.7)' : 'rgba(255,255,255,0.9)'}>
+          loadingBackgroundColor={isDarkMode ? 'rgba(17,24,39,0.7)' : 'rgba(255,255,255,0.9)'}
+        >
           <MapMarkers
             locations={mergedLocations}
             onMarkerPress={handleMarkerPress}
@@ -605,9 +633,10 @@ const MapPage = () => {
               centerOnUser();
             }}
             className={cn(
-              'absolute bottom-12 right-12 rounded-full p-4',
-              isDarkMode ? 'bg-[#111827]' : 'bg-white'
-            )}>
+              'absolute right-12 bottom-12 rounded-full p-4',
+              isDarkMode ? 'bg-[#111827]' : 'bg-white',
+            )}
+          >
             <Locate size={24} color={COLORS['ut-burnt-orange']} />
           </TouchableOpacity>
         )}

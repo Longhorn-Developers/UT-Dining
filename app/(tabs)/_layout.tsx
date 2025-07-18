@@ -40,14 +40,13 @@ export default function Layout() {
         tabBarIconStyle: {
           marginTop: 2,
         },
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size, focused }) => (
-            <Home size={size} color={color} strokeWidth={1.2} />
-          ),
+          tabBarIcon: ({ color, size }) => <Home size={size} color={color} strokeWidth={1.2} />,
           tabBarActiveBackgroundColor: 'rgba(191, 87, 0, 0.05)',
         }}
         listeners={{
@@ -58,9 +57,7 @@ export default function Layout() {
         name="map"
         options={{
           title: 'Map',
-          tabBarIcon: ({ color, size, focused }) => (
-            <MapPin size={size} color={color} strokeWidth={1.2} />
-          ),
+          tabBarIcon: ({ color, size }) => <MapPin size={size} color={color} strokeWidth={1.2} />,
           tabBarActiveBackgroundColor: 'rgba(191, 87, 0, 0.05)',
         }}
         listeners={{
@@ -71,9 +68,7 @@ export default function Layout() {
         name="notifications"
         options={{
           title: 'Notifications',
-          tabBarIcon: ({ color, size, focused }) => (
-            <Bell size={size} color={color} strokeWidth={1.2} />
-          ),
+          tabBarIcon: ({ color, size }) => <Bell size={size} color={color} strokeWidth={1.2} />,
           tabBarActiveBackgroundColor: 'rgba(191, 87, 0, 0.05)',
           tabBarBadge: hasUnread ? unreadCount : undefined,
           tabBarBadgeStyle: {
@@ -90,9 +85,7 @@ export default function Layout() {
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ color, size, focused }) => (
-            <Cog size={size} color={color} strokeWidth={1.2} />
-          ),
+          tabBarIcon: ({ color, size }) => <Cog size={size} color={color} strokeWidth={1.2} />,
           tabBarActiveBackgroundColor: 'rgba(191, 87, 0, 0.05)',
         }}
         listeners={{

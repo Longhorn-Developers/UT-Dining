@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { useMemo, useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { useDatabase } from '~/hooks/useDatabase';
 import * as schema from '~/services/database/schema';
@@ -23,7 +23,7 @@ export function useUnreadNotifications() {
         sent_at: schema.notifications.sent_at,
       })
       .from(schema.notifications)
-      .orderBy(sql`datetime(${schema.notifications.sent_at}) DESC`)
+      .orderBy(sql`datetime(${schema.notifications.sent_at}) DESC`),
   );
 
   // Calculate unread count based on last visited timestamp

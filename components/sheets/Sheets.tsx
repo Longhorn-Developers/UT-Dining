@@ -1,13 +1,11 @@
 // https://rnas.vercel.app/
 
-import { registerSheet, SheetDefinition } from 'react-native-actions-sheet';
-
+import { registerSheet, type SheetDefinition } from 'react-native-actions-sheet';
+import type { Location } from '~/services/database/schema';
 import FiltersSheet from './FiltersSheet';
 import FoodInfoSheet from './FoodInfoSheet';
 import LocationAboutSheet from './LocationAboutSheet';
 import MapLocationSheet from './MapLocationSheet';
-
-import { Location } from '~/services/database/schema';
 
 registerSheet('location-about', LocationAboutSheet);
 registerSheet('food-info', FoodInfoSheet, 'food');
@@ -39,5 +37,3 @@ declare module 'react-native-actions-sheet' {
     }>;
   }
 }
-
-export {};

@@ -1,4 +1,4 @@
-import { ImageSourcePropType } from 'react-native';
+import type { ImageSourcePropType } from 'react-native';
 
 const BevoPayIcon = require('../assets/payment-icons/bp_payment.webp');
 const CreditDebitIcon = require('../assets/payment-icons/c-d_payment.webp');

@@ -1,4 +1,4 @@
-import { LayoutChangeEvent, View } from 'react-native';
+import { type LayoutChangeEvent, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useSettingsStore } from '~/store/useSettingsStore';
@@ -32,8 +32,9 @@ export const Container = ({
       className={cn(
         'mx-6 flex flex-1 flex-col gap-y-8 pb-24',
         isDarkMode ? 'bg-gray-900' : 'bg-transparent',
-        className
-      )}>
+        className,
+      )}
+    >
       {children}
     </View>
   );

@@ -3,9 +3,14 @@ import * as Linking from 'expo-linking';
 import { router } from 'expo-router';
 import { CircleAlert, MapPin } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
-import React, { useEffect } from 'react';
+import type React from 'react';
+import { useEffect } from 'react';
 import { Platform, Text, TouchableOpacity, View } from 'react-native';
-import ActionSheet, { ActionSheetRef, ScrollView, useSheetRef } from 'react-native-actions-sheet';
+import ActionSheet, {
+  type ActionSheetRef,
+  ScrollView,
+  useSheetRef,
+} from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { getSafePostHog } from '~/services/analytics/posthog';
@@ -45,6 +50,7 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
     Linking.openURL(url);
   };
 
+  // biome-ignorelint/correctness/useExhaustiveDependencies: analytics only
   useEffect(() => {
     analytics.screen(`${name}-map-sheet`);
   }, []);
@@ -65,12 +71,13 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
       gestureEnabled
       safeAreaInsets={insets}
       useBottomSafeAreaPadding
-      backgroundInteractionEnabled>
+      backgroundInteractionEnabled
+    >
       <ScrollView showsHorizontalScrollIndicator={false} className="max-h-[60vh] p-5">
         {/* Location header */}
         <View className="mb-4 flex-row items-start justify-between">
           <View className="flex-1">
-            <Text className={cn('text-3xl font-bold', isDarkMode && 'text-white')}>{name}</Text>
+            <Text className={cn('font-bold text-3xl', isDarkMode && 'text-white')}>{name}</Text>
             <View className="mt-2 flex-col gap-y-2">
               <View className="flex-row items-center gap-x-3">
                 {/* Location Type Pill */}
@@ -79,13 +86,15 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
                     <View
                       className={cn(
                         'self-start rounded-full px-3 py-1',
-                        isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-ut-grey/5'
-                      )}>
+                        isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-ut-grey/5',
+                      )}
+                    >
                       <Text
                         className={cn(
-                          'text-xs font-bold uppercase',
-                          isDarkMode ? 'text-white' : 'text-black/75'
-                        )}>
+                          'font-bold text-xs uppercase',
+                          isDarkMode ? 'text-white' : 'text-black/75',
+                        )}
+                      >
                         {type}
                       </Text>
                     </View>
@@ -101,8 +110,9 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
                 <Text
                   className={cn(
                     'ml-1 pr-4 text-base',
-                    isDarkMode ? 'text-ut-grey-dark-mode' : 'text-ut-grey'
-                  )}>
+                    isDarkMode ? 'text-ut-grey-dark-mode' : 'text-ut-grey',
+                  )}
+                >
                   {address}
                 </Text>
               </TouchableOpacity>
@@ -111,7 +121,7 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
             <View
               className={cn(
                 'my-2 h-1 w-full border-b',
-                isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15'
+                isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15',
               )}
             />
           </View>
@@ -128,7 +138,7 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
         {note && (
           <View className="mb-4 flex-row items-center gap-x-3 self-start rounded-xl bg-ut-burnt-orange/10 px-4 py-2.5">
             <CircleAlert color={getColor('ut-burnt-orange', isColorBlindMode)} size={18} />
-            <Text className="text-sm font-medium text-ut-burnt-orange">{note}</Text>
+            <Text className="font-medium text-sm text-ut-burnt-orange">{note}</Text>
           </View>
         )}
 
@@ -139,7 +149,8 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
           style={{
             backgroundColor: getColor('ut-burnt-orange', isColorBlindMode),
           }}
-          onPress={handleOpenMaps}>
+          onPress={handleOpenMaps}
+        >
           <Text className="text-center font-bold text-white">Directions</Text>
         </TouchableOpacity>
 
@@ -148,7 +159,7 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
             activeOpacity={0.8}
             className={cn(
               'mt-3 rounded-xl border py-3.5 shadow-sm',
-              isDarkMode ? 'border-ut-grey-dark-mode/20' : 'border-ut-grey/30'
+              isDarkMode ? 'border-ut-grey-dark-mode/20' : 'border-ut-grey/30',
             )}
             onPress={() => {
               if (hasMenu) {
@@ -167,12 +178,14 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
                   router.push(`/location_generic/${name}`);
                 }, 10);
               }
-            }}>
+            }}
+          >
             <Text
               className={cn(
                 'text-center font-semibold',
-                isDarkMode ? 'text-ut-grey-dark-mode' : 'text-ut-grey'
-              )}>
+                isDarkMode ? 'text-ut-grey-dark-mode' : 'text-ut-grey',
+              )}
+            >
               More Info
             </Text>
           </TouchableOpacity>

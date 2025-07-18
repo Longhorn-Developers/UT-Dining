@@ -2,9 +2,9 @@ import { FlashList } from '@shopify/flash-list';
 import { eq, sql } from 'drizzle-orm';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { router, Stack, useFocusEffect } from 'expo-router';
-import { Bell, ChefHat, MapPin, Star, ExternalLink } from 'lucide-react-native';
-import React, { useState, useCallback, useMemo } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { Bell, ChefHat, ExternalLink, MapPin, Star } from 'lucide-react-native';
+import { useCallback, useMemo } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 import { Container } from '~/components/Container';
 import { useDatabase } from '~/hooks/useDatabase';
@@ -79,14 +79,15 @@ const NotificationItem = ({
             : 'bg-gray-50'
           : isDarkMode
             ? 'bg-orange-500/5'
-            : 'bg-orange-50'
-      )}>
+            : 'bg-orange-50',
+      )}
+    >
       <View className="flex-row items-start gap-x-3">
         <View className="mt-1">{getNotificationIcon(notification.type_name)}</View>
 
         <View className="flex-1">
           <View className="flex-row items-center justify-between">
-            <Text className={cn('text-base font-bold', isDarkMode ? 'text-white' : 'text-black')}>
+            <Text className={cn('font-bold text-base', isDarkMode ? 'text-white' : 'text-black')}>
               {notification.title}
             </Text>
             <View className="flex-row items-center gap-x-2">
@@ -102,15 +103,16 @@ const NotificationItem = ({
           <Text
             className={cn(
               'mt-1 text-sm leading-relaxed',
-              isDarkMode ? 'text-gray-300' : 'text-gray-700'
-            )}>
+              isDarkMode ? 'text-gray-300' : 'text-gray-700',
+            )}
+          >
             {notification.body}
           </Text>
 
           {!notification.isRead && (
             <View className="mt-2 flex-row">
               <View className="rounded-full bg-ut-burnt-orange px-2 py-1">
-                <Text className="text-xs font-bold text-white">NEW</Text>
+                <Text className="font-bold text-white text-xs">NEW</Text>
               </View>
             </View>
           )}
@@ -133,7 +135,7 @@ const Notifications = () => {
         const now = Date.now();
         setLastVisited(now);
       };
-    }, [setLastVisited])
+    }, [setLastVisited]),
   );
 
   // Use live query to get notifications in real-time, sorted by sent_at DESC
@@ -151,9 +153,9 @@ const Notifications = () => {
       .from(schema.notifications)
       .leftJoin(
         schema.notification_types,
-        eq(schema.notifications.type, schema.notification_types.id)
+        eq(schema.notifications.type, schema.notification_types.id),
       )
-      .orderBy(sql`datetime(${schema.notifications.sent_at}) DESC`)
+      .orderBy(sql`datetime(${schema.notifications.sent_at}) DESC`),
   );
 
   // Convert database notifications to UI format with isRead state
@@ -179,7 +181,7 @@ const Notifications = () => {
 
   const handleNotificationPress = (notification: Notification) => {
     if (notification.redirect_url) {
-      router.push(notification.redirect_url as any);
+      router.push(notification.redirect_url);
     }
   };
 
@@ -207,9 +209,10 @@ const Notifications = () => {
                   <View className="flex-row items-center gap-x-2">
                     <Text
                       className={cn(
-                        'text-3xl font-extrabold',
-                        isDarkMode ? 'text-white' : 'text-black'
-                      )}>
+                        'font-extrabold text-3xl',
+                        isDarkMode ? 'text-white' : 'text-black',
+                      )}
+                    >
                       Notifications
                     </Text>
                   </View>
@@ -217,11 +220,12 @@ const Notifications = () => {
                     <View className="flex-row items-center gap-x-3">
                       <TouchableOpacity
                         onPress={handleReadAll}
-                        className="rounded-lg bg-ut-burnt-orange px-3 py-1">
-                        <Text className="text-xs font-semibold text-white">Read All</Text>
+                        className="rounded-lg bg-ut-burnt-orange px-3 py-1"
+                      >
+                        <Text className="font-semibold text-white text-xs">Read All</Text>
                       </TouchableOpacity>
                       <View className="rounded-full bg-ut-burnt-orange px-3 py-1">
-                        <Text className="text-sm font-bold text-white">{unreadCount}</Text>
+                        <Text className="font-bold text-sm text-white">{unreadCount}</Text>
                       </View>
                     </View>
                   )}
@@ -234,7 +238,7 @@ const Notifications = () => {
               <View
                 className={cn(
                   'my-1 mb-6 w-full border-b',
-                  isDarkMode ? 'border-gray-700' : 'border-ut-grey/15'
+                  isDarkMode ? 'border-gray-700' : 'border-ut-grey/15',
                 )}
               />
             </View>
@@ -248,14 +252,15 @@ const Notifications = () => {
           ItemSeparatorComponent={() => <View className="h-3" />}
           ListEmptyComponent={
             <View className="mt-12 flex items-center justify-center px-6">
-              <Text className="mt-4 text-lg font-bold text-ut-burnt-orange">
+              <Text className="mt-4 font-bold text-lg text-ut-burnt-orange">
                 No Notifications Yet!
               </Text>
               <Text
                 className={cn(
                   'mt-2 max-w-72 text-center',
-                  isDarkMode ? 'text-gray-300' : 'text-ut-grey'
-                )}>
+                  isDarkMode ? 'text-gray-300' : 'text-ut-grey',
+                )}
+              >
                 We'll notify you about your favorite foods and dining location updates.
               </Text>
             </View>

@@ -1,12 +1,11 @@
-import { HeartIcon, CircleX, ChefHatIcon } from 'lucide-react-native';
-import React from 'react';
-import { ViewStyle } from 'react-native';
+import { ChefHatIcon, CircleX, HeartIcon } from 'lucide-react-native';
+import type { ViewStyle } from 'react-native';
 import Reanimated, {
-  useAnimatedStyle,
+  Extrapolation,
   interpolate,
   interpolateColor,
-  Extrapolation,
-  SharedValue,
+  type SharedValue,
+  useAnimatedStyle,
 } from 'react-native-reanimated';
 
 import { COLORS } from '~/utils/colors';
@@ -27,7 +26,7 @@ export const FavoriteAction = ({ progress }: { progress: SharedValue<number> }) 
       backgroundColor: interpolateColor(
         progress.value,
         [0, 0.8, 1],
-        ['#ff7400', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
+        ['#ff7400', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']],
       ),
     };
   });
@@ -35,7 +34,8 @@ export const FavoriteAction = ({ progress }: { progress: SharedValue<number> }) 
   return (
     <Reanimated.View
       style={backgroundStyle}
-      className="min-w-[6.5rem] flex-row items-center justify-end pr-4">
+      className="min-w-[6.5rem] flex-row items-center justify-end pr-4"
+    >
       <Reanimated.View style={animatedStyle}>
         <HeartIcon fill="#fff" stroke="#fff" />
       </Reanimated.View>
@@ -59,7 +59,7 @@ export const RemoveAction = ({ progress }: { progress: SharedValue<number> }) =>
       backgroundColor: interpolateColor(
         progress.value,
         [0, 0.8, 1],
-        ['#ff7400', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
+        ['#ff7400', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']],
       ),
     };
   });
@@ -67,7 +67,8 @@ export const RemoveAction = ({ progress }: { progress: SharedValue<number> }) =>
   return (
     <Reanimated.View
       style={backgroundStyle}
-      className="min-w-[6.5rem] flex-row items-center justify-end pr-4">
+      className="min-w-[6.5rem] flex-row items-center justify-end pr-4"
+    >
       <Reanimated.View style={animatedStyle}>
         <CircleX stroke="#fff" />
       </Reanimated.View>
@@ -91,7 +92,7 @@ export const AddMealPlanAction = ({ progress }: { progress: SharedValue<number> 
       backgroundColor: interpolateColor(
         progress.value,
         [0, 0.8, 1],
-        ['#ff7400', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']]
+        ['#ff7400', COLORS['ut-burnt-orange'], COLORS['ut-burnt-orange']],
       ),
     };
   });
@@ -99,7 +100,8 @@ export const AddMealPlanAction = ({ progress }: { progress: SharedValue<number> 
   return (
     <Reanimated.View
       style={backgroundStyle}
-      className="min-w-[6.5rem] flex-row items-center justify-end pr-4">
+      className="min-w-[6.5rem] flex-row items-center justify-end pr-4"
+    >
       <Reanimated.View style={animatedStyle}>
         <ChefHatIcon fill="#fff" stroke="#fff" />
       </Reanimated.View>

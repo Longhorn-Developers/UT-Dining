@@ -2,15 +2,9 @@ import { FlashList } from '@shopify/flash-list';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { BicepsFlexed, Flame, Wheat } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
-import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
+import { useEffect } from 'react';
+import { Text, View } from 'react-native';
 import { SheetProvider } from 'react-native-actions-sheet';
-
-import AllergenSection from './components/AllergenSection';
-import NutritionFooter from './components/NutritionFooter';
-import NutritionInfo from './components/NutritionInfo';
-import NutritionRow from './components/NutritionRow';
-
 import { Container } from '~/components/Container';
 import TopBar from '~/components/TopBar';
 import { useFoodData } from '~/hooks/useFoodData';
@@ -18,6 +12,10 @@ import { getSafePostHog } from '~/services/analytics/posthog';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
+import AllergenSection from './components/AllergenSection';
+import NutritionFooter from './components/NutritionFooter';
+import NutritionInfo from './components/NutritionInfo';
+import NutritionRow from './components/NutritionRow';
 
 const FoodScreen = () => {
   const params = useLocalSearchParams<{
@@ -35,7 +33,7 @@ const FoodScreen = () => {
     menu,
     category,
     food,
-    favorite === 'true'
+    favorite === 'true',
   );
 
   const analytics = getSafePostHog(usePostHog());
@@ -43,6 +41,7 @@ const FoodScreen = () => {
   // Filter out serving size from nutrition data
   const nutritionDataFiltered = nutritionData.filter((item) => item.key !== 'Serving Size');
 
+  // biome-ignorelint/correctness/useExhaustiveDependencies: analytics only
   useEffect(() => {
     analytics.screen(`${food}`, {
       location,
@@ -61,7 +60,8 @@ const FoodScreen = () => {
             paddingTop: 8,
             paddingBottom: 8,
             backgroundColor: isDarkMode ? '#111827' : '#fff',
-          }}>
+          }}
+        >
           <View
             style={{
               width: 40,
@@ -84,9 +84,10 @@ const FoodScreen = () => {
                   <View>
                     <Text
                       className={cn(
-                        'font-sans text-3xl font-extrabold',
-                        isDarkMode ? 'text-white' : 'text-black'
-                      )}>
+                        'font-extrabold font-sans text-3xl',
+                        isDarkMode ? 'text-white' : 'text-black',
+                      )}
+                    >
                       {foodItem.name}
                     </Text>
 
@@ -146,15 +147,16 @@ const FoodScreen = () => {
                     <View
                       className={cn(
                         'my-4 w-full border-b',
-                        isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15'
+                        isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15',
                       )}
                     />
 
                     <Text
                       className={cn(
-                        'mb-2 text-2xl font-bold',
-                        isDarkMode ? 'text-white' : 'text-black'
-                      )}>
+                        'mb-2 font-bold text-2xl',
+                        isDarkMode ? 'text-white' : 'text-black',
+                      )}
+                    >
                       Nutrition Facts
                     </Text>
 
@@ -170,7 +172,7 @@ const FoodScreen = () => {
                       <View
                         className={cn(
                           'w-full border-b',
-                          isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15'
+                          isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15',
                         )}
                       />
                     </View>

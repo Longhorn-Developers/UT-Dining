@@ -15,7 +15,7 @@ import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
 import '../components/sheets/Sheets';
 
 import migrations from '../drizzle/migrations';
-import * as schema from '../services/database/schema';
+import type * as schema from '../services/database/schema';
 
 import '../global.css';
 import { VersionCheckProvider } from '~/components/VersionCheckProvider';
@@ -44,7 +44,7 @@ const AppContent = () => {
     } else if (error) {
       console.error('❌ Error migrating database:', error);
     }
-  }, [success]);
+  }, [success, error]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -52,7 +52,8 @@ const AppContent = () => {
         <SQLiteProvider
           databaseName={DATABASE_NAME}
           options={{ enableChangeListener: true }}
-          useSuspense>
+          useSuspense
+        >
           <GestureHandlerRootView>
             <NotifierWrapper useRNScreensOverlay>
               <SheetProvider>
@@ -65,7 +66,8 @@ const AppContent = () => {
                         backgroundColor: 'white',
                       },
                       gestureEnabled: true,
-                    }}>
+                    }}
+                  >
                     <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
                     <Stack.Screen
@@ -127,7 +129,8 @@ export default function Layout() {
       apiKey={POSTHOG_CONFIG.apiKey}
       options={POSTHOG_CONFIG.options}
       autocapture={POSTHOG_CONFIG.autocapture}
-      debug={POSTHOG_CONFIG.debug}>
+      debug={POSTHOG_CONFIG.debug}
+    >
       <AppContent />
     </PostHogProvider>
   );

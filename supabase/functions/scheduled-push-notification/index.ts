@@ -4,20 +4,21 @@
 // Setup type definitions for built-in Supabase Runtime APIs
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL'),
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
 );
 const BATCH_SIZE = 100;
 console.log('🔍 Starting scheduled push notification function...');
-Deno.serve(async (req) => {
+Deno.serve(async (_req) => {
   try {
     // Get current time in Central Time Zone
     const now = new Date();
     const centralTime = new Date(
       now.toLocaleString('en-US', {
         timeZone: 'America/Chicago',
-      })
+      }),
     );
     console.log('🕐 Current Central Time:', centralTime.toISOString());
     // Query for scheduled notifications that are due and haven't been sent
@@ -39,7 +40,7 @@ Deno.serve(async (req) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
     }
     console.log('📋 Found scheduled notifications:', scheduledNotifications?.length || 0);
@@ -55,7 +56,7 @@ Deno.serve(async (req) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
     }
     // Get all user devices with push tokens
@@ -73,7 +74,7 @@ Deno.serve(async (req) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
     }
     console.log('📱 Total user devices:', userDevices?.length || 0);
@@ -94,7 +95,7 @@ Deno.serve(async (req) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
     }
     // Process each scheduled notification
@@ -165,8 +166,8 @@ Deno.serve(async (req) => {
           notifications: processedNotifications,
         },
         null,
-        2
-      )
+        2,
+      ),
     );
     return new Response(
       JSON.stringify({
@@ -180,7 +181,7 @@ Deno.serve(async (req) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
   } catch (error) {
     console.error('❌ Unexpected error:', error);
@@ -193,7 +194,7 @@ Deno.serve(async (req) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
   }
 }); /* To invoke locally:

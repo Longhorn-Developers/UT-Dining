@@ -3,36 +3,35 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import * as Haptics from 'expo-haptics';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { usePostHog } from 'posthog-react-native';
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
-
-import CategoryHeader from './components/CategoryHeader';
-import FoodItemRow from './components/FoodItemRow';
-import LocationHeader from './components/LocationHeader';
-import ScrollToTopButton from './components/ScrollToTopButton';
-import SkeletonItem from './components/SkeletonItem';
-
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Text, View } from 'react-native';
 import { Container } from '~/components/Container';
+import type { ListItem } from '~/hooks/useCategoryExpansion';
 import { useCategoryExpansion } from '~/hooks/useCategoryExpansion';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useDebounce } from '~/hooks/useDebounce';
 import { useMenuData } from '~/hooks/useMenuData';
 import { useScrollToTop } from '~/hooks/useScrollToTop';
 import * as schema from '~/services/database/schema';
-import { useFiltersStore } from '~/store/useFiltersStore';
+import { type FiltersState, useFiltersStore } from '~/store/useFiltersStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getTodayInCentralTime } from '~/utils/date';
 import { filterFoodItems } from '~/utils/filter';
 import { cn } from '~/utils/utils';
+import CategoryHeader from './components/CategoryHeader';
+import FoodItemRow from './components/FoodItemRow';
+import LocationHeader from './components/LocationHeader';
+import ScrollToTopButton from './components/ScrollToTopButton';
+import SkeletonItem from './components/SkeletonItem';
 
 /**
  * Filter items based on search query and user-selected filters
  */
 const useFilteredItems = (
-  flattenedItems: any[],
+  flattenedItems: ListItem[],
   debouncedSearchQuery: string,
-  filters: any,
-  favorites: any[]
+  filters: FiltersState['filters'],
+  favorites: schema.Favorite[],
 ) => {
   return React.useMemo(() => {
     // First, filter by search query
@@ -49,9 +48,8 @@ const useFilteredItems = (
           currentCategory = { ...item, isExpanded: true };
         } else if (item.type === 'food_item') {
           const foodName = item.data.name ? item.data.name.toLowerCase() : '';
-          const description = item.data.description ? item.data.description.toLowerCase() : '';
 
-          if (foodName.includes(query) || description.includes(query)) {
+          if (foodName.includes(query)) {
             if (currentCategory && !processedCategoryIds.has(currentCategory.id)) {
               // Always expand categories in search results
               result.push({
@@ -75,7 +73,7 @@ const useFilteredItems = (
       Object.values(filters).some(
         (val) =>
           val === true ||
-          (typeof val === 'object' && val !== null && Object.values(val).some((v) => v))
+          (typeof val === 'object' && val !== null && Object.values(val).some((v) => v)),
       )
     ) {
       const filteredCategories = new Set();
@@ -116,14 +114,14 @@ const useFilteredItems = (
 /**
  * Generate skeleton items for loading state
  */
-const useSkeletonItems = () => {
+const useSkeletonItems = (): ListItem[] => {
   return React.useMemo(() => {
-    const items = [];
+    const items: ListItem[] = [];
     for (let i = 0; i < 2; i++) {
-      items.push({ type: 'skeleton_header', id: `skeleton-header-${i}` });
+      items.push({ type: 'skeleton_header', id: `skeleton-header-${i}` } as const);
       const itemCount = Math.floor(Math.random() * 2) + 3;
       for (let j = 0; j < itemCount; j++) {
-        items.push({ type: 'skeleton_item', id: `skeleton-item-${i}-${j}` });
+        items.push({ type: 'skeleton_item', id: `skeleton-item-${i}-${j}` } as const);
       }
     }
     return items;
@@ -163,12 +161,12 @@ const Location = () => {
     flattenedItems,
     debouncedSearchQuery,
     activeFilters,
-    favorites
+    favorites,
   );
   const skeletonItems = useSkeletonItems();
 
   // Scroll to top functionality
-  const listRef = useRef<FlashList<any>>(null);
+  const listRef = useRef<FlashList<ListItem>>(null);
   const { showScrollToTop, scrollButtonAnimation, handleScroll, scrollToTop } =
     useScrollToTop(listRef);
 
@@ -187,13 +185,13 @@ const Location = () => {
     } catch (error) {
       console.error('Error resetting menu state:', error);
     }
-  }, [selectedMenu, selectedDate, resetExpandedCategories]);
+  }, [resetExpandedCategories]);
 
   useEffect(() => {
     if (posthog) {
       posthog.screen(location);
     }
-  }, []);
+  }, [location, posthog]);
 
   // Memoize the displayed items to prevent unnecessary recalculations
   const displayedItems = useMemo(() => {
@@ -201,7 +199,7 @@ const Location = () => {
     if (error) return []; // Return empty array on error, EmptyState will handle the display
     return debouncedSearchQuery ||
       Object.values(activeFilters).some(
-        (val) => val === true || (typeof val === 'object' && Object.values(val).some((v) => v))
+        (val) => val === true || (typeof val === 'object' && Object.values(val).some((v) => v)),
       )
       ? filteredItems
       : flattenedItems;
@@ -217,7 +215,7 @@ const Location = () => {
 
   // In your renderItem function in [location].tsx
   const renderItem = useCallback(
-    ({ item }: { item: any }) => {
+    ({ item }: { item: ListItem }) => {
       switch (item.type) {
         case 'category_header':
           return (
@@ -260,7 +258,7 @@ const Location = () => {
           return null;
       }
     },
-    [selectedMenu, location, toggleCategory, favorites, db]
+    [selectedMenu, location, toggleCategory, favorites, db],
   );
 
   // Empty state component
@@ -274,7 +272,7 @@ const Location = () => {
         return 'Try a different search term.';
       } else if (
         Object.values(activeFilters).some(
-          (val) => val === true || (typeof val === 'object' && Object.values(val).some((v) => v))
+          (val) => val === true || (typeof val === 'object' && Object.values(val).some((v) => v)),
         )
       ) {
         return 'Try adjusting your filters.';
@@ -287,7 +285,7 @@ const Location = () => {
 
     return (
       <View className="mt-12 flex-1 items-center justify-center">
-        <Text className="text-xl font-bold text-ut-burnt-orange">{title}</Text>
+        <Text className="font-bold text-ut-burnt-orange text-xl">{title}</Text>
         <Text className={cn('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
           {subtitle()}
         </Text>
@@ -309,23 +307,19 @@ const Location = () => {
           data={displayedItems}
           removeClippedSubviews
           scrollEnabled={!isSwitchingMenus}
-          ListHeaderComponent={
-            <>
-              <LocationHeader
-                location={location}
-                selectedMenu={selectedMenu ?? null}
-                setSelectedMenu={setSelectedMenu}
-                filters={menuFilters}
-                query={searchQuery}
-                setQuery={(query) => {
-                  resetExpandedCategories();
-                  setSearchQuery(query);
-                }}
-                selectedDate={selectedDate}
-                onDateChange={handleDateChange}
-              />
-            </>
-          }
+          ListHeaderComponent=<LocationHeader
+            location={location}
+            selectedMenu={selectedMenu ?? null}
+            setSelectedMenu={setSelectedMenu}
+            filters={menuFilters}
+            query={searchQuery}
+            setQuery={(query) => {
+              resetExpandedCategories();
+              setSearchQuery(query);
+            }}
+            selectedDate={selectedDate}
+            onDateChange={handleDateChange}
+          />
           ListEmptyComponent={<EmptyState />}
           renderItem={renderItem}
           getItemType={(item) => ('type' in item ? item.type : 'unknown')}
@@ -338,7 +332,8 @@ const Location = () => {
             className="absolute inset-0 z-10 flex h-screen items-center justify-center"
             style={{
               backgroundColor: isDarkMode ? 'rgba(17, 24, 39, 0.7)' : 'rgba(255, 255, 255, 0.7)',
-            }}>
+            }}
+          >
             <View
               className="flex items-center justify-center rounded-lg p-4"
               style={{
@@ -347,7 +342,8 @@ const Location = () => {
                 shadowOpacity: 0.25,
                 shadowRadius: 3.84,
                 elevation: 5,
-              }}>
+              }}
+            >
               <ActivityIndicator size="small" style={{ marginBottom: 8 }} />
             </View>
           </View>
