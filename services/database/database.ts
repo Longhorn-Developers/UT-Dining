@@ -191,7 +191,7 @@ const querySupabase = async (date?: string) => {
 
     // Early return if no menu categories
     if (menuCategoryData.length === 0) {
-      console.log('ℹ️ No menu categories found for menus:', menuIds);
+      console.log('ℹ️  No menu categories found for menus:', menuIds);
       return {
         location: locationData,
         location_type: locationTypeData,
