@@ -55,7 +55,9 @@ export function PushNotificationsInitializer() {
       }
 
       if (finalStatus !== 'granted') {
-        alert('Permission not granted for push notifications!');
+        if (__DEV__) {
+          alert('Permission not granted for push notifications! (DEV)');
+        }
         return;
       }
 
@@ -63,7 +65,9 @@ export function PushNotificationsInitializer() {
         Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
 
       if (!projectId) {
-        alert('Project ID not found.');
+        if (__DEV__) {
+          alert('Project ID not found. (DEV)');
+        }
         return;
       }
 

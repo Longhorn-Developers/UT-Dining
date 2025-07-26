@@ -9,7 +9,7 @@ export const POSTHOG_CONFIG = {
   options: {
     host: 'https://us.i.posthog.com',
     enableSessionReplay: true,
-    disabled: IS_DEV,
+    disabled: IS_DEV, // Set to false to enable analytics in development
   },
   autocapture: {
     captureScreens: true,
@@ -38,6 +38,11 @@ export function getSafePostHog(posthog: PostHog | undefined) {
       }
     },
     capture: (eventName: string, properties?: PostHogEventProperties) => {
+      if (posthog) {
+        posthog.capture(eventName, properties);
+      }
+    },
+    track: (eventName: string, properties?: PostHogEventProperties) => {
       if (posthog) {
         posthog.capture(eventName, properties);
       }
