@@ -60,7 +60,10 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
   const { currentStep, setCurrentStep, completeOnboarding } = useOnboardingStore();
   const [hasDataSelection, setHasDataSelection] = React.useState(false);
   const [selectedMotivations, setSelectedMotivations] = React.useState<string[]>([]);
-  const [permissionStatus, setPermissionStatus] = React.useState<{location: string; notifications: string} | null>(null);
+  const [permissionStatus, setPermissionStatus] = React.useState<{
+    location: string;
+    notifications: string;
+  } | null>(null);
   const [hasTrackedStart, setHasTrackedStart] = React.useState(false);
 
   // Track onboarding start only once
@@ -145,7 +148,9 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
       case ONBOARDING_STEPS.FEATURES_FAVORITES:
         return <FavoritesFeatureScreen key={index} width={width} />;
       case ONBOARDING_STEPS.PERMISSIONS:
-        return <PermissionsScreen key={index} width={width} onPermissionsChange={setPermissionStatus} />;
+        return (
+          <PermissionsScreen key={index} width={width} onPermissionsChange={setPermissionStatus} />
+        );
       case ONBOARDING_STEPS.COMPLETE:
         return (
           <CompleteScreen
@@ -214,7 +219,6 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
             <ProgressIndicator
               step={currentStep}
               totalSteps={ONBOARDING_SCREENS.length}
-              stepWidth={width}
               className="w-[180px]"
             />
           </View>

@@ -123,7 +123,7 @@ const PermissionsScreen = ({ width, onPermissionsChange }: Props) => {
             activeOpacity={0.7}
             onPress={permissions.location === 'denied' ? openSettings : undefined}
             className={cn(
-              'mb-2 rounded-2xl  p-6',
+              'mb-2 rounded-2xl p-6',
               isDark ? ' bg-gray-800' : 'border border-gray-200 bg-white',
             )}
           >
@@ -154,7 +154,7 @@ const PermissionsScreen = ({ width, onPermissionsChange }: Props) => {
             activeOpacity={0.7}
             onPress={openSettings}
             className={cn(
-              'rounded-2xl  p-6',
+              'rounded-2xl p-6',
               isDark ? ' bg-gray-800' : 'border border-gray-200 bg-white',
             )}
           >

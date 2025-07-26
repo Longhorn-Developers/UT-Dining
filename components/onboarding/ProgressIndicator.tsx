@@ -8,14 +8,12 @@ import { cn } from '~/utils/utils';
 interface ProgressIndicatorProps {
   step: number;
   totalSteps: number;
-  stepWidth: number;
   className?: string;
 }
 
 export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
   step,
   totalSteps,
-  stepWidth,
   className,
 }) => {
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
@@ -23,7 +21,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
   const progressStyle = useAnimatedStyle(() => {
     const progress = (step / (totalSteps - 1)) * 100;
     return {
-      width: withSpring(`${Math.max(10, Math.min(100, progress))}%`, {
+      width: withSpring(`${Math.max(1, Math.min(100, progress))}%`, {
         damping: 20,
         stiffness: 200,
       }),

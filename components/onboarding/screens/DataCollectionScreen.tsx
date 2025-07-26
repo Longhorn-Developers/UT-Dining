@@ -64,7 +64,7 @@ const DataCollectionScreen = ({ width, onSelectionChange, onSelectionUpdate }: P
               key={tag.id}
               onPress={() => toggleTag(tag.id)}
               className={cn(
-                'mb-4 w-[48%] rounded-xl  p-4',
+                'mb-4 w-[48%] rounded-xl p-4',
                 selectedTags.includes(tag.id)
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange/10'
                   : isDark
@@ -85,7 +85,7 @@ const DataCollectionScreen = ({ width, onSelectionChange, onSelectionUpdate }: P
                 />
                 <Text
                   className={cn(
-                    'text-center font-medium text-sm mt-2',
+                    'mt-2 text-center font-medium text-sm',
                     selectedTags.includes(tag.id)
                       ? 'text-ut-burnt-orange'
                       : isDark
