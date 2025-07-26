@@ -17,6 +17,7 @@ import {
   Moon,
   RefreshCcw,
   Shield,
+  Star,
   Type,
 } from 'lucide-react-native';
 import React from 'react';
@@ -30,6 +31,7 @@ import { useNotificationPermissions } from '~/hooks/useNotificationPermissions';
 import { getAppInformation } from '~/services/database/database';
 import type { AppInformation } from '~/services/database/schema';
 import { getOrCreateDeviceId } from '~/services/device/deviceId';
+import { useAppLaunchStore } from '~/store/useAppLaunchStore';
 import { useOnboardingStore } from '~/store/useOnboardingStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
@@ -378,6 +380,8 @@ const VersionInfo = ({ isDarkMode }: VersionInfoProps): JSX.Element => {
   );
 };
 
+const itunesItemId = '6743042002';
+
 const SettingsPage = () => {
   const {
     useColloquialNames,
@@ -388,6 +392,7 @@ const SettingsPage = () => {
     toggleColorBlindMode,
   } = useSettingsStore();
   const { resetOnboarding } = useOnboardingStore();
+  const { resetRatingPrompt } = useAppLaunchStore();
   const db = useDatabase();
   const [appInfo, setAppInfo] = React.useState<AppInformation | null>(null);
 
@@ -486,12 +491,25 @@ const SettingsPage = () => {
           <SectionHeader title="Feedback" className="mt-4" isDarkMode={isDarkMode} />
           <SettingItem
             activeOpacity={0.7}
-            title="Submit Feedback"
+            title="Submit Suggestions"
             Icon={MessageSquare}
             hasChevron
             isDarkMode={isDarkMode}
             onPress={() => Linking.openURL('https://utdining.userjot.com')}
-            subtitle="Want to suggest a feature or report a bug?"
+            subtitle="Suggest a feature or report a bug"
+          />
+          <SettingItem
+            activeOpacity={0.7}
+            title="Enjoying the app?"
+            Icon={Star}
+            hasChevron
+            isDarkMode={isDarkMode}
+            onPress={() =>
+              Linking.openURL(
+                `itms-apps://itunes.apple.com/app/viewContentsUserReviews/id${itunesItemId}?action=write-review`,
+              )
+            }
+            subtitle="Leave a quick review — it means a lot!"
           />
           <SettingItem
             activeOpacity={0.7}
@@ -521,6 +539,20 @@ const SettingsPage = () => {
                   );
                   resetOnboarding();
                 }}
+              />
+              <SettingItem
+                activeOpacity={0.7}
+                title="Reset Rating Prompt"
+                Icon={RefreshCcw}
+                hasChevron
+                isDarkMode={isDarkMode}
+                onPress={() => {
+                  console.log(
+                    '⚠️  Resetting rating prompt. It will show on the next second launch.',
+                  );
+                  resetRatingPrompt();
+                }}
+                subtitle="Reset the rating prompt to test it again"
               />
             </>
           )}
