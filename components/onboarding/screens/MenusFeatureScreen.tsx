@@ -1,26 +1,50 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Text, View } from 'react-native';
-
-import { COLORS } from '~/utils/colors';
+import { useAssets } from 'expo-asset';
+import { Image } from 'expo-image';
+import { Text, useColorScheme, View } from 'react-native';
+import { cn } from '~/utils/utils';
 
 type Props = {
   width: number;
 };
 
 const MenusFeatureScreen = ({ width }: Props) => {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+  const [assets] = useAssets([require('~/assets/onboarding/menu.png')]);
+
+  if (!assets) {
+    return null;
+  }
+
   return (
-    <View style={{ width }} className="flex-1 px-6 py-8">
+    <View style={{ width }} className={cn('flex-1 px-6 py-8', isDark ? 'bg-gray-900' : 'bg-white')}>
       <View className="flex-1 items-center justify-center">
-        {/* Image/Video placeholder */}
-        <View className="mb-8 h-64 w-80 items-center justify-center rounded-3xl bg-gray-100">
-          <Ionicons name="restaurant" size={60} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-4 text-gray-500 text-sm">Real-time Menus Demo</Text>
-        </View>
+        <Image
+          source={assets[0]}
+          style={{
+            width: 236,
+            height: 512,
+          }}
+          contentFit="contain"
+          className="mb-8"
+        />
 
         <View>
-          <Text className="mb-2 text-center font-bold text-3xl text-gray-900">Real-time Menus</Text>
-          <Text className="mx-auto max-w-[250px] text-center text-gray-600 text-lg leading-6">
-            No more guessing. Know what’s on the menu before you go
+          <Text
+            className={cn(
+              'mb-4 text-center font-bold text-3xl',
+              isDark ? 'text-white' : 'text-gray-900',
+            )}
+          >
+            Browse Menus with Ease
+          </Text>
+          <Text
+            className={cn(
+              'mx-auto max-w-[300px] text-center text-lg leading-6',
+              isDark ? 'text-gray-300' : 'text-gray-600',
+            )}
+          >
+            No more guessing. Know what's on the menu before you go
           </Text>
         </View>
       </View>

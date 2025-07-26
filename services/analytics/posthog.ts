@@ -9,7 +9,7 @@ export const POSTHOG_CONFIG = {
   options: {
     host: 'https://us.i.posthog.com',
     enableSessionReplay: true,
-    disabled: IS_DEV,
+    disabled: IS_DEV, // Set to false to enable analytics in development
   },
   autocapture: {
     captureScreens: true,

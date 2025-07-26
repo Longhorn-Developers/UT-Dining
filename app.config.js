@@ -45,6 +45,18 @@ export default {
       ],
       'expo-notifications',
       'expo-localization',
+      [
+        'expo-asset',
+        {
+          assets: [
+            './assets/onboarding/icon.png',
+            './assets/onboarding/menu.png',
+            './assets/onboarding/meal-plan.png',
+            './assets/onboarding/favorites.png',
+            './assets/onboarding/map.png',
+          ],
+        },
+      ],
     ],
     experiments: {
       typedRoutes: true,
@@ -53,11 +65,7 @@ export default {
     orientation: 'portrait',
     icon: './assets/icons/ios-light.png',
     userInterfaceStyle: 'automatic',
-    splash: {
-      image: './assets/icons/splash-icon.png',
-      resizeMode: 'contain',
-      backgroundColor: '#ffffff',
-    },
+
     assetBundlePatterns: ['**/*'],
     ios: {
       supportsTablet: true,
@@ -75,6 +83,16 @@ export default {
           'UT Dining needs your location to show your location on the map.',
         NSLocationUsageDescription:
           'UT Dining needs your location to show your location on the map.',
+      },
+      splash: {
+        image: './assets/icons/splash-icon.png',
+        resizeMode: 'contain',
+        backgroundColor: '#ffffff',
+        dark: {
+          image: './assets/icons/splash-icon.png',
+          resizeMode: 'contain',
+          backgroundColor: '#111827',
+        },
       },
     },
     android: {

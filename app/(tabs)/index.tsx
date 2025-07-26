@@ -174,9 +174,12 @@ export default function Home() {
   };
 
   useEffect(() => {
+    SplashScreen.hide();
+  }, []);
+
+  useEffect(() => {
     if (layoutLoaded && !isLoading && !isFetching) {
       console.log('✅ Splash screen hidden');
-      SplashScreen.hide();
     }
   }, [layoutLoaded, isLoading, isFetching]);
 

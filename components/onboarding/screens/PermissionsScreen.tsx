@@ -1,10 +1,19 @@
-import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
+import { Bell, Check, MapPin, XIcon } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
-import { Alert, AppState, Linking, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  AppState,
+  Linking,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from 'react-native';
 
 import { COLORS } from '~/utils/colors';
+import { cn } from '~/utils/utils';
 
 type Props = {
   width: number;
@@ -22,6 +31,8 @@ const PermissionsScreen = ({ width }: Props) => {
     location: 'undetermined',
     notifications: 'undetermined',
   });
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   useEffect(() => {
     const requestPermissions = async () => {
@@ -80,67 +91,102 @@ const PermissionsScreen = ({ width }: Props) => {
   };
 
   return (
-    <View style={{ width }} className="flex-1 px-6 py-8">
+    <View style={{ width }} className={cn('flex-1 px-6', isDark ? 'bg-gray-900' : 'bg-white')}>
       <View className="flex-1 items-center justify-center">
-        <Text className="mb-4 text-center font-bold text-3xl text-gray-900">
+        <Text
+          className={cn(
+            'mb-1 text-center font-bold text-3xl',
+            isDark ? 'text-white' : 'text-gray-900',
+          )}
+        >
           Enable Permissions
         </Text>
-        <Text className="mb-8 text-center text-gray-600 text-lg">
-          Allow these permissions to get the best experience from UT Dining
+        <Text
+          className={cn(
+            'mb-4 max-w-[250px] text-center text-lg leading-6',
+            isDark ? 'text-gray-300' : 'text-gray-600',
+          )}
+        >
+          We just need a few permissions to make your experience better
         </Text>
 
-        <View className="mb-8 w-full space-y-6">
+        <View className="w-full space-y-6">
           {/* Location Permission */}
           <TouchableOpacity
+            activeOpacity={0.7}
             onPress={permissions.location === 'denied' ? openSettings : undefined}
-            className="rounded-2xl border border-gray-200 bg-white p-6"
+            className={cn(
+              'mb-2 rounded-2xl  p-6',
+              isDark ? ' bg-gray-800' : 'border border-gray-200 bg-white',
+            )}
           >
             <View className="flex-row items-center">
               <View className="mr-4 h-12 w-12 items-center justify-center rounded-full bg-ut-burnt-orange/10">
-                <Ionicons name="location" size={24} color={COLORS['ut-burnt-orange']} />
+                <MapPin size={24} color={COLORS['ut-burnt-orange']} />
               </View>
               <View className="flex-1">
-                <Text className="font-semibold text-gray-900 text-lg">Location Services</Text>
-                <Text className="text-gray-600 text-sm">
-                  Find nearby dining halls and get personalized recommendations
+                <Text
+                  className={cn('font-semibold text-lg', isDark ? 'text-white' : 'text-gray-900')}
+                >
+                  Location Services
+                </Text>
+                <Text className={cn('text-sm', isDark ? 'text-gray-300' : 'text-gray-600')}>
+                  See your location on the interactive campus map
                 </Text>
               </View>
-              <Ionicons
-                name={permissions.location === 'granted' ? 'checkmark-circle' : 'ellipse-outline'}
-                size={24}
-                color={permissions.location === 'granted' ? '#10B981' : COLORS['ut-grey']}
-              />
+              {permissions.location === 'granted' ? (
+                <Check size={24} color={isDark ? '#22c55e' : 'green'} />
+              ) : (
+                <XIcon size={24} color={isDark ? '#ef4444' : 'red'} />
+              )}
             </View>
           </TouchableOpacity>
 
           {/* Notification Permission */}
           <TouchableOpacity
-            onPress={permissions.notifications === 'denied' ? openSettings : undefined}
-            className="rounded-2xl border border-gray-200 bg-white p-6"
+            activeOpacity={0.7}
+            onPress={openSettings}
+            className={cn(
+              'rounded-2xl  p-6',
+              isDark ? ' bg-gray-800' : 'border border-gray-200 bg-white',
+            )}
           >
             <View className="flex-row items-center">
               <View className="mr-4 h-12 w-12 items-center justify-center rounded-full bg-ut-burnt-orange/10">
-                <Ionicons name="notifications" size={24} color={COLORS['ut-burnt-orange']} />
+                <Bell size={24} color={COLORS['ut-burnt-orange']} />
               </View>
               <View className="flex-1">
-                <Text className="font-semibold text-gray-900 text-lg">Push Notifications</Text>
-                <Text className="text-gray-600 text-sm">
-                  Get notified when your favorite meals are available
+                <Text
+                  className={cn('font-semibold text-lg', isDark ? 'text-white' : 'text-gray-900')}
+                >
+                  Push Notifications
+                </Text>
+                <Text
+                  className={cn(
+                    'max-w-[200px] text-sm',
+                    isDark ? 'text-gray-300' : 'text-gray-600',
+                  )}
+                >
+                  Get notified for menu updates, hours changes, and more
                 </Text>
               </View>
-              <Ionicons
-                name={
-                  permissions.notifications === 'granted' ? 'checkmark-circle' : 'ellipse-outline'
-                }
-                size={24}
-                color={permissions.notifications === 'granted' ? '#10B981' : COLORS['ut-grey']}
-              />
+
+              {permissions.notifications === 'granted' ? (
+                <Check size={24} color={isDark ? '#22c55e' : 'green'} />
+              ) : (
+                <XIcon size={24} color={isDark ? '#ef4444' : 'red'} />
+              )}
             </View>
           </TouchableOpacity>
         </View>
 
-        <Text className="text-center text-gray-500 text-sm">
-          These settings can be changed anytime in the settings page.
+        <Text
+          className={cn(
+            'absolute bottom-0 max-w-[260px] text-center text-sm',
+            isDark ? 'text-gray-400' : 'text-gray-500',
+          )}
+        >
+          These settings are completely optional and can be changed at any time.
         </Text>
       </View>
     </View>

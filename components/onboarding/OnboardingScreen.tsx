@@ -1,7 +1,15 @@
-import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { ChevronLeft } from 'lucide-react-native';
 import React, { useCallback } from 'react';
-import { Modal, Pressable, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import {
+  Modal,
+  Pressable,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedRef,
@@ -39,6 +47,8 @@ interface OnboardingScreenProps {
 
 const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
   const { width } = useWindowDimensions();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollX = useSharedValue(0);
   const currentStepShared = useSharedValue(0);
@@ -106,7 +116,14 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
       case ONBOARDING_STEPS.PERMISSIONS:
         return <PermissionsScreen key={index} width={width} />;
       case ONBOARDING_STEPS.COMPLETE:
-        return <CompleteScreen key={index} width={width} handleComplete={handleComplete} />;
+        return (
+          <CompleteScreen
+            key={index}
+            width={width}
+            handleComplete={handleComplete}
+            isCurrentScreen={currentStep === index}
+          />
+        );
       default:
         return null;
     }
@@ -148,7 +165,7 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
 
   return (
     <Modal animationType="slide" presentationStyle="fullScreen" visible={!isOnboardingComplete}>
-      <Container className="mx-0 mt-2 mb-2">
+      <Container className={cn('mx-0', isDark ? 'bg-gray-900' : 'bg-white')}>
         <View className="flex-row items-center px-6">
           <TouchableOpacity
             activeOpacity={0.8}
@@ -156,7 +173,10 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
             disabled={currentStep === 0}
             className={cn('rounded-full', currentStep === 0 ? 'opacity-0' : 'opacity-100')}
           >
-            <Ionicons name="chevron-back" size={24} color={COLORS['ut-grey']} />
+            <ChevronLeft
+              size={24}
+              color={isDark ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']}
+            />
           </TouchableOpacity>
 
           <View className="flex-1 items-center justify-center px-4">
@@ -188,12 +208,15 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
             onPress={handlePress}
-            className="w-full rounded-full bg-ut-burnt-orange p-3"
+            className={cn(
+              'w-full rounded-full p-3',
+              isDark ? 'bg-ut-burnt-orange/90' : 'bg-ut-burnt-orange',
+            )}
             style={[animatedStyle]}
           >
             <Text className="py-2 text-center font-semibold text-white">
               {currentStep === ONBOARDING_SCREENS.length - 1
-                ? 'Get Started'
+                ? 'Finish'
                 : currentStep === 1 && !hasDataSelection
                   ? 'Skip'
                   : 'Continue'}
