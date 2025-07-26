@@ -1107,7 +1107,14 @@ export const getAppInformation = async (
  */
 export const getAllLocationsWithCoordinates = async (
   db: ExpoSQLiteDatabase<typeof schema>,
-): Promise<Pick<schema.Location, 'id' | 'name' | 'latitude' | 'longitude' | 'address'>[]> => {
+): Promise<
+  (Pick<
+    schema.Location,
+    'id' | 'name' | 'description' | 'latitude' | 'longitude' | 'address' | 'has_menus'
+  > & {
+    type: string;
+  })[]
+> => {
   const data = await db
     .select({
       id: schema.location.id,
@@ -1126,7 +1133,10 @@ export const getAllLocationsWithCoordinates = async (
     .leftJoin(schema.location_type, eq(schema.location.type_id, schema.location_type.id))
     .execute();
 
-  return data;
+  return data.map((item) => ({
+    ...item,
+    type: item.type || 'Unknown',
+  }));
 };
 
 /**

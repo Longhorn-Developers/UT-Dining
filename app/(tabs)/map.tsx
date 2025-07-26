@@ -33,11 +33,12 @@ import { cn } from '~/utils/utils';
 type MergedLocation = {
   name: string;
   address: string;
+  description: string;
   coordinates: {
     latitude: number;
     longitude: number;
   };
-  type: 'dining' | 'microwave';
+  type: string;
   hasMenu: boolean;
 };
 
@@ -298,6 +299,7 @@ const MapMarkers = ({
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             onMarkerPress(location.coordinates);
+
             SheetManager.show('map-location', {
               payload: {
                 name: location.name,
@@ -398,12 +400,13 @@ const MapPage = () => {
       .map((loc) => ({
         name: loc.name as string,
         address: loc.address,
+        description: loc.description,
         coordinates: {
           latitude: Number(loc.latitude),
           longitude: Number(loc.longitude),
         },
-        type: 'dining' as const,
-        hasMenu: true,
+        type: loc.type,
+        hasMenu: loc.has_menus,
       }));
 
     // Add microwave locations that don't overlap with database locations
