@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { View } from 'react-native';
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
@@ -36,8 +36,9 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
       className={cn(
         'h-1.5 w-full overflow-hidden rounded-full',
         isDarkMode ? 'bg-gray-700' : 'bg-gray-200',
-        className
-      )}>
+        className,
+      )}
+    >
       <Animated.View className="h-full rounded-full bg-ut-burnt-orange/75" style={progressStyle} />
     </View>
   );

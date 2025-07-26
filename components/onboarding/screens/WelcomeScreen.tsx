@@ -1,15 +1,10 @@
-import React from 'react';
-import { View, Text, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-
-import { COLORS } from '~/utils/colors';
+import { Image, Text, View } from 'react-native';
 
 type Props = {
   width: number;
 };
 
 const icon = require('~/assets/image.png');
-
 
 const WelcomeScreen = ({ width }: Props) => {
   return (
@@ -21,14 +16,16 @@ const WelcomeScreen = ({ width }: Props) => {
           <Text className="mt-4 text-sm text-gray-500">Welcome Image/Video</Text>
         </View> */}
 
-
-        <Image source={icon} className="mb-8 h-64 w-64 items-center justify-center rounded-3xl bg-gray-100" />
+        <Image
+          source={icon}
+          className="mb-8 h-64 w-64 items-center justify-center rounded-3xl bg-gray-100"
+        />
 
         <View className="mb-8">
-          <Text className="mb-4 text-center text-4xl font-bold text-gray-900">
+          <Text className="mb-4 text-center font-bold text-4xl text-gray-900">
             The all-in-one UT Austin dining app 🤘
           </Text>
-          <Text className="text-center text-lg leading-6 text-gray-600 max-w-[300px] mx-auto">
+          <Text className="mx-auto max-w-[300px] text-center text-gray-600 text-lg leading-6">
             Explore menus, hours, locations, and more—right at your fingertips.
           </Text>
         </View>

@@ -42,7 +42,7 @@ export function getSafePostHog(posthog: PostHog | undefined) {
         posthog.capture(eventName, properties);
       }
     },
-    track: (eventName: string, properties?: Record<string, any>) => {
+    track: (eventName: string, properties?: PostHogEventProperties) => {
       if (posthog) {
         posthog.capture(eventName, properties);
       }

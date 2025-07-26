@@ -1,16 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import React, { useCallback } from 'react';
-import { Text, Modal, View, TouchableOpacity, useWindowDimensions, Pressable } from 'react-native';
+import { Modal, Pressable, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Animated, {
-  useSharedValue,
+  runOnJS,
   useAnimatedRef,
   useAnimatedScrollHandler,
   useAnimatedStyle,
-  runOnJS,
+  useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-
+import { ONBOARDING_STEPS, useOnboardingStore } from '~/store/useOnboardingStore';
+import { COLORS } from '~/utils/colors';
+import { cn } from '~/utils/utils';
 import { Container } from '../Container';
 import { ProgressIndicator } from './ProgressIndicator';
 import CompleteScreen from './screens/CompleteScreen';
@@ -20,10 +22,6 @@ import MapFeatureScreen from './screens/MapFeatureScreen';
 import MenusFeatureScreen from './screens/MenusFeatureScreen';
 import PermissionsScreen from './screens/PermissionsScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
-
-import { useOnboardingStore, ONBOARDING_STEPS } from '~/store/useOnboardingStore';
-import { COLORS } from '~/utils/colors';
-import { cn } from '~/utils/utils';
 
 const ONBOARDING_SCREENS = [
   ONBOARDING_STEPS.WELCOME,
@@ -150,13 +148,14 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
 
   return (
     <Modal animationType="slide" presentationStyle="fullScreen" visible={!isOnboardingComplete}>
-      <Container className="mx-0 mb-2 mt-2">
+      <Container className="mx-0 mt-2 mb-2">
         <View className="flex-row items-center px-6">
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={goToPrevious}
             disabled={currentStep === 0}
-            className={cn('rounded-full', currentStep === 0 ? 'opacity-0' : 'opacity-100')}>
+            className={cn('rounded-full', currentStep === 0 ? 'opacity-0' : 'opacity-100')}
+          >
             <Ionicons name="chevron-back" size={24} color={COLORS['ut-grey']} />
           </TouchableOpacity>
 
@@ -179,7 +178,8 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
           showsHorizontalScrollIndicator={false}
           onScroll={scrollHandler}
           scrollEventThrottle={16}
-          contentContainerStyle={{ flexGrow: 1 }}>
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
           {ONBOARDING_SCREENS.map((stepId, index) => renderScreen(stepId, index))}
         </Animated.ScrollView>
 
@@ -189,12 +189,13 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
             onPressOut={handlePressOut}
             onPress={handlePress}
             className="w-full rounded-full bg-ut-burnt-orange p-3"
-            style={[animatedStyle]}>
+            style={[animatedStyle]}
+          >
             <Text className="py-2 text-center font-semibold text-white">
-              {currentStep === ONBOARDING_SCREENS.length - 1 
-                ? 'Get Started' 
-                : currentStep === 1 && !hasDataSelection 
-                  ? 'Skip' 
+              {currentStep === ONBOARDING_SCREENS.length - 1
+                ? 'Get Started'
+                : currentStep === 1 && !hasDataSelection
+                  ? 'Skip'
                   : 'Continue'}
             </Text>
           </AnimatedPressable>

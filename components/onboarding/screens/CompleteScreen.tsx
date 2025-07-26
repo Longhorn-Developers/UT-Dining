@@ -1,14 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { useEffect } from 'react';
+import { Dimensions, Text, View } from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withRepeat,
-  withTiming,
   Easing,
+  useAnimatedStyle,
+  useSharedValue,
   withDelay,
+  withRepeat,
+  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
 
 import { COLORS } from '~/utils/colors';
@@ -32,9 +32,9 @@ const ConfettiPiece = ({ delay, color, size }: { delay: number; color: string; s
       withTiming(screenHeight + 50, {
         duration: 3000,
         easing: Easing.out(Easing.quad),
-      })
+      }),
     );
-    
+
     rotation.value = withDelay(
       delay,
       withRepeat(
@@ -42,17 +42,17 @@ const ConfettiPiece = ({ delay, color, size }: { delay: number; color: string; s
           duration: 1000,
           easing: Easing.linear,
         }),
-        -1
-      )
+        -1,
+      ),
     );
 
     opacity.value = withDelay(
       delay + 2000,
       withTiming(0, {
         duration: 1000,
-      })
+      }),
     );
-  }, [delay]);
+  }, [delay, opacity, rotation, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -93,7 +93,7 @@ const CompleteScreen = ({ width, handleComplete }: Props) => {
       withSpring(1, {
         damping: 15,
         stiffness: 200,
-      })
+      }),
     );
 
     checkmarkScale.value = withDelay(
@@ -101,9 +101,9 @@ const CompleteScreen = ({ width, handleComplete }: Props) => {
       withSpring(1, {
         damping: 10,
         stiffness: 300,
-      })
+      }),
     );
-  }, []);
+  }, [checkmarkScale, scale]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -133,7 +133,10 @@ const CompleteScreen = ({ width, handleComplete }: Props) => {
       {/* Confetti pieces */}
       {Array.from({ length: 20 }).map((_, index) => (
         <ConfettiPiece
-          key={index}
+          key={`confetti-${
+            // biome-ignore lint/suspicious/noArrayIndexKey: we need to use the index as the key
+            index
+          }`}
           delay={index * 100}
           color={confettiColors[index % confettiColors.length]}
           size={Math.random() * 8 + 4}
@@ -147,11 +150,9 @@ const CompleteScreen = ({ width, handleComplete }: Props) => {
               <Ionicons name="checkmark" size={48} color="#10B981" />
             </Animated.View>
           </View>
-          
-          <Text className="mb-4 text-center text-4xl font-bold text-gray-900">
-            You're All Set!
-          </Text>
-          <Text className="text-center text-lg leading-6 text-gray-600">
+
+          <Text className="mb-4 text-center font-bold text-4xl text-gray-900">You're All Set!</Text>
+          <Text className="text-center text-gray-600 text-lg leading-6">
             Start exploring UT dining options and never miss a meal again
           </Text>
         </Animated.View>
@@ -160,15 +161,15 @@ const CompleteScreen = ({ width, handleComplete }: Props) => {
       <View className="mb-4 flex-row items-center justify-center space-x-8">
         <View className="items-center">
           <Ionicons name="rocket-outline" size={24} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-1 text-xs text-gray-600">Ready to Go</Text>
+          <Text className="mt-1 text-gray-600 text-xs">Ready to Go</Text>
         </View>
         <View className="items-center">
           <Ionicons name="star-outline" size={24} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-1 text-xs text-gray-600">Explore Now</Text>
+          <Text className="mt-1 text-gray-600 text-xs">Explore Now</Text>
         </View>
         <View className="items-center">
           <Ionicons name="restaurant-outline" size={24} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-1 text-xs text-gray-600">Find Food</Text>
+          <Text className="mt-1 text-gray-600 text-xs">Find Food</Text>
         </View>
       </View>
     </View>

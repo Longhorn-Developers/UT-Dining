@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
@@ -36,17 +36,15 @@ const DataCollectionScreen = ({ width, onSelectionChange }: Props) => {
   return (
     <View style={{ width }} className="flex-1 px-6 py-8">
       <View className="mb-8">
-        <Text className="text-center text-3xl font-bold text-gray-900">
+        <Text className="text-center font-bold text-3xl text-gray-900">
           Before we get started...
         </Text>
         <Text className="text-center text-base text-gray-600">
-        Tell us what you’re hoping to get out of UT Dining
+          Tell us what you’re hoping to get out of UT Dining
         </Text>
       </View>
 
-      <View
-        className="flex-1"
-        >
+      <View className="flex-1">
         <View className="flex-row flex-wrap justify-between">
           {MOTIVATION_TAGS.map((tag) => (
             <TouchableOpacity
@@ -57,8 +55,9 @@ const DataCollectionScreen = ({ width, onSelectionChange }: Props) => {
                 'mb-4 w-[48%] rounded-xl border p-4',
                 selectedTags.includes(tag.id)
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange/10'
-                  : 'border-gray-200 bg-white'
-              )}>
+                  : 'border-gray-200 bg-white',
+              )}
+            >
               <View className="items-center">
                 <Ionicons
                   name={tag.icon}
@@ -70,9 +69,10 @@ const DataCollectionScreen = ({ width, onSelectionChange }: Props) => {
                 />
                 <Text
                   className={cn(
-                    'text-center text-sm font-medium',
-                    selectedTags.includes(tag.id) ? 'text-ut-burnt-orange' : 'text-gray-700'
-                  )}>
+                    'text-center font-medium text-sm',
+                    selectedTags.includes(tag.id) ? 'text-ut-burnt-orange' : 'text-gray-700',
+                  )}
+                >
                   {tag.label}
                 </Text>
               </View>

@@ -517,7 +517,7 @@ const SettingsPage = () => {
                 isDarkMode={isDarkMode}
                 onPress={() => {
                   console.log(
-                    '⚠️  Resetting onboarding. Go to the home screen to see the onboarding again.'
+                    '⚠️  Resetting onboarding. Go to the home screen to see the onboarding again.',
                   );
                   resetOnboarding();
                 }}

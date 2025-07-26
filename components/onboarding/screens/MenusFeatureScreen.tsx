@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { View, Text } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { COLORS } from '~/utils/colors';
 
@@ -15,15 +14,13 @@ const MenusFeatureScreen = ({ width }: Props) => {
         {/* Image/Video placeholder */}
         <View className="mb-8 h-64 w-80 items-center justify-center rounded-3xl bg-gray-100">
           <Ionicons name="restaurant" size={60} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-4 text-sm text-gray-500">Real-time Menus Demo</Text>
+          <Text className="mt-4 text-gray-500 text-sm">Real-time Menus Demo</Text>
         </View>
 
         <View>
-          <Text className="mb-2 text-center text-3xl font-bold text-gray-900">
-            Real-time Menus
-          </Text>
-          <Text className="text-center text-lg leading-6 text-gray-600 max-w-[250px] mx-auto">
-          No more guessing. Know what’s on the menu before you go
+          <Text className="mb-2 text-center font-bold text-3xl text-gray-900">Real-time Menus</Text>
+          <Text className="mx-auto max-w-[250px] text-center text-gray-600 text-lg leading-6">
+            No more guessing. Know what’s on the menu before you go
           </Text>
         </View>
       </View>
