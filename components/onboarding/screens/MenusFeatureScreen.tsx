@@ -18,29 +18,13 @@ const MenusFeatureScreen = ({ width }: Props) => {
           <Text className="mt-4 text-sm text-gray-500">Real-time Menus Demo</Text>
         </View>
 
-        <View className="mb-8">
-          <Text className="mb-4 text-center text-3xl font-bold text-gray-900">
+        <View>
+          <Text className="mb-2 text-center text-3xl font-bold text-gray-900">
             Real-time Menus
           </Text>
-          <Text className="text-center text-lg leading-6 text-gray-600">
-            Browse current menus with comprehensive location details including hours, temporary 
-            closures, and special announcements
+          <Text className="text-center text-lg leading-6 text-gray-600 max-w-[250px] mx-auto">
+          No more guessing. Know what’s on the menu before you go
           </Text>
-        </View>
-      </View>
-
-      <View className="mb-4 flex-row items-center justify-center space-x-8">
-        <View className="items-center">
-          <Ionicons name="time-outline" size={24} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-1 text-xs text-gray-600">Live Updates</Text>
-        </View>
-        <View className="items-center">
-          <Ionicons name="information-circle-outline" size={24} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-1 text-xs text-gray-600">Location Info</Text>
-        </View>
-        <View className="items-center">
-          <Ionicons name="alert-circle-outline" size={24} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-1 text-xs text-gray-600">Closures</Text>
         </View>
       </View>
     </View>

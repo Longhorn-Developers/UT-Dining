@@ -195,7 +195,7 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
                 ? 'Get Started' 
                 : currentStep === 1 && !hasDataSelection 
                   ? 'Skip' 
-                  : 'Next'}
+                  : 'Continue'}
             </Text>
           </AnimatedPressable>
         </View>

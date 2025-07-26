@@ -19,27 +19,12 @@ const FavoritesFeatureScreen = ({ width }: Props) => {
         </View>
 
         <View className="mb-8">
-          <Text className="mb-4 text-center text-3xl font-bold text-gray-900">
+          <Text className="mb-2 text-center text-3xl font-bold text-gray-900">
             Favorites & Meal Planning
           </Text>
-          <Text className="text-center text-lg leading-6 text-gray-600">
-            Save your favorite meals and get notified when they're available on campus menus
+          <Text className="text-center text-lg leading-6 text-gray-600 max-w-[275px] mx-auto">
+            Save your favorite food and plan your meals ahead of time
           </Text>
-        </View>
-      </View>
-
-      <View className="mb-4 flex-row items-center justify-center space-x-8">
-        <View className="items-center">
-          <Ionicons name="heart-outline" size={24} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-1 text-xs text-gray-600">Save Favorites</Text>
-        </View>
-        <View className="items-center">
-          <Ionicons name="notifications-outline" size={24} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-1 text-xs text-gray-600">Get Notified</Text>
-        </View>
-        <View className="items-center">
-          <Ionicons name="calendar-outline" size={24} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-1 text-xs text-gray-600">Plan Meals</Text>
         </View>
       </View>
     </View>

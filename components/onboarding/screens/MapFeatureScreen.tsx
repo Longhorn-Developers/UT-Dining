@@ -18,29 +18,14 @@ const MapFeatureScreen = ({ width }: Props) => {
           <Text className="mt-4 text-sm text-gray-500">Interactive Map Demo</Text>
         </View>
 
-        <View className="mb-8">
-          <Text className="mb-4 text-center text-3xl font-bold text-gray-900">
+        <View>
+          <Text className="mb-2 text-center text-3xl font-bold text-gray-900">
             Interactive Campus Map
           </Text>
-          <Text className="text-center text-lg leading-6 text-gray-600">
+          <Text className="text-center text-lg leading-6 text-gray-600 text-balance mx-auto">
             Explore and navigate to 50+ dining halls, food trucks, coffee shops, and convenience 
             stores across campus
           </Text>
-        </View>
-      </View>
-
-      <View className="mb-4 flex-row items-center justify-center space-x-8">
-        <View className="items-center">
-          <Ionicons name="location-outline" size={24} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-1 text-xs text-gray-600">50+ Locations</Text>
-        </View>
-        <View className="items-center">
-          <Ionicons name="navigate-outline" size={24} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-1 text-xs text-gray-600">Navigation</Text>
-        </View>
-        <View className="items-center">
-          <Ionicons name="car-outline" size={24} color={COLORS['ut-burnt-orange']} />
-          <Text className="mt-1 text-xs text-gray-600">Food Trucks</Text>
         </View>
       </View>
     </View>
