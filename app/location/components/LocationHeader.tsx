@@ -1,21 +1,19 @@
 import { eq } from 'drizzle-orm';
 import * as Haptics from 'expo-haptics';
-import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
-
-import DateNavigator from './DateNavigator';
-import SearchBar from './SearchBar';
-import TimeSchedule from './TimeSchedule';
-
+import React, { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
 import FilterBar from '~/components/FilterBar';
 import TopBar from '~/components/TopBar';
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
-import { menu, location as location_schema } from '~/services/database/schema';
+import { location as location_schema, menu } from '~/services/database/schema';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { useLocationName, useMealTimes } from '~/utils/locations';
 import { generateSchedule, isLocationOpen } from '~/utils/time';
 import { cn } from '~/utils/utils';
+import DateNavigator from './DateNavigator';
+import SearchBar from './SearchBar';
+import TimeSchedule from './TimeSchedule';
 
 interface LocationHeaderProps {
   location: string;
@@ -77,7 +75,7 @@ const LocationHeader = React.memo(
       };
 
       checkOpen();
-    }, [location, locationData]);
+    }, [location, locationData, db.select]);
 
     return (
       <View className="mx-6 mt-6 flex gap-y-5">
@@ -90,7 +88,7 @@ const LocationHeader = React.memo(
               {/* Temporarily Closed Banner */}
               {locationData?.force_close && (
                 <View className="rounded-lg bg-red-600 px-4 py-2">
-                  <Text className="text-center text-lg font-extrabold tracking-wider text-white">
+                  <Text className="text-center font-extrabold text-lg text-white tracking-wider">
                     TEMPORARILY CLOSED
                   </Text>
                 </View>
@@ -101,21 +99,22 @@ const LocationHeader = React.memo(
                 <View className="mb-1 w-full flex-row flex-wrap items-center gap-x-3 gap-y-1">
                   <Text
                     className={cn(
-                      'font-sans text-3xl font-extrabold',
-                      isDarkMode ? 'text-white' : 'text-black'
-                    )}>
+                      'font-extrabold font-sans text-3xl',
+                      isDarkMode ? 'text-white' : 'text-black',
+                    )}
+                  >
                     {displayName}
                   </Text>
                 </View>
                 <View className="flex-row items-center gap-x-3">
-                  <Text className="text-lg font-semibold text-ut-burnt-orange">
+                  <Text className="font-semibold text-lg text-ut-burnt-orange">
                     {open ? 'Open' : 'Closed'}
                   </Text>
 
                   <View
                     className={cn(
                       'size-1 rounded-full',
-                      isDarkMode ? 'bg-ut-grey-dark-mode' : 'bg-ut-burnt-orange'
+                      isDarkMode ? 'bg-ut-grey-dark-mode' : 'bg-ut-burnt-orange',
                     )}
                   />
 
@@ -124,13 +123,15 @@ const LocationHeader = React.memo(
                     <View
                       className={cn(
                         'self-start rounded-full px-3 py-1',
-                        isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-ut-grey/5'
-                      )}>
+                        isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-ut-grey/5',
+                      )}
+                    >
                       <Text
                         className={cn(
-                          'text-xs font-bold uppercase',
-                          isDarkMode ? 'text-white' : 'text-black/75'
-                        )}>
+                          'font-bold text-xs uppercase',
+                          isDarkMode ? 'text-white' : 'text-black/75',
+                        )}
+                      >
                         {locationData.type}
                       </Text>
                     </View>
@@ -151,7 +152,7 @@ const LocationHeader = React.memo(
               <View
                 className={cn(
                   'my-0 h-1 w-full border-b',
-                  isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15'
+                  isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15',
                 )}
               />
 
@@ -191,7 +192,7 @@ const LocationHeader = React.memo(
         )}
       </View>
     );
-  }
+  },
 );
 
 export default LocationHeader;

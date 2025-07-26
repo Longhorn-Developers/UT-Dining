@@ -15,9 +15,10 @@ import { useSyncQueries } from 'tanstack-query-dev-tools-expo-plugin';
 import '../components/sheets/Sheets';
 
 import migrations from '../drizzle/migrations';
-import * as schema from '../services/database/schema';
+import type * as schema from '../services/database/schema';
 
 import '../global.css';
+import { VersionCheckProvider } from '~/components/VersionCheckProvider';
 import { POSTHOG_API_KEY, POSTHOG_CONFIG } from '~/services/analytics/posthog';
 import { PushNotificationsInitializer } from '~/services/notifications/notifications';
 
@@ -43,7 +44,7 @@ const AppContent = () => {
     } else if (error) {
       console.error('❌ Error migrating database:', error);
     }
-  }, [success]);
+  }, [success, error]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -51,58 +52,62 @@ const AppContent = () => {
         <SQLiteProvider
           databaseName={DATABASE_NAME}
           options={{ enableChangeListener: true }}
-          useSuspense>
+          useSuspense
+        >
           <GestureHandlerRootView>
             <NotifierWrapper useRNScreensOverlay>
               <SheetProvider>
-                <PushNotificationsInitializer />
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                    contentStyle: {
-                      backgroundColor: 'white',
-                    },
-                    gestureEnabled: true,
-                  }}>
-                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <VersionCheckProvider>
+                  <PushNotificationsInitializer />
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      contentStyle: {
+                        backgroundColor: 'white',
+                      },
+                      gestureEnabled: true,
+                    }}
+                  >
+                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-                  <Stack.Screen
-                    name="location_generic/[location]"
-                    options={{
-                      presentation: 'modal',
-                      sheetGrabberVisible: true,
-                      headerShown: false,
-                    }}
-                  />
-                  <Stack.Screen
-                    name="food/[food]"
-                    options={{
-                      presentation: 'modal',
-                      sheetGrabberVisible: true,
-                      headerShown: false,
-                    }}
-                  />
+                    <Stack.Screen
+                      name="location_generic/[location]"
+                      options={{
+                        presentation: 'modal',
+                        sheetGrabberVisible: true,
+                        headerShown: false,
+                      }}
+                    />
+                    <Stack.Screen
+                      name="food/[food]"
+                      options={{
+                        presentation: 'modal',
+                        sheetGrabberVisible: true,
+                        headerShown: false,
+                      }}
+                    />
 
-                  <Stack.Screen
-                    name="favorites"
-                    options={{
-                      headerShown: false,
-                    }}
-                  />
+                    <Stack.Screen
+                      name="favorites"
+                      options={{
+                        headerShown: false,
+                      }}
+                    />
 
-                  <Stack.Screen
-                    name="meal-plan"
-                    options={{
-                      headerShown: false,
-                    }}
-                  />
-                  <Stack.Screen
-                    name="location/[location]"
-                    options={{
-                      headerShown: false,
-                    }}
-                  />
-                </Stack>
+                    <Stack.Screen
+                      name="meal-plan"
+                      options={{
+                        headerShown: false,
+                      }}
+                    />
+                    <Stack.Screen
+                      name="location/[location]"
+                      options={{
+                        headerShown: false,
+                      }}
+                    />
+                  </Stack>
+                </VersionCheckProvider>
               </SheetProvider>
             </NotifierWrapper>
           </GestureHandlerRootView>
@@ -124,7 +129,8 @@ export default function Layout() {
       apiKey={POSTHOG_CONFIG.apiKey}
       options={POSTHOG_CONFIG.options}
       autocapture={POSTHOG_CONFIG.autocapture}
-      debug={POSTHOG_CONFIG.debug}>
+      debug={POSTHOG_CONFIG.debug}
+    >
       <AppContent />
     </PostHogProvider>
   );

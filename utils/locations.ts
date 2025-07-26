@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm';
-import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
+import type { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 
 import { useDatabase } from '~/hooks/useDatabase';
 import * as schema from '~/services/database/schema';
@@ -21,7 +21,7 @@ export interface MealTimes {
 export const getLocationName = (
   db: ExpoSQLiteDatabase<typeof schema>,
   locationName: string,
-  useColloquial: boolean
+  useColloquial: boolean,
 ): string => {
   if (!useColloquial) return locationName;
 
@@ -54,7 +54,7 @@ export const getLocationName = (
  */
 export const getMealTimes = (
   db: ExpoSQLiteDatabase<typeof schema>,
-  locationName: string
+  locationName: string,
 ): MealTimes | null => {
   try {
     const locationData = db

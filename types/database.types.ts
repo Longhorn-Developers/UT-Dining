@@ -97,6 +97,7 @@ export type Database = {
         Row: {
           about_description: string | null;
           about_title: string | null;
+          app_version: string;
           created_at: string;
           credits_contributors: Json | null;
           id: string;
@@ -106,6 +107,7 @@ export type Database = {
         Insert: {
           about_description?: string | null;
           about_title?: string | null;
+          app_version?: string;
           created_at?: string;
           credits_contributors?: Json | null;
           id?: string;
@@ -115,6 +117,7 @@ export type Database = {
         Update: {
           about_description?: string | null;
           about_title?: string | null;
+          app_version?: string;
           created_at?: string;
           credits_contributors?: Json | null;
           id?: string;

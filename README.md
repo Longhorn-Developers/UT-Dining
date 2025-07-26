@@ -57,6 +57,7 @@ Browse menus, check dining hours, and find the perfect meal on campus.
 - **Analytics**: [PostHog](https://posthog.com/) with session replay and auto-capture
 - **Styling**: [NativeWind](https://www.nativewind.dev/) (Tailwind CSS for React Native)
 - **Icons**: [Lucide React Native](https://lucide.dev/guide/packages/lucide-react-native)
+- **Code Quality**: [Biome](https://biomejs.dev/) for formatting and linting
 
 ## How it Works
 
@@ -80,8 +81,7 @@ Every 24 hours, the **Expo** mobile application fetches the latest menu data fro
 
 We recommend using the following VSCode extensions to improve your development experience:
 
-- **[ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)**: For identifying and fixing linting issues.
-- **[Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)**: For automatic code formatting.
+- **[Biome](https://marketplace.visualstudio.com/items?itemName=biomejs.biome)**: For automatic code formatting and linting.
 - **[Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)**: For Tailwind CSS class autocomplete and IntelliSense.
 
 ### Installation

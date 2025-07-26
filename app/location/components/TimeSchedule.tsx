@@ -1,6 +1,5 @@
 import { ChevronDown, Clock } from 'lucide-react-native';
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
@@ -22,7 +21,7 @@ const TimeSchedule = ({ schedule, isOpen, onToggle }: TimeScheduleProps) => {
         {(isOpen ? schedule : schedule.slice(0, 1)).map((item, index) => {
           const timeLines = item.time.split('\n');
           return timeLines.map((_, lineIdx) => (
-            <View key={item.dayRange + '-' + lineIdx} className="flex flex-row items-center gap-2">
+            <View key={`${item.dayRange}-${lineIdx}`} className="flex flex-row items-center gap-2">
               {lineIdx === 0 ? (
                 <View className={index === 0 ? 'flex' : 'invisible'}>
                   <Clock size={12} color={isDarkMode ? '#aaa' : COLORS['ut-grey']} />
@@ -35,8 +34,9 @@ const TimeSchedule = ({ schedule, isOpen, onToggle }: TimeScheduleProps) => {
                   'text-sm',
                   isDarkMode ? 'text-gray-300' : 'text-ut-grey',
                   index === 0 && lineIdx === 0 && 'font-semibold',
-                  lineIdx > 0 && 'opacity-0' // Hide text for extra lines
-                )}>
+                  lineIdx > 0 && 'opacity-0', // Hide text for extra lines
+                )}
+              >
                 {lineIdx === 0 ? `${item.dayRange}:` : ''}
               </Text>
             </View>
@@ -50,8 +50,9 @@ const TimeSchedule = ({ schedule, isOpen, onToggle }: TimeScheduleProps) => {
           const timeLines = item.time.split('\n');
           return timeLines.map((line, lineIdx) => (
             <View
-              key={item.dayRange + '-time-' + lineIdx}
-              className="flex flex-row items-center gap-2">
+              key={`${item.dayRange}-time-${lineIdx}`}
+              className="flex flex-row items-center gap-2"
+            >
               <Text className={cn('text-sm', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
                 {line}
               </Text>
@@ -59,8 +60,9 @@ const TimeSchedule = ({ schedule, isOpen, onToggle }: TimeScheduleProps) => {
                 <View
                   className={cn(
                     'duration-200 ease-in-out',
-                    isOpen ? 'rotate-180 transform' : 'rotate-0'
-                  )}>
+                    isOpen ? 'rotate-180 transform' : 'rotate-0',
+                  )}
+                >
                   <ChevronDown size={12} color={isDarkMode ? '#aaa' : COLORS['ut-grey']} />
                 </View>
               )}

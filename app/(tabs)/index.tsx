@@ -1,19 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { eq } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { drizzle, type ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import * as Network from 'expo-network';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useSQLiteContext } from 'expo-sqlite';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, View, Text } from 'react-native';
+import { type SQLiteDatabase, useSQLiteContext } from 'expo-sqlite';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
 import { Notifier } from 'react-native-notifier';
-
-import * as schema from '../../services/database/schema';
-import HomeHeader from '../_components/HomeHeader';
-import LocationItem from '../_components/LocationItem';
-
 import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
 import OnboardingScreen from '~/components/onboarding/OnboardingScreen';
@@ -23,6 +18,9 @@ import { COLORS } from '~/utils/colors';
 import { getTodayInCentralTime } from '~/utils/date';
 import { getLocationOpenStatus } from '~/utils/locationStatus';
 import { fetchMenuData } from '~/utils/queries';
+import * as schema from '../../services/database/schema';
+import HomeHeader from '../_components/HomeHeader';
+import LocationItem from '../_components/LocationItem';
 
 // Constants
 const SPLASH_SCREEN_DURATION = 1000;
@@ -42,8 +40,8 @@ const filterAndSortLocations = (
   locations: schema.LocationWithType[],
   locationTypes: schema.LocationType[],
   filter: FilterType,
-  db: any,
-  currentTime: Date
+  db: DrizzleDB,
+  currentTime: Date,
 ) => {
   // First filter by type
   let filteredLocations = locations;
@@ -68,6 +66,11 @@ const filterAndSortLocations = (
       .from(schema.location)
       .where(eq(schema.location.id, location.id))
       .get();
+    if (!locationData) {
+      // count as closed, todo: log error
+      closedLocations.push(location);
+      return;
+    }
     const isOpen = getLocationOpenStatus(location, locationData, db, currentTime, todayDate);
 
     if (isOpen) {
@@ -81,6 +84,10 @@ const filterAndSortLocations = (
   return [...openLocations, ...closedLocations];
 };
 
+export type DrizzleDB = ExpoSQLiteDatabase<typeof schema> & {
+  $client: SQLiteDatabase;
+};
+
 export default function Home() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
@@ -90,7 +97,7 @@ export default function Home() {
   const isOnboardingComplete = useOnboardingStore((state) => state.isOnboardingComplete);
 
   const db = useSQLiteContext();
-  const drizzleDb = drizzle(db, { schema });
+  const drizzleDb: DrizzleDB = drizzle(db, { schema });
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
   useDrizzleStudio(db);
@@ -173,6 +180,38 @@ export default function Home() {
     }
   }, [layoutLoaded, isLoading, isFetching]);
 
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: isDarkMode ? '#111827' : '#fff',
+        }}
+      >
+        <ActivityIndicator size="small" />
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: isDarkMode ? '#111827' : '#fff',
+        }}
+      >
+        <Text style={{ color: isDarkMode ? '#fff' : '#000' }}>
+          Failed to load data. Please try again.
+        </Text>
+      </View>
+    );
+  }
+
   const locations = data?.locations || [];
   const locationTypes = data?.locationTypes || [];
 
@@ -181,7 +220,7 @@ export default function Home() {
     locationTypes,
     selectedFilter,
     drizzleDb,
-    currentTime
+    currentTime,
   );
 
   return (

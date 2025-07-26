@@ -1,7 +1,13 @@
-import { FoodItem } from '~/services/database/database';
+import type { FoodItem } from '~/services/database/database';
+import type * as schema from '~/services/database/schema';
+import type { FiltersState } from '~/store/useFiltersStore';
 import { useMealPlanStore } from '~/store/useMealPlanStore';
 
-export const filterFoodItems = (foodItems: FoodItem[], filters: any, favorites: any[]) => {
+export const filterFoodItems = (
+  foodItems: FoodItem[],
+  filters: FiltersState['filters'],
+  favorites: schema.Favorite[],
+) => {
   return foodItems.filter((item) => {
     // Check favorites filter
     if (filters.favorites && !favorites?.some((fav) => fav.name === item.name)) {

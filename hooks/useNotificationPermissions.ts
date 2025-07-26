@@ -1,10 +1,10 @@
 import * as Notifications from 'expo-notifications';
 import { useFocusEffect } from 'expo-router';
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export function useNotificationPermissions() {
   const [permissionStatus, setPermissionStatus] = useState<Notifications.PermissionStatus | null>(
-    null
+    null,
   );
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,7 +29,7 @@ export function useNotificationPermissions() {
   useFocusEffect(
     useCallback(() => {
       checkPermissions();
-    }, [checkPermissions])
+    }, [checkPermissions]),
   );
 
   const requestPermissions = async () => {

@@ -1,6 +1,29 @@
 import { format } from 'date-fns';
 
-import * as schema from '~/services/database/schema';
+import type * as schema from '~/services/database/schema';
+
+// Types for service hours structure
+interface TimeRange {
+  open: number;
+  close: number;
+}
+
+interface DaySchedule {
+  isClosed?: boolean;
+  timeRanges?: TimeRange[];
+}
+
+interface ServiceHours {
+  monday?: DaySchedule;
+  tuesday?: DaySchedule;
+  wednesday?: DaySchedule;
+  thursday?: DaySchedule;
+  friday?: DaySchedule;
+  saturday?: DaySchedule;
+  sunday?: DaySchedule;
+  [key: string]: DaySchedule | undefined;
+}
+
 import type { MealTimes } from '~/utils/locations';
 
 type WeekDay = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
@@ -11,7 +34,7 @@ const weekdayName = (date: Date): WeekDay => format(date, 'EEEE') as WeekDay;
 // Returns time of day: 'morning', 'afternoon', or 'evening'
 export const timeOfDay = (
   date: Date,
-  mealTimes?: MealTimes
+  mealTimes?: MealTimes,
 ): 'morning' | 'afternoon' | 'evening' => {
   const hour = date.getHours();
   const minutes = date.getMinutes();
@@ -38,7 +61,7 @@ export const timeOfDay = (
 export function getTodaySchedule(locationData: schema.Location | null, date: Date = new Date()) {
   if (!locationData || !locationData.regular_service_hours) return null;
 
-  const serviceHours = locationData.regular_service_hours as any;
+  const serviceHours = locationData.regular_service_hours as ServiceHours;
   const day = weekdayName(date).toLowerCase();
   const daySchedule = serviceHours[day];
 
@@ -53,7 +76,7 @@ export function getTodaySchedule(locationData: schema.Location | null, date: Dat
 
   return {
     days: [weekdayName(date)],
-    intervals: daySchedule.timeRanges.map((timeRange: any) => ({
+    intervals: daySchedule.timeRanges.map((timeRange: TimeRange) => ({
       openTime: timeRange.open,
       closeTime: timeRange.close,
     })),
@@ -70,7 +93,7 @@ function convertToMinutes(time: number): number {
 // Database-based version of isLocationOpen
 export function isLocationOpen(
   locationData: schema.Location | null,
-  currentTime: Date = new Date()
+  currentTime: Date = new Date(),
 ): boolean {
   if (locationData?.force_close) {
     // If the location is forced closed, return false immediately
@@ -91,7 +114,7 @@ export function isLocationOpen(
 // Database-based version of getLocationTimeMessage
 export function getLocationTimeMessage(
   locationData: schema.Location | null,
-  currentTime: Date = new Date()
+  currentTime: Date = new Date(),
 ): string {
   const schedule = getTodaySchedule(locationData, currentTime);
   if (!schedule || schedule.intervals.length === 0) return 'Closed';
@@ -155,12 +178,12 @@ const dayAbbreviations: Record<WeekDay, string> = {
 // If the days in a schedule are not contiguous, they are joined by commas.
 export function generateSchedule(
   locationData: schema.Location | null,
-  todayFirst: boolean = true,
-  date: Date = new Date()
+  _todayFirst: boolean = true,
+  date: Date = new Date(),
 ): { dayRange: string; time: string }[] {
   if (!locationData || !locationData.regular_service_hours) return [];
 
-  const serviceHours = locationData.regular_service_hours as any;
+  const serviceHours = locationData.regular_service_hours as ServiceHours;
   const dayOrder: WeekDay[] = [
     'Monday',
     'Tuesday',
@@ -199,7 +222,7 @@ export function generateSchedule(
       Array.isArray(daySchedule.timeRanges) &&
       daySchedule.timeRanges.length > 0
     ) {
-      const intervals = daySchedule.timeRanges.map((interval: any) => {
+      const intervals = daySchedule.timeRanges.map((interval: TimeRange) => {
         const openStr = formatTimeFromNumber(interval.open, date);
         const closeStr = formatTimeFromNumber(interval.close, date);
         return `${openStr} - ${closeStr}`;

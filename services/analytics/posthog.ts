@@ -1,5 +1,5 @@
-import { PostHog } from 'posthog-react-native';
-import { PostHogEventProperties } from 'posthog-react-native/lib/posthog-core/src';
+import type { PostHog } from 'posthog-react-native';
+import type { PostHogEventProperties } from 'posthog-react-native/lib/posthog-core/src';
 
 export const POSTHOG_API_KEY = process.env.EXPO_PUBLIC_POSTHOG_API_KEY;
 const IS_DEV = __DEV__;
@@ -37,7 +37,7 @@ export function getSafePostHog(posthog: PostHog | undefined) {
         posthog.screen(name, properties);
       }
     },
-    capture: (eventName: string, properties?: Record<string, any>) => {
+    capture: (eventName: string, properties?: PostHogEventProperties) => {
       if (posthog) {
         posthog.capture(eventName, properties);
       }
@@ -53,11 +53,11 @@ export function getSafePostHog(posthog: PostHog | undefined) {
 // Log warning only once on app start
 if (!POSTHOG_API_KEY) {
   console.warn(
-    '⚠️ PostHog analytics are disabled. To enable analytics, add EXPO_PUBLIC_POSTHOG_API_KEY to your environment variables. See README.md for more information.'
+    '⚠️ PostHog analytics are disabled. To enable analytics, add EXPO_PUBLIC_POSTHOG_API_KEY to your environment variables. See README.md for more information.',
   );
 } else if (POSTHOG_CONFIG.options.disabled) {
   console.log(
-    'ℹ️  PostHog analytics disabled in development mode. To enable analytics in development, set disabled: false in POSTHOG_CONFIG options.'
+    'ℹ️  PostHog analytics disabled in development mode. To enable analytics in development, set `disabled: false` in POSTHOG_CONFIG options.',
   );
 } else if (!POSTHOG_CONFIG.debug) {
   console.log('✅ PostHog analytics enabled (debug disabled)');

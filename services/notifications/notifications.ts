@@ -4,13 +4,11 @@ import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
-
-import { insertNotification } from '../database/database';
-
 import { useDatabase } from '~/hooks/useDatabase';
 import { getOrCreateDeviceId } from '~/services/device/deviceId';
 import { usePushNotificationsStore } from '~/store/usePushNotificationsStore';
 import { supabase } from '~/utils/supabase';
+import { insertNotification } from '../database/database';
 
 // Global handler (still needed)
 Notifications.setNotificationHandler({
@@ -136,7 +134,7 @@ export function PushNotificationsInitializer() {
             console.error('❌ Error saving notification to database:', error);
           }
         }
-      }
+      },
     );
 
     // Triggered when the app is in the background (when the app is closed and the notification is tapped)
@@ -167,7 +165,7 @@ export function PushNotificationsInitializer() {
         } else {
           router.push('/notifications');
         }
-      }
+      },
     );
 
     return () => {
@@ -175,7 +173,7 @@ export function PushNotificationsInitializer() {
       responseListener.remove();
       console.log('✅ Push notification listeners cleaned up.');
     };
-  }, [setDeviceId, setExpoPushToken, setNotification]);
+  }, [setDeviceId, setExpoPushToken, setNotification, db]);
 
   return null;
 }

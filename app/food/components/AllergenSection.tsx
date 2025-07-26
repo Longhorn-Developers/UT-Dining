@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { Image, Text, View } from 'react-native';
 
-import { ALLERGEN_ICONS, AllergenKey } from '~/data/AllergenInfo';
+import { ALLERGEN_ICONS, type AllergenKey } from '~/data/AllergenInfo';
 import { cn } from '~/utils/utils';
 
 interface AllergenSectionProps {
@@ -31,7 +31,7 @@ const AllergenSection = React.memo(
         ))}
       </View>
     </View>
-  )
+  ),
 );
 
 export default AllergenSection;
