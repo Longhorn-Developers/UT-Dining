@@ -21,6 +21,8 @@ import '../global.css';
 import { VersionCheckProvider } from '~/components/VersionCheckProvider';
 import { POSTHOG_API_KEY, POSTHOG_CONFIG } from '~/services/analytics/posthog';
 import { PushNotificationsInitializer } from '~/services/notifications/notifications';
+import { ratingService } from '~/services/rating/rating';
+import { useAppLaunchStore } from '~/store/useAppLaunchStore';
 
 export const DATABASE_NAME = 'database.db';
 
@@ -36,15 +38,22 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { success, error } = useMigrations(db, migrations);
+  const { incrementLaunchCount } = useAppLaunchStore();
   useSyncQueries({ queryClient });
 
   useEffect(() => {
     if (success) {
       console.log('✅ Database migrated successfully');
+
+      // Increment launch count on successful app initialization
+      incrementLaunchCount();
+
+      // Check and show rating prompt if conditions are met
+      ratingService.checkAndShowRatingPrompt();
     } else if (error) {
       console.error('❌ Error migrating database:', error);
     }
-  }, [success, error]);
+  }, [success, error, incrementLaunchCount]);
 
   return (
     <QueryClientProvider client={queryClient}>
