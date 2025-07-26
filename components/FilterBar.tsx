@@ -1,14 +1,14 @@
 import * as Haptics from 'expo-haptics';
 import { Filter } from 'lucide-react-native';
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
 
-import { FilterType } from '~/app/(tabs)';
+import type { FilterType } from '~/app/(tabs)';
 import { useFiltersStore } from '~/store/useFiltersStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
-import { MealTimes } from '~/utils/locations';
+import type { MealTimes } from '~/utils/locations';
 import { timeOfDay } from '~/utils/time';
 import { cn } from '~/utils/utils';
 
@@ -73,7 +73,7 @@ const FilterBar = ({
         setSelectedItem(filterItems[0]?.id as FilterType);
       }
     }
-  }, [filterItems, selectedItem, useTimeOfDayDefault, setSelectedItem]);
+  }, [filterItems, selectedItem, useTimeOfDayDefault, setSelectedItem, mealTimes]);
 
   const onPressItem = async (id: FilterType) => {
     setSelectedItem(id as FilterType);
@@ -86,20 +86,22 @@ const FilterBar = ({
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerClassName="gap-x-2">
+          contentContainerClassName="gap-x-2"
+        >
           {sortedItems.map((item) => (
             <TouchableOpacity
               activeOpacity={0.8}
               key={item.id}
               onPress={() => onPressItem(item.id as FilterType)}
               className={cn(
-                'self-start rounded-full  px-3 py-1',
+                'self-start rounded-full px-3 py-1',
                 selectedItem === item.id
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange text-white'
                   : isDarkMode
                     ? 'border-gray-700 bg-gray-800 text-gray-200'
-                    : 'border border-gray-200 bg-white text-ut-grey'
-              )}>
+                    : 'border border-gray-200 bg-white text-ut-grey',
+              )}
+            >
               <Text
                 className={cn(
                   'text-xs',
@@ -107,8 +109,9 @@ const FilterBar = ({
                     ? 'font-bold text-white'
                     : isDarkMode
                       ? 'font-medium text-gray-200'
-                      : 'font-medium text-ut-grey/75'
-                )}>
+                      : 'font-medium text-ut-grey/75',
+                )}
+              >
                 {item.title}
               </Text>
             </TouchableOpacity>
@@ -127,7 +130,7 @@ const FilterButton = () => {
 
   // If there are any filters, make this true
   const hasFilters = () => {
-    const hasValues = <T extends Record<string, boolean> | any[]>(item: T): boolean =>
+    const hasValues = <T extends Record<string, boolean>>(item: T): boolean =>
       Array.isArray(item) ? item.length > 0 : Object.values(item).some(Boolean);
 
     return (
@@ -143,11 +146,12 @@ const FilterButton = () => {
       onPress={() => {
         SheetManager.show('filters');
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      }}>
+      }}
+    >
       <Filter size={18} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
 
       {hasFilters() && (
-        <View className="absolute right-0 top-0 -mr-2 -mt-2">
+        <View className="-mr-2 -mt-2 absolute top-0 right-0">
           <View className="size-2 rounded-full bg-ut-burnt-orange" />
         </View>
       )}

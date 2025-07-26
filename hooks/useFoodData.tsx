@@ -1,11 +1,9 @@
 import { router } from 'expo-router';
-import { useEffect, useState, useMemo, useRef } from 'react';
-
-import { useDatabase } from './useDatabase';
-
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ALLERGEN_EXCEPTIONS, NUTRITION_ORDER } from '~/data/AllergenInfo';
-import { getFoodItem, FoodItem, getFavoriteItem } from '~/services/database/database';
-import { Favorite } from '~/services/database/schema';
+import { type FoodItem, getFavoriteItem, getFoodItem } from '~/services/database/database';
+import type { Favorite } from '~/services/database/schema';
+import { useDatabase } from './useDatabase';
 
 // Helper function to format nutrition keys
 const formatNutritionKey = (key: string) =>
@@ -19,7 +17,7 @@ export function useFoodData(
   menu: string | string[],
   category: string | string[],
   food: string | string[],
-  isFavorite?: boolean
+  isFavorite?: boolean,
 ) {
   const db = useDatabase();
 
@@ -46,12 +44,16 @@ export function useFoodData(
       const foodString = Array.isArray(food) ? food[0] : food;
 
       try {
-        let item;
+        let item: FoodItem | null;
 
         if (isFavorite) {
           // Fetch from favorites table if isFavorite is true
-          item = getFavoriteItem(db, foodString);
-          item = convertFavoriteItemToFoodItem(item as Favorite);
+          const favoriteItem = getFavoriteItem(db, foodString);
+          if (!favoriteItem) {
+            router.back();
+            return;
+          }
+          item = convertFavoriteItemToFoodItem(favoriteItem);
         } else {
           // Fetch from regular food items table
           item = await getFoodItem(db, locString, menuString, categoryString, foodString);

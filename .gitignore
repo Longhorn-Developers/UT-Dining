@@ -14,7 +14,7 @@ expo-env.d.ts
 
 # firebase/supabase/vexo
 .env
-.env-example 
+.dev.vars
 
 ios
 android

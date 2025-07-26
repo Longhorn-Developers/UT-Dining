@@ -1,10 +1,8 @@
 import { eq } from 'drizzle-orm';
-import { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
+import type { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import * as Network from 'expo-network';
-
-import * as schema from '../services/database/schema';
-
 import { insertDataIntoSQLiteDB } from '~/services/database/database';
+import * as schema from '../services/database/schema';
 
 export const fetchMenuData = async (drizzleDb: ExpoSQLiteDatabase<typeof schema>) => {
   // If there is no internet, skip data insertion
@@ -25,7 +23,7 @@ export const fetchMenuData = async (drizzleDb: ExpoSQLiteDatabase<typeof schema>
         joinedData.map(({ location, location_type }) => ({
           ...location,
           type: location_type.name,
-        }))
+        })),
       ),
     drizzleDb.select().from(schema.location_type).orderBy(schema.location_type.display_order),
   ]);

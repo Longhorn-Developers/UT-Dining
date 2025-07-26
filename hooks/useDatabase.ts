@@ -1,4 +1,4 @@
-import { drizzle, ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
+import { drizzle, type ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useMemo } from 'react';
 

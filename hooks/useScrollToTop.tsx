@@ -1,8 +1,8 @@
-import { FlashList } from '@shopify/flash-list';
-import { useRef, useState, useCallback } from 'react';
-import { Animated, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import type { FlashList } from '@shopify/flash-list';
+import { useCallback, useRef, useState } from 'react';
+import { Animated, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 
-export const useScrollToTop = (listRef: React.RefObject<FlashList<any>>) => {
+export const useScrollToTop = <T,>(listRef: React.RefObject<FlashList<T>>) => {
   const [showScrollToTop, setShowScrollToTop] = useState(false);
   const scrollButtonAnimation = useRef(new Animated.Value(0)).current;
 
@@ -29,7 +29,7 @@ export const useScrollToTop = (listRef: React.RefObject<FlashList<any>>) => {
         });
       }
     },
-    [showScrollToTop, scrollButtonAnimation]
+    [showScrollToTop, scrollButtonAnimation],
   );
 
   const scrollToTop = useCallback(() => {

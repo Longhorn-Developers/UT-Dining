@@ -6,9 +6,17 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
+if (Deno.env.get('SUPABASE_URL') === undefined) {
+  throw new Error('SUPABASE_URL environment variable is not set');
+}
+
+if (Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') === undefined) {
+  throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is not set');
+}
+
 const supabase = createClient(
-  Deno.env.get('SUPABASE_URL')!,
-  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  Deno.env.get('SUPABASE_URL'),
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
 );
 const BATCH_SIZE = 100;
 
@@ -23,7 +31,7 @@ Deno.serve(async (req) => {
   const pushTokens = [...new Set(userDevices.map((device) => device.push_token))];
 
   // Batch tokens into groups of 100
-  const tokenBatches = [];
+  const tokenBatches: string[][] = [];
 
   for (let i = 0; i < pushTokens.length; i += BATCH_SIZE) {
     tokenBatches.push(pushTokens.slice(i, i + BATCH_SIZE));
@@ -83,7 +91,7 @@ Deno.serve(async (req) => {
     {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
-    }
+    },
   );
 });
 

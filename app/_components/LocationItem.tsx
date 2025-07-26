@@ -1,13 +1,13 @@
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { ChevronRight } from 'lucide-react-native';
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Pressable, Animated, Easing } from 'react-native';
-import Reanimated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Animated, Easing, Pressable, Text, View } from 'react-native';
+import Reanimated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
-import { LocationWithType } from '~/services/database/schema';
+import type { LocationWithType } from '~/services/database/schema';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
 import { getTodayInCentralTime } from '~/utils/date';
@@ -35,24 +35,9 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
     const todayDate = getTodayInCentralTime();
     const isOpen = getLocationOpenStatus(location, locationData, db, currentTime, todayDate);
     setOpen(isOpen);
-  }, [locationData, currentTime]);
+  }, [locationData, currentTime, db, location]);
 
-  useEffect(() => {
-    // Stop any running animation
-    pingAnimation.stopAnimation();
-    pingAnimation.setValue(0);
-
-    if (open) {
-      startPingAnimation();
-    }
-
-    return () => {
-      // Clean up animation on unmount
-      pingAnimation.stopAnimation();
-    };
-  }, [open]);
-
-  const startPingAnimation = () => {
+  const startPingAnimation = useCallback(() => {
     // Create a looping animation that expands and fades
     Animated.loop(
       Animated.sequence([
@@ -68,9 +53,24 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
           duration: 0,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
-  };
+  }, [pingAnimation]);
+
+  useEffect(() => {
+    // Stop any running animation
+    pingAnimation.stopAnimation();
+    pingAnimation.setValue(0);
+
+    if (open) {
+      startPingAnimation();
+    }
+
+    return () => {
+      // Clean up animation on unmount
+      pingAnimation.stopAnimation();
+    };
+  }, [open, pingAnimation, startPingAnimation]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -109,8 +109,9 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
         onPress={handlePress}
         className={cn(
           'mb-2 flex-row items-center justify-between rounded-lg p-4',
-          isDarkMode ? ' border-gray-700 bg-gray-800' : 'border border-ut-grey/15 bg-white'
-        )}>
+          isDarkMode ? ' border-gray-700 bg-gray-800' : 'border border-ut-grey/15 bg-white',
+        )}
+      >
         <View className="flex-row items-center justify-center gap-x-4">
           <View className="relative size-3">
             <View
@@ -161,22 +162,24 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
           <View>
             <Text
               className={cn(
-                'text-xl font-bold',
+                'font-bold text-xl',
                 open
                   ? isDarkMode
                     ? 'text-white'
                     : 'text-ut-black'
                   : isDarkMode
                     ? 'text-gray-500'
-                    : 'text-ut-grey/75'
-              )}>
+                    : 'text-ut-grey/75',
+              )}
+            >
               {displayName}
             </Text>
             <Text
               className={cn(
-                'text-xs font-medium',
-                isDarkMode ? 'text-gray-400' : 'text-ut-grey/75'
-              )}>
+                'font-medium text-xs',
+                isDarkMode ? 'text-gray-400' : 'text-ut-grey/75',
+              )}
+            >
               {open ? getLocationTimeMessage(locationData, currentTime) : 'Closed'}
             </Text>
           </View>
