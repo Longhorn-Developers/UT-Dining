@@ -9,6 +9,7 @@ import { cn } from '~/utils/utils';
 type Props = {
   width: number;
   onSelectionChange: (hasSelection: boolean) => void;
+  onSelectionUpdate: (selectedTags: string[]) => void;
 };
 
 const MOTIVATION_TAGS = [
@@ -22,7 +23,7 @@ const MOTIVATION_TAGS = [
   { id: 'filter-by-diet', label: 'Filter by Diet', icon: Leaf },
 ];
 
-const DataCollectionScreen = ({ width, onSelectionChange }: Props) => {
+const DataCollectionScreen = ({ width, onSelectionChange, onSelectionUpdate }: Props) => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -36,6 +37,7 @@ const DataCollectionScreen = ({ width, onSelectionChange }: Props) => {
 
     setSelectedTags(newSelection);
     onSelectionChange(newSelection.length > 0);
+    onSelectionUpdate(newSelection);
   };
 
   return (

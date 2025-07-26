@@ -17,6 +17,7 @@ import { cn } from '~/utils/utils';
 
 type Props = {
   width: number;
+  onPermissionsChange: (permissions: PermissionState) => void;
 };
 
 type PermissionStatus = 'granted' | 'denied' | 'undetermined';
@@ -26,7 +27,7 @@ interface PermissionState {
   notifications: PermissionStatus;
 }
 
-const PermissionsScreen = ({ width }: Props) => {
+const PermissionsScreen = ({ width, onPermissionsChange }: Props) => {
   const [permissions, setPermissions] = useState<PermissionState>({
     location: 'undetermined',
     notifications: 'undetermined',
@@ -43,10 +44,13 @@ const PermissionsScreen = ({ width }: Props) => {
         // Request notification permission
         const { status: notificationStatus } = await Notifications.requestPermissionsAsync();
 
-        setPermissions({
+        const newPermissions = {
           location: locationStatus === 'granted' ? 'granted' : 'denied',
           notifications: notificationStatus === 'granted' ? 'granted' : 'denied',
-        });
+        } as PermissionState;
+
+        setPermissions(newPermissions);
+        onPermissionsChange(newPermissions);
       } catch (error) {
         console.error('Error requesting permissions:', error);
       }
@@ -58,10 +62,13 @@ const PermissionsScreen = ({ width }: Props) => {
         const { status: locationStatus } = await Location.getForegroundPermissionsAsync();
         const { status: notificationStatus } = await Notifications.getPermissionsAsync();
 
-        setPermissions({
+        const newPermissions = {
           location: locationStatus === 'granted' ? 'granted' : 'denied',
           notifications: notificationStatus === 'granted' ? 'granted' : 'denied',
-        });
+        } as PermissionState;
+
+        setPermissions(newPermissions);
+        onPermissionsChange(newPermissions);
       } catch (error) {
         console.error('Error checking permissions:', error);
       }
@@ -81,7 +88,7 @@ const PermissionsScreen = ({ width }: Props) => {
     return () => {
       subscription?.remove();
     };
-  }, []);
+  }, [onPermissionsChange]);
 
   const openSettings = () => {
     Alert.alert('Open Settings', 'To enable permissions, please go to your device settings.', [

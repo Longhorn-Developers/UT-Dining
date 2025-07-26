@@ -1,5 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { ChevronLeft } from 'lucide-react-native';
+import { usePostHog } from 'posthog-react-native';
 import React, { useCallback } from 'react';
 import {
   Modal,
@@ -18,6 +19,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+import { getSafePostHog } from '~/services/analytics/posthog';
 import { ONBOARDING_STEPS, useOnboardingStore } from '~/store/useOnboardingStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
@@ -49,12 +51,28 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
   const { width } = useWindowDimensions();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const posthog = usePostHog();
+  const analytics = getSafePostHog(posthog);
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollX = useSharedValue(0);
   const currentStepShared = useSharedValue(0);
   const isScrolling = useSharedValue(false);
   const { currentStep, setCurrentStep, completeOnboarding } = useOnboardingStore();
   const [hasDataSelection, setHasDataSelection] = React.useState(false);
+  const [selectedMotivations, setSelectedMotivations] = React.useState<string[]>([]);
+  const [permissionStatus, setPermissionStatus] = React.useState<{location: string; notifications: string} | null>(null);
+  const [hasTrackedStart, setHasTrackedStart] = React.useState(false);
+
+  // Track onboarding start only once
+  React.useEffect(() => {
+    if (!isOnboardingComplete && !hasTrackedStart) {
+      analytics.capture('onboarding_start', {
+        onboarding_version: '1.0',
+        timestamp: new Date().toISOString(),
+      });
+      setHasTrackedStart(true);
+    }
+  }, [isOnboardingComplete, hasTrackedStart, analytics]);
 
   const scrollHandler = useAnimatedScrollHandler({
     onBeginDrag: () => {
@@ -96,6 +114,14 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
   }, [currentStep, width, scrollRef, setCurrentStep, currentStepShared]);
 
   const handleComplete = () => {
+    analytics.capture('onboarding_completed', {
+      selected_motivations: selectedMotivations,
+      motivation_count: selectedMotivations.length,
+      location_permission: permissionStatus?.location || 'undetermined',
+      notifications_permission: permissionStatus?.notifications || 'undetermined',
+      onboarding_version: '1.0',
+    });
+
     completeOnboarding();
   };
 
@@ -105,7 +131,12 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
         return <WelcomeScreen key={index} width={width} />;
       case ONBOARDING_STEPS.DATA_COLLECTION:
         return (
-          <DataCollectionScreen key={index} width={width} onSelectionChange={setHasDataSelection} />
+          <DataCollectionScreen
+            key={index}
+            width={width}
+            onSelectionChange={setHasDataSelection}
+            onSelectionUpdate={setSelectedMotivations}
+          />
         );
       case ONBOARDING_STEPS.FEATURES_MENUS:
         return <MenusFeatureScreen key={index} width={width} />;
@@ -114,7 +145,7 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
       case ONBOARDING_STEPS.FEATURES_FAVORITES:
         return <FavoritesFeatureScreen key={index} width={width} />;
       case ONBOARDING_STEPS.PERMISSIONS:
-        return <PermissionsScreen key={index} width={width} />;
+        return <PermissionsScreen key={index} width={width} onPermissionsChange={setPermissionStatus} />;
       case ONBOARDING_STEPS.COMPLETE:
         return (
           <CompleteScreen
