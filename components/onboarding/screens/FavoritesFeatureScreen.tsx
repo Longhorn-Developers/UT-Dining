@@ -1,6 +1,7 @@
 import { useAssets } from 'expo-asset';
 import { Image } from 'expo-image';
-import { Text, useColorScheme, View } from 'react-native';
+import { Text, View } from 'react-native';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { cn } from '~/utils/utils';
 
 type Props = {
@@ -8,11 +9,10 @@ type Props = {
 };
 
 const FavoritesFeatureScreen = ({ width }: Props) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = useSettingsStore((state) => state.isDarkMode);
   const [assets] = useAssets([
-    require('~/assets/onboarding/favorites.png'),
-    require('~/assets/onboarding/meal-plan.png'),
+    require('~/assets/onboarding/favorites.webp'),
+    require('~/assets/onboarding/meal-plan.webp'),
   ]);
 
   if (!assets) {

@@ -2,15 +2,7 @@ import * as Haptics from 'expo-haptics';
 import { ChevronLeft } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
 import React, { useCallback } from 'react';
-import {
-  Modal,
-  Pressable,
-  Text,
-  TouchableOpacity,
-  useColorScheme,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { Modal, Pressable, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import Animated, {
   runOnJS,
   useAnimatedRef,
@@ -21,6 +13,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { getSafePostHog } from '~/services/analytics/posthog';
 import { ONBOARDING_STEPS, useOnboardingStore } from '~/store/useOnboardingStore';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
 import { Container } from '../Container';
@@ -49,8 +42,7 @@ interface OnboardingScreenProps {
 
 const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
   const { width } = useWindowDimensions();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   const posthog = usePostHog();
   const analytics = getSafePostHog(posthog);
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
@@ -201,7 +193,7 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
 
   return (
     <Modal animationType="slide" presentationStyle="fullScreen" visible={!isOnboardingComplete}>
-      <Container className={cn('mx-0', isDark ? 'bg-gray-900' : 'bg-white')}>
+      <Container className={cn('mx-0', isDarkMode ? 'bg-gray-900' : 'bg-white')}>
         <View className="flex-row items-center px-6">
           <TouchableOpacity
             activeOpacity={0.8}
@@ -211,7 +203,7 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
           >
             <ChevronLeft
               size={24}
-              color={isDark ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']}
+              color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']}
             />
           </TouchableOpacity>
 
@@ -245,7 +237,7 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
             onPress={handlePress}
             className={cn(
               'w-full rounded-full p-3',
-              isDark ? 'bg-ut-burnt-orange/90' : 'bg-ut-burnt-orange',
+              isDarkMode ? 'bg-ut-burnt-orange/90' : 'bg-ut-burnt-orange',
             )}
             style={[animatedStyle]}
           >
