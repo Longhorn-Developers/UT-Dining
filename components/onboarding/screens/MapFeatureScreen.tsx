@@ -1,26 +1,22 @@
-import { useAssets } from 'expo-asset';
 import { Image } from 'expo-image';
-import { Text, useColorScheme, View } from 'react-native';
+import { Text, View } from 'react-native';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { cn } from '~/utils/utils';
 
 type Props = {
   width: number;
 };
 
-const MapFeatureScreen = ({ width }: Props) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  const [assets] = useAssets([require('~/assets/onboarding/map.png')]);
+const image = require('~/assets/onboarding/map.webp');
 
-  if (!assets) {
-    return null;
-  }
+const MapFeatureScreen = ({ width }: Props) => {
+  const isDark = useSettingsStore((state) => state.isDarkMode);
 
   return (
     <View style={{ width }} className={cn('flex-1 px-6 py-8', isDark ? 'bg-gray-900' : 'bg-white')}>
       <View className="flex-1 items-center justify-center">
         <Image
-          source={assets[0]}
+          source={image}
           style={{
             width: 236,
             height: 512,

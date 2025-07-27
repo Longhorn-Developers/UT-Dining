@@ -5,7 +5,7 @@ import { CircleAlert, MapPin } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
 import type React from 'react';
 import { useEffect } from 'react';
-import { Platform, Text, TouchableOpacity, View } from 'react-native';
+import { InteractionManager, Platform, Text, TouchableOpacity, View } from 'react-native';
 import ActionSheet, {
   type ActionSheetRef,
   ScrollView,
@@ -163,20 +163,20 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
             )}
             onPress={() => {
               if (hasMenu) {
-                // First redirect to home tab wait 10ms and then redirect to location
+                // First redirect to home tab and then redirect to location after interactions
                 ref.current?.hide();
                 router.replace('/');
 
-                setTimeout(() => {
-                  router.push(`/location/${name}`);
-                }, 10);
+                InteractionManager.runAfterInteractions(() => {
+                  router.navigate(`/location/${name}`);
+                });
               } else {
                 ref.current?.hide();
                 router.replace('/');
 
-                setTimeout(() => {
-                  router.push(`/location_generic/${name}`);
-                }, 10);
+                InteractionManager.runAfterInteractions(() => {
+                  router.navigate(`/location_generic/${name}`);
+                });
               }
             }}
           >

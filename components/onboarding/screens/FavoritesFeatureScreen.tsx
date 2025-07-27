@@ -1,30 +1,24 @@
-import { useAssets } from 'expo-asset';
 import { Image } from 'expo-image';
-import { Text, useColorScheme, View } from 'react-native';
+import { Text, View } from 'react-native';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { cn } from '~/utils/utils';
 
 type Props = {
   width: number;
 };
 
-const FavoritesFeatureScreen = ({ width }: Props) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  const [assets] = useAssets([
-    require('~/assets/onboarding/favorites.png'),
-    require('~/assets/onboarding/meal-plan.png'),
-  ]);
+const favoritesImage = require('~/assets/onboarding/favorites.webp');
+const mealPlanImage = require('~/assets/onboarding/meal-plan.webp');
 
-  if (!assets) {
-    return null;
-  }
+const FavoritesFeatureScreen = ({ width }: Props) => {
+  const isDark = useSettingsStore((state) => state.isDarkMode);
 
   return (
     <View style={{ width }} className={cn('flex-1 px-6 py-8', isDark ? 'bg-gray-900' : 'bg-white')}>
       <View className="flex-1 items-center justify-center">
         <View className="flex-row gap-0">
           <Image
-            source={assets[0]}
+            source={favoritesImage}
             style={{
               width: 180,
               height: 512,
@@ -32,7 +26,7 @@ const FavoritesFeatureScreen = ({ width }: Props) => {
             contentFit="contain"
           />
           <Image
-            source={assets[1]}
+            source={mealPlanImage}
             style={{
               width: 180,
               height: 512,

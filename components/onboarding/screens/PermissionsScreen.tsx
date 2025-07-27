@@ -2,16 +2,9 @@ import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import { Bell, Check, MapPin, XIcon } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
-import {
-  Alert,
-  AppState,
-  Linking,
-  Text,
-  TouchableOpacity,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { Alert, AppState, Linking, Text, TouchableOpacity, View } from 'react-native';
 
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
 
@@ -32,8 +25,7 @@ const PermissionsScreen = ({ width, onPermissionsChange }: Props) => {
     location: 'undetermined',
     notifications: 'undetermined',
   });
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = useSettingsStore((state) => state.isDarkMode);
 
   useEffect(() => {
     const requestPermissions = async () => {
