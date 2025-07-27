@@ -1,6 +1,7 @@
 import { useAssets } from 'expo-asset';
 import { Image } from 'expo-image';
-import { Text, useColorScheme, View } from 'react-native';
+import { Text, View } from 'react-native';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { cn } from '~/utils/utils';
 
 type Props = {
@@ -8,9 +9,8 @@ type Props = {
 };
 
 const MenusFeatureScreen = ({ width }: Props) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  const [assets] = useAssets([require('~/assets/onboarding/menu.png')]);
+  const isDark = useSettingsStore((state) => state.isDarkMode);
+  const [assets] = useAssets([require('~/assets/onboarding/menu.webp')]);
 
   if (!assets) {
     return null;

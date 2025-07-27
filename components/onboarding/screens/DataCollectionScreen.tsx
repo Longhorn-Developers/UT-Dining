@@ -1,8 +1,9 @@
 import * as Haptics from 'expo-haptics';
 import { Book, Calendar, Clock, Heart, Leaf, MapPin, Timer, Utensils } from 'lucide-react-native';
 import { useState } from 'react';
-import { Text, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 import { cn } from '~/utils/utils';
 
@@ -25,8 +26,7 @@ const MOTIVATION_TAGS = [
 
 const DataCollectionScreen = ({ width, onSelectionChange, onSelectionUpdate }: Props) => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = useSettingsStore((state) => state.isDarkMode);
 
   const toggleTag = (tagId: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

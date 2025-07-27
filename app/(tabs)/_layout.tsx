@@ -1,19 +1,14 @@
 import * as Haptics from 'expo-haptics';
 import { Tabs } from 'expo-router';
 import { Bell, Cog, Home, MapPin } from 'lucide-react-native';
-import { useColorScheme } from 'react-native';
 
 import { useUnreadNotifications } from '~/hooks/useUnreadNotifications';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { COLORS } from '~/utils/colors';
 
 export default function Layout() {
-  const colorScheme = useColorScheme();
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
   const { unreadCount, hasUnread } = useUnreadNotifications();
-
-  // Use manual dark mode setting if available, otherwise fall back to system
-  const isDark = isDarkMode ?? colorScheme === 'dark';
 
   const handleTabPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -24,14 +19,14 @@ export default function Layout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: isDark ? '#111827' : '#ffffff',
-          borderTopColor: isDark ? '#374151' : '#e5e7eb',
+          backgroundColor: isDarkMode ? '#111827' : '#ffffff',
+          borderTopColor: isDarkMode ? '#374151' : '#e5e7eb',
           borderTopWidth: 1,
           height: 76,
           paddingBottom: 20,
         },
         tabBarActiveTintColor: COLORS['ut-burnt-orange'],
-        tabBarInactiveTintColor: isDark ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey'],
+        tabBarInactiveTintColor: isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey'],
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '500',

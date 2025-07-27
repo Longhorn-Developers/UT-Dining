@@ -1,6 +1,7 @@
 import LottieView from 'lottie-react-native';
 import { useEffect, useRef } from 'react';
-import { Text, useColorScheme, View } from 'react-native';
+import { Text, View } from 'react-native';
+import { useSettingsStore } from '~/store/useSettingsStore';
 import { cn } from '~/utils/utils';
 
 type Props = {
@@ -11,8 +12,7 @@ type Props = {
 
 const CompleteScreen = ({ width, isCurrentScreen }: Props) => {
   const lottieRef = useRef<LottieView>(null);
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = useSettingsStore((state) => state.isDarkMode);
 
   useEffect(() => {
     if (!isCurrentScreen) {
