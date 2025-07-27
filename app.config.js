@@ -49,11 +49,11 @@ export default {
         'expo-asset',
         {
           assets: [
-            './assets/onboarding/icon.png',
-            './assets/onboarding/menu.png',
-            './assets/onboarding/meal-plan.png',
-            './assets/onboarding/favorites.png',
-            './assets/onboarding/map.png',
+            './assets/onboarding/icon.webp',
+            './assets/onboarding/menu.webp',
+            './assets/onboarding/meal-plan.webp',
+            './assets/onboarding/favorites.webp',
+            './assets/onboarding/map.webp',
           ],
         },
       ],
