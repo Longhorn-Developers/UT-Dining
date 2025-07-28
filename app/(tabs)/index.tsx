@@ -117,6 +117,7 @@ export default function Home() {
     refetchInterval: 1000 * 60 * 3, // 3 minutes polling while in app
     refetchOnMount: false,
     refetchOnWindowFocus: true,
+    retry: false, // Don't retry on failure - just use cached data
   });
 
   // Handle refresh
