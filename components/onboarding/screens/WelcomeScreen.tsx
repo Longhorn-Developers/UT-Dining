@@ -1,4 +1,3 @@
-import { useAssets } from 'expo-asset';
 import { Image } from 'expo-image';
 import { Text, View } from 'react-native';
 import { useSettingsStore } from '~/store/useSettingsStore';
@@ -8,19 +7,16 @@ type Props = {
   width: number;
 };
 
+const image = require('~/assets/onboarding/icon.webp');
+
 const WelcomeScreen = ({ width }: Props) => {
   const isDark = useSettingsStore((state) => state.isDarkMode);
-  const [assets] = useAssets([require('~/assets/onboarding/icon.webp')]);
-
-  if (!assets) {
-    return null;
-  }
 
   return (
     <View style={{ width }} className={cn('flex-1 px-6 py-8', isDark ? 'bg-gray-900' : 'bg-white')}>
       <View className="flex-1 items-center justify-center">
         <Image
-          source={assets[0]}
+          source={image}
           style={{ width: 200, height: 200 }}
           className="mb-8"
           contentFit="contain"

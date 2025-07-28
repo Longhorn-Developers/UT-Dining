@@ -5,14 +5,18 @@ import { insertDataIntoSQLiteDB } from '~/services/database/database';
 import * as schema from '../services/database/schema';
 
 export const fetchMenuData = async (drizzleDb: ExpoSQLiteDatabase<typeof schema>) => {
-  // If there is no internet, skip data insertion
-  if (!(await Network.getNetworkStateAsync()).isConnected) {
-    throw new Error('No internet connection');
+  // Check internet connection and only sync when online
+  const networkState = await Network.getNetworkStateAsync();
+  if (networkState.isConnected) {
+    try {
+      await insertDataIntoSQLiteDB(drizzleDb); // Sync with remote when online
+    } catch (error) {
+      console.warn('Failed to sync with remote database, using cached data:', error);
+      // Continue to return cached data even if sync fails
+    }
   }
 
-  await insertDataIntoSQLiteDB(drizzleDb); // Always force refresh for query
-
-  // Fetch locations and location types concurrently
+  // Always return cached data from SQLite (works both online and offline)
   const [data, types] = await Promise.all([
     drizzleDb
       .select()

@@ -1,4 +1,3 @@
-import { useAssets } from 'expo-asset';
 import { Image } from 'expo-image';
 import { Text, View } from 'react-native';
 import { useSettingsStore } from '~/store/useSettingsStore';
@@ -8,23 +7,18 @@ type Props = {
   width: number;
 };
 
+const favoritesImage = require('~/assets/onboarding/favorites.webp');
+const mealPlanImage = require('~/assets/onboarding/meal-plan.webp');
+
 const FavoritesFeatureScreen = ({ width }: Props) => {
   const isDark = useSettingsStore((state) => state.isDarkMode);
-  const [assets] = useAssets([
-    require('~/assets/onboarding/favorites.webp'),
-    require('~/assets/onboarding/meal-plan.webp'),
-  ]);
-
-  if (!assets) {
-    return null;
-  }
 
   return (
     <View style={{ width }} className={cn('flex-1 px-6 py-8', isDark ? 'bg-gray-900' : 'bg-white')}>
       <View className="flex-1 items-center justify-center">
         <View className="flex-row gap-0">
           <Image
-            source={assets[0]}
+            source={favoritesImage}
             style={{
               width: 180,
               height: 512,
@@ -32,7 +26,7 @@ const FavoritesFeatureScreen = ({ width }: Props) => {
             contentFit="contain"
           />
           <Image
-            source={assets[1]}
+            source={mealPlanImage}
             style={{
               width: 180,
               height: 512,

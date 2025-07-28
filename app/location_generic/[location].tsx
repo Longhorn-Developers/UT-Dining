@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { Clock, MapPin } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
 import { useEffect, useState } from 'react';
@@ -65,13 +65,7 @@ export default function LocationGenericScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
-      <Stack.Screen
-        options={{
-          title: 'Generic Location',
-          headerShown: false,
-        }}
-      />
+    <View style={{ flex: 1, width: '100%', backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
       <View
         style={{
           alignItems: 'center',

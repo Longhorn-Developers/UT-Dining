@@ -4,7 +4,7 @@ export default {
   expo: {
     name: IS_DEV ? 'UT Dining (Dev)' : 'UT Dining',
     slug: 'ut-dining',
-    version: '1.1.0',
+    version: '1.2.0',
     scheme: 'ut-dining',
     web: {
       bundler: 'metro',
@@ -45,18 +45,6 @@ export default {
       ],
       'expo-notifications',
       'expo-localization',
-      [
-        'expo-asset',
-        {
-          assets: [
-            './assets/onboarding/icon.webp',
-            './assets/onboarding/menu.webp',
-            './assets/onboarding/meal-plan.webp',
-            './assets/onboarding/favorites.webp',
-            './assets/onboarding/map.webp',
-          ],
-        },
-      ],
     ],
     experiments: {
       typedRoutes: true,

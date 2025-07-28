@@ -87,7 +87,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
             <TouchableOpacity
               onPress={toggleFavoriteFilter}
               className={cn(
-                'flex-row items-center gap-x-2 rounded-lg border px-3 py-2',
+                'grow flex-row items-center justify-center gap-x-2 rounded-lg border px-3 py-3',
                 filters.favorites
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange'
                   : isDarkMode
@@ -95,7 +95,11 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
                     : 'border-ut-grey/15 bg-white',
               )}
             >
-              <Heart size={16} color={filters.favorites ? '#fff' : COLORS['ut-burnt-orange']} />
+              <Heart
+                size={16}
+                color={filters.favorites ? '#fff' : COLORS['ut-burnt-orange']}
+                fill={filters.favorites ? '#fff' : 'none'}
+              />
               <Text
                 className={cn(
                   'font-medium text-sm',
@@ -108,7 +112,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
             <TouchableOpacity
               onPress={toggleMealPlanFilter}
               className={cn(
-                'flex-row items-center gap-x-2 rounded-lg border px-3 py-2',
+                'grow flex-row items-center justify-center gap-x-2 rounded-lg border px-3 py-3',
                 filters.mealPlan
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange'
                   : isDarkMode
@@ -116,7 +120,11 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
                     : 'border-ut-grey/15 bg-white',
               )}
             >
-              <ChefHat size={16} color={filters.mealPlan ? '#fff' : COLORS['ut-burnt-orange']} />
+              <ChefHat
+                size={16}
+                color={filters.mealPlan ? '#fff' : COLORS['ut-burnt-orange']}
+                fill={filters.mealPlan ? '#fff' : 'none'}
+              />
               <Text
                 className={cn(
                   'font-medium text-sm',
@@ -209,6 +217,11 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
               </TouchableOpacity>
             ))}
           </View>
+
+          <Text className={cn('text-xs', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
+            Note: Allergen and dietary data comes directly from the University Housing and Dining
+            and may not always be accurate. Use discretion when making dietary choices
+          </Text>
         </View>
       </ScrollView>
     </ActionSheet>
