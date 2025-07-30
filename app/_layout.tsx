@@ -18,12 +18,12 @@ import migrations from '../drizzle/migrations';
 import type * as schema from '../services/database/schema';
 
 import '../global.css';
+import * as Device from 'expo-device';
 import { VersionCheckProvider } from '~/components/VersionCheckProvider';
 import { POSTHOG_API_KEY, POSTHOG_CONFIG } from '~/services/analytics/posthog';
 import { PushNotificationsInitializer } from '~/services/notifications/notifications';
 import { ratingService } from '~/services/rating/rating';
 import { useAppLaunchStore } from '~/store/useAppLaunchStore';
-
 export const DATABASE_NAME = 'database.db';
 
 // This is the default configuration
@@ -40,6 +40,8 @@ const AppContent = () => {
   const { success, error } = useMigrations(db, migrations);
   const { incrementLaunchCount } = useAppLaunchStore();
   useSyncQueries({ queryClient });
+
+  const isTablet = Device.deviceType === Device.DeviceType.TABLET;
 
   useEffect(() => {
     if (success) {
@@ -82,7 +84,7 @@ const AppContent = () => {
                     <Stack.Screen
                       name="location_generic/[location]"
                       options={{
-                        presentation: 'modal',
+                        presentation: isTablet ? 'card' : 'modal',
                         sheetGrabberVisible: true,
                         headerShown: false,
                         animation: 'slide_from_bottom',
@@ -91,7 +93,7 @@ const AppContent = () => {
                     <Stack.Screen
                       name="food/[food]"
                       options={{
-                        presentation: 'modal',
+                        presentation: isTablet ? 'card' : 'modal',
                         sheetGrabberVisible: true,
                         headerShown: false,
                       }}
