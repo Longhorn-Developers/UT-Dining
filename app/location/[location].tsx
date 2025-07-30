@@ -45,23 +45,22 @@ const useFilteredItems = (
 
       for (const item of flattenedItems) {
         if (item.type === 'category_header') {
-          currentCategory = { ...item, isExpanded: true };
+          currentCategory = { ...item };
         } else if (item.type === 'food_item') {
           const foodName = item.data.name ? item.data.name.toLowerCase() : '';
 
           if (foodName.includes(query)) {
             if (currentCategory && !processedCategoryIds.has(currentCategory.id)) {
-              // Always expand categories in search results
+              // Respect the actual expansion state of categories in search results
               result.push({
                 ...currentCategory,
-                isExpanded: true,
               });
               processedCategoryIds.add(currentCategory.id);
             }
-            // Don't mark items as hidden in search results
+            // Respect the category's expansion state for hiding items
             result.push({
               ...item,
-              hidden: false,
+              hidden: currentCategory ? !currentCategory.isExpanded : false,
             });
           }
         }

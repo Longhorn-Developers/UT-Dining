@@ -181,7 +181,7 @@ const PermissionsScreen = ({ width, onPermissionsChange }: Props) => {
 
         <Text
           className={cn(
-            'absolute bottom-0 max-w-[260px] text-center text-sm',
+            'absolute bottom-0 max-w-[260px] text-center text-sm md:max-w-full',
             isDark ? 'text-gray-400' : 'text-gray-500',
           )}
         >

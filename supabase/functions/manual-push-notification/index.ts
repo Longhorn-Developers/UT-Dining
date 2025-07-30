@@ -6,18 +6,11 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
-if (Deno.env.get('SUPABASE_URL') === undefined) {
-  throw new Error('SUPABASE_URL environment variable is not set');
-}
-
-if (Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') === undefined) {
-  throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is not set');
-}
-
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL'),
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
 );
+
 const BATCH_SIZE = 100;
 
 console.log('🔍 Starting manual push notification function...');
@@ -25,30 +18,57 @@ console.log('🔍 Starting manual push notification function...');
 Deno.serve(async (req) => {
   const { title, body, redirect_url, type } = await req.json();
 
+  if (!type) {
+    return new Response(JSON.stringify({ error: 'Missing required field: type (UUID)' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // 1. Insert into notifications table
+  const { error: insertError } = await supabase.from('notifications').insert({
+    title,
+    body,
+    redirect_url,
+    sent: true, // since it's sent immediately
+    type, // must be a valid UUID from notification_types
+  });
+
+  if (insertError) {
+    console.error('❌ Failed to insert notification:', insertError);
+    return new Response(
+      JSON.stringify({ error: 'Failed to record notification', details: insertError }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    );
+  }
+
+  // 2. Fetch user push tokens
   const { data: userDevices } = await supabase.from('user_devices').select('push_token');
+
   console.log('🔍 User devices:', JSON.stringify(userDevices, null, 2));
-  // Get unique push tokens
+
   const pushTokens = [...new Set(userDevices.map((device) => device.push_token))];
 
-  // Batch tokens into groups of 100
-  const tokenBatches: string[][] = [];
-
+  // 3. Chunk tokens into batches
+  const tokenBatches = [];
   for (let i = 0; i < pushTokens.length; i += BATCH_SIZE) {
     tokenBatches.push(pushTokens.slice(i, i + BATCH_SIZE));
   }
 
-  const sentAt = new Date().toISOString();
-
-  // Send notifications to each batch
-  const sendPromises = tokenBatches.map(async (tokenBatch) => {
-    const notificationMessage = {
+  // 4. Send notifications
+  const sendPromises = tokenBatches.map((tokenBatch) => {
+    const message = {
       to: tokenBatch,
       sound: 'default',
       title,
       body,
-      data: { redirect_url, type, sent_at: sentAt },
+      data: {
+        redirect: redirect_url,
+      },
     };
-
     return fetch('https://exp.host/--/api/v2/push/send', {
       method: 'POST',
       headers: {
@@ -57,29 +77,11 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${Deno.env.get('EXPO_ACCESS_TOKEN')}`,
       },
-      body: JSON.stringify(notificationMessage),
+      body: JSON.stringify(message),
     });
   });
 
-  // Wait for all batches to be sent
   await Promise.all(sendPromises);
-
-  // Create new row in notifications table
-  const { error } = await supabase.from('notifications').insert({
-    title,
-    body,
-    redirect_url,
-    type,
-    sent: true,
-  });
-
-  if (error) {
-    console.error('❌ Error inserting notification:', error);
-    return new Response(JSON.stringify({ success: false, error: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
 
   return new Response(
     JSON.stringify({

@@ -181,7 +181,8 @@ const Notifications = () => {
 
   const handleNotificationPress = (notification: Notification) => {
     if (notification.redirect_url) {
-      router.push(notification.redirect_url);
+      // biome-ignore lint/suspicious/noExplicitAny: The redirect url is valid.
+      router.push(notification.redirect_url as any);
     }
   };
 
