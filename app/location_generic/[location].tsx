@@ -1,4 +1,5 @@
-import { useLocalSearchParams } from 'expo-router';
+import * as Device from 'expo-device';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Clock, MapPin } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
 import { useEffect, useState } from 'react';
@@ -12,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-
 import { Container } from '~/components/Container';
 import { PAYMENT_INFO_ICONS } from '~/data/PaymentInfo';
 import { useDatabase } from '~/hooks/useDatabase';
@@ -43,6 +43,7 @@ export default function LocationGenericScreen() {
     ? locationData.methods_of_payment
     : [];
 
+  const isTablet = Device.deviceType === Device.DeviceType.TABLET;
   // Only track screen view if PostHog is enabled
   // biome-ignorelint/correctness/useExhaustiveDependencies: analytics only
   useEffect(() => {
@@ -271,6 +272,18 @@ export default function LocationGenericScreen() {
                   })}
                 </View>
               </View>
+
+              {isTablet && (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  className="mt-4 rounded-full bg-ut-burnt-orange px-4 py-4"
+                  onPress={() => {
+                    router.dismissTo('/');
+                  }}
+                >
+                  <Text className="text-center font-semibold text-white">Back to Home</Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
         />
