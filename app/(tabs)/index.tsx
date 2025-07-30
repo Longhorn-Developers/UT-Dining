@@ -7,7 +7,14 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { type SQLiteDatabase, useSQLiteContext } from 'expo-sqlite';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Notifier } from 'react-native-notifier';
 import Alert from '~/components/Alert';
 import { Container } from '~/components/Container';
@@ -18,6 +25,7 @@ import { COLORS } from '~/utils/colors';
 import { getTodayInCentralTime } from '~/utils/date';
 import { getLocationOpenStatus } from '~/utils/locationStatus';
 import { fetchMenuData } from '~/utils/queries';
+import { cn } from '~/utils/utils';
 import * as schema from '../../services/database/schema';
 import HomeHeader from '../_components/HomeHeader';
 import LocationItem from '../_components/LocationItem';
@@ -209,9 +217,24 @@ export default function Home() {
           backgroundColor: isDarkMode ? '#111827' : '#fff',
         }}
       >
-        <Text style={{ color: isDarkMode ? '#fff' : '#000' }}>
-          Failed to load data. Please try again.
+        <Text
+          className={cn('font-bold text-lg', isDarkMode ? 'text-white' : 'text-ut-burnt-orange')}
+        >
+          Failed to load data!
         </Text>
+
+        <Text
+          className={cn('mb-4 max-w-64 text-center', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}
+        >
+          If you just updated the app, close and reopen the app.
+        </Text>
+
+        <TouchableOpacity
+          onPress={handleRefresh}
+          className="rounded-full bg-ut-burnt-orange px-4 py-2"
+        >
+          <Text className="font-bold text-white">Reload</Text>
+        </TouchableOpacity>
       </View>
     );
   }
