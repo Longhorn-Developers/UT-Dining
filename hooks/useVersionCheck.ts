@@ -102,7 +102,10 @@ export const useVersionCheck = () => {
               'Latest version:',
               appInfo.app_version,
             );
-            showUpdateAlert();
+
+            if (!__DEV__) {
+              showUpdateAlert();
+            }
           } else {
             console.log('☁️  No update available');
           }
