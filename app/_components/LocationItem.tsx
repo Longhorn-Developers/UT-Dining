@@ -109,7 +109,7 @@ const LocationItem = ({ location, currentTime }: LocationItemProps) => {
         onPress={handlePress}
         className={cn(
           'mb-2 flex-row items-center justify-between rounded-lg p-4',
-          isDarkMode ? ' border-gray-700 bg-gray-800' : 'border border-ut-grey/15 bg-white',
+          isDarkMode ? ' border-gray-700 bg-neutral-800' : 'border border-ut-grey/15 bg-white',
         )}
       >
         <View className="flex-row items-center justify-center gap-x-4">

@@ -31,7 +31,7 @@ export const Container = ({
       }}
       className={cn(
         'mx-6 flex flex-1 flex-col gap-y-8 pb-24',
-        isDarkMode ? 'bg-gray-900' : 'bg-transparent',
+        isDarkMode ? 'bg-neutral-900' : 'bg-transparent',
         className,
       )}
     >

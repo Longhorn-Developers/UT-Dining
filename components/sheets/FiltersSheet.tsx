@@ -44,7 +44,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
     <ActionSheet
       id={sheetId}
       defaultOverlayOpacity={0.5}
-      containerStyle={{ backgroundColor: isDarkMode ? '#111827' : 'white' }}
+      containerStyle={{ backgroundColor: isDarkMode ? '#171717' : 'white' }}
       gestureEnabled
       safeAreaInsets={insets}
       useBottomSafeAreaPadding
@@ -91,7 +91,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
                 filters.favorites
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange'
                   : isDarkMode
-                    ? 'border-gray-700 bg-gray-800'
+                    ? 'border-gray-700 bg-neutral-800'
                     : 'border-ut-grey/15 bg-white',
               )}
             >
@@ -116,7 +116,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
                 filters.mealPlan
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange'
                   : isDarkMode
-                    ? 'border-gray-700 bg-gray-800'
+                    ? 'border-gray-700 bg-neutral-800'
                     : 'border-ut-grey/15 bg-white',
               )}
             >
@@ -156,7 +156,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
                   filters.allergens[key]
                     ? 'border-ut-burnt-orange bg-ut-burnt-orange'
                     : isDarkMode
-                      ? 'border-gray-700 bg-gray-800'
+                      ? 'border-gray-700 bg-neutral-800'
                       : 'border-ut-grey/15 bg-white',
                 )}
               >
@@ -197,7 +197,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
                   filters.dietary[key]
                     ? 'border-ut-burnt-orange bg-ut-burnt-orange'
                     : isDarkMode
-                      ? 'border-gray-700 bg-gray-800'
+                      ? 'border-gray-700 bg-neutral-800'
                       : 'border-ut-grey/15 bg-white',
                 )}
               >

@@ -71,7 +71,7 @@ const MealPlanComponent = ({
       <View
         className={cn(
           'flex-row items-center justify-between rounded border px-3 py-2 pb-2',
-          isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-ut-grey/15 bg-white',
+          isDarkMode ? 'border-gray-700 bg-neutral-800' : 'border-ut-grey/15 bg-white',
         )}
       >
         <View className="max-w-[16rem] gap-1">
@@ -194,7 +194,7 @@ const MealPlan = () => {
       <FlatList
         keyExtractor={(item) => `${item.name}-${item.categoryName}-${item.menuName}`}
         ListHeaderComponent={
-          <View className={cn('flex gap-y-5 py-6', isDarkMode ? 'bg-gray-900' : 'bg-white')}>
+          <View className={cn('flex gap-y-5 py-6', isDarkMode ? 'bg-neutral-900' : 'bg-white')}>
             <TopBar variant="back" />
             <View>
               <View className="flex-row items-center gap-x-2">
@@ -220,7 +220,7 @@ const MealPlan = () => {
             <View
               className={cn(
                 'flex-row justify-around rounded-lg border p-4',
-                isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-ut-grey/15 bg-white',
+                isDarkMode ? 'border-gray-700 bg-neutral-800' : 'border-ut-grey/15 bg-white',
               )}
             >
               <View className="flex-1 items-center">

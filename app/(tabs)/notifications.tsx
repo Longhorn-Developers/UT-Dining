@@ -75,8 +75,8 @@ const NotificationItem = ({
         'mx-6 rounded-lg p-4',
         notification.isRead
           ? isDarkMode
-            ? 'bg-gray-800'
-            : 'bg-gray-50'
+            ? 'bg-neutral-800'
+            : 'bg-neutral-50'
           : isDarkMode
             ? 'bg-orange-500/5'
             : 'bg-orange-50',
@@ -194,7 +194,7 @@ const Notifications = () => {
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
+    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#171717' : '#fff' }}>
       <Stack.Screen
         options={{
           title: 'Notifications',

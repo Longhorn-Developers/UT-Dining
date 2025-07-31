@@ -32,7 +32,7 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
       <ActionSheet
         id={sheetId}
         defaultOverlayOpacity={0.5}
-        containerStyle={{ backgroundColor: isDarkMode ? '#111827' : 'white', maxHeight: 600 }}
+        containerStyle={{ backgroundColor: isDarkMode ? '#171717' : 'white', maxHeight: 600 }}
         gestureEnabled
         safeAreaInsets={insets}
         useBottomSafeAreaPadding
@@ -53,7 +53,7 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
       <ActionSheet
         id={sheetId}
         defaultOverlayOpacity={0.5}
-        containerStyle={{ backgroundColor: isDarkMode ? '#111827' : 'white', maxHeight: 600 }}
+        containerStyle={{ backgroundColor: isDarkMode ? '#171717' : 'white', maxHeight: 600 }}
         gestureEnabled
         safeAreaInsets={insets}
         useBottomSafeAreaPadding
@@ -73,7 +73,7 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
     <ActionSheet
       id={sheetId}
       defaultOverlayOpacity={0.5}
-      containerStyle={{ backgroundColor: isDarkMode ? '#111827' : 'white' }}
+      containerStyle={{ backgroundColor: isDarkMode ? '#171717' : 'white' }}
       gestureEnabled
       safeAreaInsets={insets}
       useBottomSafeAreaPadding
@@ -123,7 +123,7 @@ const LocationAboutSheet = ({ sheetId, payload }: SheetProps<'location-about'>) 
           <View
             className={cn(
               'flex-col gap-y-3 rounded-xl p-4',
-              isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50',
+              isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-neutral-50',
             )}
           >
             <Text

@@ -193,7 +193,7 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
 
   return (
     <Modal animationType="slide" presentationStyle="fullScreen" visible={!isOnboardingComplete}>
-      <Container className={cn('mx-0', isDarkMode ? 'bg-gray-900' : 'bg-white')}>
+      <Container className={cn('mx-0', isDarkMode ? 'bg-neutral-900' : 'bg-white')}>
         <View className="flex-row items-center px-6">
           <TouchableOpacity
             activeOpacity={0.8}

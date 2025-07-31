@@ -33,7 +33,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
     <View
       className={cn(
         'h-1.5 w-full overflow-hidden rounded-full',
-        isDarkMode ? 'bg-gray-700' : 'bg-gray-200',
+        isDarkMode ? 'bg-neutral-700' : 'bg-neutral-200',
         className,
       )}
     >

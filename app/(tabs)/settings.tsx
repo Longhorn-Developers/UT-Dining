@@ -76,7 +76,7 @@ const SettingItem = ({
         <View
           className={cn(
             'mr-3 h-8 w-8 items-center justify-center rounded-full',
-            isDarkMode ? 'bg-gray-800' : 'bg-orange-100',
+            isDarkMode ? 'bg-neutral-800' : 'bg-orange-100',
           )}
         >
           <Icon size={16} color={getColor('ut-burnt-orange', false)} />
@@ -134,7 +134,7 @@ interface AboutSectionProps {
 
 const AboutSection = ({ appInfo, isDarkMode }: AboutSectionProps) => (
   <View
-    className={cn('mt-2 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50')}
+    className={cn('mt-2 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-neutral-50')}
   >
     <Text
       className={cn('mb-2 font-semibold text-lg', isDarkMode ? 'text-gray-100' : 'text-gray-800')}
@@ -164,7 +164,7 @@ const HelpSupportSection = ({ appInfo, isDarkMode }: HelpSupportSectionProps): J
 
   return (
     <View
-      className={cn('mt-4 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50')}
+      className={cn('mt-4 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-neutral-50')}
     >
       <Text
         className={cn('mb-2 font-semibold text-lg', isDarkMode ? 'text-gray-100' : 'text-gray-800')}
@@ -194,7 +194,7 @@ const CreditsSection = ({ appInfo, isDarkMode }: CreditsSectionProps): JSX.Eleme
   <View
     className={cn(
       'mt-4 gap-y-2 rounded-lg p-4',
-      isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50',
+      isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-neutral-50',
     )}
   >
     <Text className={cn('font-semibold text-lg', isDarkMode ? 'text-gray-100' : 'text-gray-800')}>
@@ -277,7 +277,7 @@ const NotificationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): J
         <View
           className={cn(
             'mr-3 h-8 w-8 items-center justify-center rounded-full',
-            isDarkMode ? 'bg-gray-800' : 'bg-orange-100',
+            isDarkMode ? 'bg-neutral-800' : 'bg-orange-100',
           )}
         >
           <Bell size={16} color={getColor('ut-burnt-orange', false)} />
@@ -338,7 +338,7 @@ const LocationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): JSX.E
         <View
           className={cn(
             'mr-3 h-8 w-8 items-center justify-center rounded-full',
-            isDarkMode ? 'bg-gray-800' : 'bg-orange-100',
+            isDarkMode ? 'bg-neutral-800' : 'bg-orange-100',
           )}
         >
           <MapPin size={16} color={getColor('ut-burnt-orange', false)} />
@@ -409,12 +409,12 @@ const SettingsPage = () => {
   return (
     <SheetProvider context="settings">
       <Container
-        className={cn('m-0', isDarkMode ? 'bg-[#111827]' : 'bg-white')}
+        className={cn('m-0', isDarkMode ? 'bg-[#171717]' : 'bg-white')}
         disableBottomPadding
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : 'white' }}
+          style={{ flex: 1, backgroundColor: isDarkMode ? '#171717' : 'white' }}
           contentContainerStyle={{ padding: 24 }}
         >
           <Text className={cn('font-extrabold text-3xl', isDarkMode ? 'text-white' : 'text-black')}>

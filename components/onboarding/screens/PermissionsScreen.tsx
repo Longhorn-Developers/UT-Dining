@@ -90,7 +90,7 @@ const PermissionsScreen = ({ width, onPermissionsChange }: Props) => {
   };
 
   return (
-    <View style={{ width }} className={cn('flex-1 px-6', isDark ? 'bg-gray-900' : 'bg-white')}>
+    <View style={{ width }} className={cn('flex-1 px-6', isDark ? 'bg-neutral-900' : 'bg-white')}>
       <View className="flex-1 items-center justify-center">
         <Text
           className={cn(
@@ -116,7 +116,7 @@ const PermissionsScreen = ({ width, onPermissionsChange }: Props) => {
             onPress={permissions.location === 'denied' ? openSettings : undefined}
             className={cn(
               'mb-2 rounded-2xl p-6',
-              isDark ? ' bg-gray-800' : 'border border-gray-200 bg-white',
+              isDark ? ' bg-neutral-800' : 'border border-gray-200 bg-white',
             )}
           >
             <View className="flex-row items-center">
@@ -147,7 +147,7 @@ const PermissionsScreen = ({ width, onPermissionsChange }: Props) => {
             onPress={openSettings}
             className={cn(
               'rounded-2xl p-6',
-              isDark ? ' bg-gray-800' : 'border border-gray-200 bg-white',
+              isDark ? ' bg-neutral-800' : 'border border-gray-200 bg-white',
             )}
           >
             <View className="flex-row items-center">

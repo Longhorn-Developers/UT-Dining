@@ -21,7 +21,7 @@ const CompleteScreen = ({ width, isCurrentScreen }: Props) => {
   }, [isCurrentScreen]);
 
   return (
-    <View style={{ width }} className={cn('flex-1 px-6', isDark ? 'bg-gray-900' : 'bg-white')}>
+    <View style={{ width }} className={cn('flex-1 px-6', isDark ? 'bg-neutral-900' : 'bg-white')}>
       <View className="flex-1 items-center justify-center">
         <View className="items-center">
           <LottieView

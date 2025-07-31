@@ -79,7 +79,7 @@ export default {
         dark: {
           image: './assets/icons/splash-icon.png',
           resizeMode: 'contain',
-          backgroundColor: '#111827',
+          backgroundColor: '#171717',
         },
       },
     },
