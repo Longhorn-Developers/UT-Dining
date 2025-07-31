@@ -136,15 +136,15 @@ const MealPlanComponent = ({
         <View className="relative items-center gap-1">
           <TextInput
             className="h-8 w-12 rounded-lg border border-ut-burnt-orange text-center font-bold text-ut-burnt-orange"
-            keyboardType="numeric"
+            keyboardType="decimal-pad"
             value={quantityInput}
             onChangeText={setQuantityInput}
             onEndEditing={() => {
-              let quantity = parseInt(quantityInput, 10);
+              let quantity = parseFloat(quantityInput);
               if (Number.isNaN(quantity)) {
                 quantity = 1;
               }
-              if (quantity < 1) {
+              if (quantity <= 0) {
                 removeMealPlanItem(food.name || '');
 
                 Notifier.showNotification({
@@ -156,6 +156,8 @@ const MealPlanComponent = ({
               } else if (quantity > 99) {
                 quantity = 99;
               }
+              
+              quantity = Math.round(quantity * 100) / 100;
               setQuantityInput(quantity.toString());
               updateMealPlanItemQuantity(food.name || '', quantity);
             }}
