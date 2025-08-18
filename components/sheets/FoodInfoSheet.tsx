@@ -76,7 +76,9 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
                   <View
                     className={cn(
                       'mb-1 rounded-full border p-3',
-                      isDarkMode ? 'border-gray-700 bg-neutral-800' : 'border-gray-200 bg-neutral-50',
+                      isDarkMode
+                        ? 'border-neutral-800 bg-neutral-800'
+                        : 'border-gray-200 bg-neutral-50',
                     )}
                   >
                     <Image
@@ -102,7 +104,7 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
           <View
             className={cn(
               'mb-4 w-full border-b',
-              isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15',
+              isDarkMode ? 'border-neutral-800' : 'border-b-ut-grey/15',
             )}
           />
 
@@ -120,7 +122,9 @@ const FoodInfoSheet = ({ sheetId }: SheetProps<'food-info'>) => {
                   <View
                     className={cn(
                       'mb-1 rounded-full border p-3',
-                      isDarkMode ? 'border-gray-700 bg-neutral-800' : 'border-gray-200 bg-neutral-50',
+                      isDarkMode
+                        ? 'border-neutral-800 bg-neutral-800'
+                        : 'border-gray-200 bg-neutral-50',
                     )}
                   >
                     <Image source={item.icon} className="size-10" resizeMode="contain" />

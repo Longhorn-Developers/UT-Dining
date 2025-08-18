@@ -41,7 +41,10 @@ const DataCollectionScreen = ({ width, onSelectionChange, onSelectionUpdate }: P
   };
 
   return (
-    <View style={{ width }} className={cn('flex-1 px-6 py-8', isDark ? 'bg-neutral-900' : 'bg-white')}>
+    <View
+      style={{ width }}
+      className={cn('flex-1 px-6 py-8', isDark ? 'bg-neutral-900' : 'bg-white')}
+    >
       <View className="mb-8">
         <Text
           className={cn(

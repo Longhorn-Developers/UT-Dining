@@ -600,7 +600,7 @@ const MapPage = () => {
           onRegionChangeComplete={handleRegionChangeComplete}
           userInterfaceStyle={isDarkMode ? 'dark' : 'light'}
           loadingEnabled
-          loadingBackgroundColor={isDarkMode ? 'rgba(17,24,39,0.7)' : 'rgba(255,255,255,0.9)'}
+          loadingBackgroundColor={isDarkMode ? 'rgba(0,0,0,0.7)' : 'rgba(255,255,255,0.9)'}
         >
           <MapMarkers
             locations={mergedLocations}

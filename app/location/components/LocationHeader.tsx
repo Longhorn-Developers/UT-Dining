@@ -152,7 +152,7 @@ const LocationHeader = React.memo(
               <View
                 className={cn(
                   'my-0 h-1 w-full border-b',
-                  isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15',
+                  isDarkMode ? 'border-neutral-800' : 'border-b-ut-grey/15',
                 )}
               />
 

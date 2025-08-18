@@ -40,7 +40,7 @@ const SkeletonItem = React.memo(({ isHeader = false }: SkeletonItemProps) => {
 
   const backgroundColor = shimmerAnimation.interpolate({
     inputRange: [0, 1],
-    outputRange: isDarkMode ? ['#374151', '#1F2937'] : ['#d1d5db', '#f3f4f6'],
+    outputRange: isDarkMode ? ['#262626', '#404040'] : ['#d1d5db', '#f3f4f6'],
   });
 
   // Header skeleton

@@ -330,7 +330,7 @@ const Location = () => {
           <View
             className="absolute inset-0 z-10 flex h-screen items-center justify-center"
             style={{
-              backgroundColor: isDarkMode ? 'rgba(17, 24, 39, 0.7)' : 'rgba(255, 255, 255, 0.7)',
+              backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)',
             }}
           >
             <View

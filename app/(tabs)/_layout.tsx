@@ -20,7 +20,7 @@ export default function Layout() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: isDarkMode ? '#171717' : '#ffffff',
-          borderTopColor: isDarkMode ? '#374151' : '#e5e7eb',
+          borderTopColor: isDarkMode ? '#262626' : '#e5e7eb',
           borderTopWidth: 1,
           height: 76,
           paddingBottom: 20,

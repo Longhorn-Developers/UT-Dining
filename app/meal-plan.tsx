@@ -71,7 +71,7 @@ const MealPlanComponent = ({
       <View
         className={cn(
           'flex-row items-center justify-between rounded border px-3 py-2 pb-2',
-          isDarkMode ? 'border-gray-700 bg-neutral-800' : 'border-ut-grey/15 bg-white',
+          isDarkMode ? 'border-neutral-800 bg-neutral-800' : 'border-ut-grey/15 bg-white',
         )}
       >
         <View className="max-w-[16rem] gap-1">
@@ -222,7 +222,7 @@ const MealPlan = () => {
             <View
               className={cn(
                 'flex-row justify-around rounded-lg border p-4',
-                isDarkMode ? 'border-gray-700 bg-neutral-800' : 'border-ut-grey/15 bg-white',
+                isDarkMode ? 'border-neutral-800 bg-neutral-800' : 'border-ut-grey/15 bg-white',
               )}
             >
               <View className="flex-1 items-center">
@@ -269,7 +269,7 @@ const MealPlan = () => {
             <View
               className={cn(
                 'my-1 w-full border-b',
-                isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15',
+                isDarkMode ? 'border-neutral-800' : 'border-b-ut-grey/15',
               )}
             />
           </View>

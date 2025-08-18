@@ -65,7 +65,7 @@ const NutritionRow = React.memo(({ item, isDarkMode }: NutritionRowProps) => {
         </View>
       </View>
       <View
-        className={cn('w-full border-b', isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15')}
+        className={cn('w-full border-b', isDarkMode ? 'border-neutral-800' : 'border-b-ut-grey/15')}
       />
     </View>
   );

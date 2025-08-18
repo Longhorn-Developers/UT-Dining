@@ -146,7 +146,7 @@ export default function Home() {
 
       // Add timeout to refetch operation (10 seconds)
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), 10000);
+        setTimeout(() => reject(new Error('Request timeout')), 30000);
       });
 
       await Promise.race([refetch(), timeoutPromise]);
