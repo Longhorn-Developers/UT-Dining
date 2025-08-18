@@ -65,7 +65,7 @@ const SettingItem = ({
   <TouchableOpacity
     className={cn(
       'flex-row items-center justify-between border-b py-3',
-      isDarkMode ? 'border-gray-700' : 'border-gray-100',
+      isDarkMode ? 'border-neutral-800' : 'border-gray-100',
     )}
     onPress={onPress}
     disabled={!hasChevron && !onPress}
@@ -164,7 +164,10 @@ const HelpSupportSection = ({ appInfo, isDarkMode }: HelpSupportSectionProps): J
 
   return (
     <View
-      className={cn('mt-4 rounded-lg p-4', isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-neutral-50')}
+      className={cn(
+        'mt-4 rounded-lg p-4',
+        isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-neutral-50',
+      )}
     >
       <Text
         className={cn('mb-2 font-semibold text-lg', isDarkMode ? 'text-gray-100' : 'text-gray-800')}
@@ -268,7 +271,7 @@ const NotificationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): J
     <TouchableOpacity
       className={cn(
         'flex-row items-center justify-between border-b py-3',
-        isDarkMode ? 'border-gray-700' : 'border-gray-100',
+        isDarkMode ? 'border-neutral-800' : 'border-gray-100',
       )}
       onPress={handleNotificationAction}
       activeOpacity={isGranted ? 1 : 0.7}
@@ -329,7 +332,7 @@ const LocationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): JSX.E
     <TouchableOpacity
       className={cn(
         'flex-row items-center justify-between border-b py-3',
-        isDarkMode ? 'border-gray-700' : 'border-gray-100',
+        isDarkMode ? 'border-neutral-800' : 'border-gray-100',
       )}
       onPress={handleLocationAction}
       activeOpacity={isGranted ? 1 : 0.7}

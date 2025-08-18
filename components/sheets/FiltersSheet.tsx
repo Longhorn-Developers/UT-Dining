@@ -67,7 +67,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
               }}
               className={cn(
                 'flex-row items-center gap-x-1 rounded-full border px-3 py-1',
-                isDarkMode ? 'border-gray-700' : 'border-ut-grey/50',
+                isDarkMode ? 'border-neutral-800' : 'border-ut-grey/50',
               )}
             >
               <RotateCwIcon size={16} color={isDarkMode ? '#ccc' : COLORS['ut-grey']} />
@@ -91,7 +91,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
                 filters.favorites
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange'
                   : isDarkMode
-                    ? 'border-gray-700 bg-neutral-800'
+                    ? 'border-neutral-800 bg-neutral-800'
                     : 'border-ut-grey/15 bg-white',
               )}
             >
@@ -116,7 +116,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
                 filters.mealPlan
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange'
                   : isDarkMode
-                    ? 'border-gray-700 bg-neutral-800'
+                    ? 'border-neutral-800 bg-neutral-800'
                     : 'border-ut-grey/15 bg-white',
               )}
             >
@@ -156,7 +156,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
                   filters.allergens[key]
                     ? 'border-ut-burnt-orange bg-ut-burnt-orange'
                     : isDarkMode
-                      ? 'border-gray-700 bg-neutral-800'
+                      ? 'border-neutral-800 bg-neutral-800'
                       : 'border-ut-grey/15 bg-white',
                 )}
               >
@@ -197,7 +197,7 @@ const FiltersSheet = ({ sheetId }: SheetProps<'filters'>) => {
                   filters.dietary[key]
                     ? 'border-ut-burnt-orange bg-ut-burnt-orange'
                     : isDarkMode
-                      ? 'border-gray-700 bg-neutral-800'
+                      ? 'border-neutral-800 bg-neutral-800'
                       : 'border-ut-grey/15 bg-white',
                 )}
               >

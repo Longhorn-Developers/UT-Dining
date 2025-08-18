@@ -147,7 +147,7 @@ const FoodScreen = () => {
                     <View
                       className={cn(
                         'my-4 w-full border-b',
-                        isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15',
+                        isDarkMode ? 'border-neutral-800' : 'border-b-ut-grey/15',
                       )}
                     />
 
@@ -172,7 +172,7 @@ const FoodScreen = () => {
                       <View
                         className={cn(
                           'w-full border-b',
-                          isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15',
+                          isDarkMode ? 'border-neutral-800' : 'border-b-ut-grey/15',
                         )}
                       />
                     </View>

@@ -67,7 +67,7 @@ const Favorites = () => {
           <View
             className={cn(
               'my-1 w-full border-b',
-              isDarkMode ? 'border-gray-700' : 'border-ut-grey/15',
+              isDarkMode ? 'border-neutral-800' : 'border-ut-grey/15',
             )}
           />
         </View>

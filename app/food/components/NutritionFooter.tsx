@@ -25,7 +25,7 @@ const NutritionFooter = React.memo(
       </View>
 
       <View
-        className={cn('w-full border-b', isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15')}
+        className={cn('w-full border-b', isDarkMode ? 'border-neutral-800' : 'border-b-ut-grey/15')}
       />
 
       <View className="my-2">
@@ -40,7 +40,7 @@ const NutritionFooter = React.memo(
       </View>
 
       <View
-        className={cn('w-full border-b', isDarkMode ? 'border-gray-700' : 'border-b-ut-grey/15')}
+        className={cn('w-full border-b', isDarkMode ? 'border-neutral-800' : 'border-b-ut-grey/15')}
       />
 
       <View className="my-2">
