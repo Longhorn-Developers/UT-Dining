@@ -60,7 +60,7 @@ const MapLocationSheet = ({ payload, sheetId }: MapLocationProps) => {
       id={sheetId}
       defaultOverlayOpacity={0.2}
       containerStyle={{
-        backgroundColor: isDarkMode ? '#111827' : 'white',
+        backgroundColor: isDarkMode ? '#171717' : 'white',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
       }}

@@ -21,7 +21,7 @@ const Alert = ({ title, description }: { title: string; description: string }) =
         <View
           className={cn(
             'flex-row items-center gap-x-3 rounded-lg border p-4 pr-12',
-            isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-ut-grey/25 bg-white',
+            isDarkMode ? 'border-gray-700 bg-neutral-800' : 'border-ut-grey/25 bg-white',
           )}
         >
           <View className="h-full w-1 rounded-full bg-ut-burnt-orange" />

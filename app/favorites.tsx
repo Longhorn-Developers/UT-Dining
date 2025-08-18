@@ -39,7 +39,7 @@ const Favorites = () => {
   }, [favorites]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
+    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#171717' : '#fff' }}>
       <Stack.Screen
         options={{
           title: 'Favorites',

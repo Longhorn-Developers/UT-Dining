@@ -575,10 +575,10 @@ const MapPage = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
+    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#171717' : '#fff' }}>
       <Container
         disableInsets
-        className={cn('mx-0 gap-6', isDarkMode ? 'bg-gray-900' : 'bg-white')}
+        className={cn('mx-0 gap-6', isDarkMode ? 'bg-neutral-900' : 'bg-white')}
       >
         <Stack.Screen
           options={{
@@ -637,7 +637,7 @@ const MapPage = () => {
             }}
             className={cn(
               'absolute right-12 bottom-12 rounded-full p-4',
-              isDarkMode ? 'bg-[#111827]' : 'bg-white',
+              isDarkMode ? 'bg-[#171717]' : 'bg-white',
             )}
           >
             <Locate size={24} color={COLORS['ut-burnt-orange']} />

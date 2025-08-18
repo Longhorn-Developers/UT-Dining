@@ -19,7 +19,7 @@ export default function Layout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: isDarkMode ? '#111827' : '#ffffff',
+          backgroundColor: isDarkMode ? '#171717' : '#ffffff',
           borderTopColor: isDarkMode ? '#374151' : '#e5e7eb',
           borderTopWidth: 1,
           height: 76,

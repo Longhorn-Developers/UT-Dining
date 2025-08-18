@@ -57,7 +57,7 @@ export default function LocationGenericScreen() {
           flex: 1,
           alignItems: 'center',
           justifyContent: 'center',
-          backgroundColor: isDarkMode ? '#111827' : '#fff',
+          backgroundColor: isDarkMode ? '#171717' : '#fff',
         }}
       >
         <ActivityIndicator size="small" />
@@ -66,13 +66,13 @@ export default function LocationGenericScreen() {
   }
 
   return (
-    <View style={{ flex: 1, width: '100%', backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
+    <View style={{ flex: 1, width: '100%', backgroundColor: isDarkMode ? '#171717' : '#fff' }}>
       <View
         style={{
           alignItems: 'center',
           paddingTop: 8,
           paddingBottom: 8,
-          backgroundColor: isDarkMode ? '#111827' : '#fff',
+          backgroundColor: isDarkMode ? '#171717' : '#fff',
         }}
       >
         <View
@@ -104,7 +104,7 @@ export default function LocationGenericScreen() {
                     <View
                       className={cn(
                         'absolute inset-0 rounded-3xl',
-                        isDarkMode ? 'bg-gray-700' : 'bg-gray-200',
+                        isDarkMode ? 'bg-neutral-700' : 'bg-neutral-200',
                       )}
                     />
                   )}
@@ -212,7 +212,7 @@ export default function LocationGenericScreen() {
               <View
                 className={cn(
                   'flex-col gap-y-3 rounded-xl p-4',
-                  isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-gray-50',
+                  isDarkMode ? 'bg-ut-grey-dark-mode/10' : 'bg-neutral-50',
                 )}
               >
                 <Text

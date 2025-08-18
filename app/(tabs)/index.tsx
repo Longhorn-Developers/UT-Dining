@@ -199,7 +199,7 @@ export default function Home() {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: isDarkMode ? '#111827' : '#fff',
+          backgroundColor: isDarkMode ? '#171717' : '#fff',
         }}
       >
         <ActivityIndicator size="small" />
@@ -214,7 +214,7 @@ export default function Home() {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: isDarkMode ? '#111827' : '#fff',
+          backgroundColor: isDarkMode ? '#171717' : '#fff',
         }}
       >
         <Text
@@ -251,7 +251,7 @@ export default function Home() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
+    <View style={{ flex: 1, backgroundColor: isDarkMode ? '#171717' : '#fff' }}>
       <Stack.Screen options={{ title: 'Home' }} />
       <Container disableBottomPadding onLayout={onLayoutRootView}>
         <OnboardingScreen isOnboardingComplete={isOnboardingComplete} />

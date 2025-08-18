@@ -35,7 +35,7 @@ const SearchBar = ({ query, setQuery, onFocus, onBlur, isSearchFocused }: Props)
       <View
         className={cn(
           'flex-1 flex-row items-center rounded-lg border px-3 py-2.5',
-          isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-ut-grey/15 bg-white',
+          isDarkMode ? 'border-gray-700 bg-neutral-800' : 'border-ut-grey/15 bg-white',
         )}
       >
         <Search size={18} color={isDarkMode ? '#aaa' : COLORS['ut-grey']} />

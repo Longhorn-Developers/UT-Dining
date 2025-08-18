@@ -53,7 +53,7 @@ const QuickLinksCard = ({ title, description, Icon, onPress, isDarkMode }: Quick
     <Reanimated.View
       className={cn(
         'flex-1 rounded-lg px-2 py-3',
-        isDarkMode ? 'bg-gray-800' : 'border border-gray-200 bg-white',
+        isDarkMode ? 'bg-neutral-800' : 'border border-gray-200 bg-white',
         'shadow-sm',
       )}
       style={animatedStyle}
@@ -67,7 +67,7 @@ const QuickLinksCard = ({ title, description, Icon, onPress, isDarkMode }: Quick
         <View
           className={cn(
             'mr-3 h-10 w-10 items-center justify-center rounded-full',
-            isDarkMode ? 'bg-gray-700' : 'bg-orange-100',
+            isDarkMode ? 'bg-neutral-700' : 'bg-orange-100',
           )}
         >
           <Icon size={20} color={getColor('ut-burnt-orange', false)} />

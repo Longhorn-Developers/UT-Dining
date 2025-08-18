@@ -41,7 +41,7 @@ const DataCollectionScreen = ({ width, onSelectionChange, onSelectionUpdate }: P
   };
 
   return (
-    <View style={{ width }} className={cn('flex-1 px-6 py-8', isDark ? 'bg-gray-900' : 'bg-white')}>
+    <View style={{ width }} className={cn('flex-1 px-6 py-8', isDark ? 'bg-neutral-900' : 'bg-white')}>
       <View className="mb-8">
         <Text
           className={cn(
@@ -68,7 +68,7 @@ const DataCollectionScreen = ({ width, onSelectionChange, onSelectionUpdate }: P
                 selectedTags.includes(tag.id)
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange/10'
                   : isDark
-                    ? ' bg-gray-800'
+                    ? ' bg-neutral-800'
                     : 'border border-gray-200 bg-white',
               )}
             >

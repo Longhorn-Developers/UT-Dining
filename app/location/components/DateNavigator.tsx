@@ -103,11 +103,11 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onDateChang
           'flex h-8 w-8 items-center justify-center rounded-full',
           isPreviousDisabled
             ? isDarkMode
-              ? 'bg-gray-800 opacity-50'
-              : 'bg-gray-200 opacity-50'
+              ? 'bg-neutral-800 opacity-50'
+              : 'bg-neutral-200 opacity-50'
             : isDarkMode
-              ? 'bg-gray-700'
-              : 'bg-gray-100',
+              ? 'bg-neutral-700'
+              : 'bg-neutral-100',
         )}
       >
         <Pressable
@@ -144,11 +144,11 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onDateChang
           'flex h-8 w-8 items-center justify-center rounded-full',
           isNextDisabled
             ? isDarkMode
-              ? 'bg-gray-800 opacity-50'
-              : 'bg-gray-200 opacity-50'
+              ? 'bg-neutral-800 opacity-50'
+              : 'bg-neutral-200 opacity-50'
             : isDarkMode
-              ? 'bg-gray-700'
-              : 'bg-gray-100',
+              ? 'bg-neutral-700'
+              : 'bg-neutral-100',
         )}
       >
         <Pressable

@@ -163,7 +163,7 @@ const FoodComponent = ({
           onPress={handlePress}
           className={cn(
             'flex-row items-center justify-between rounded border px-3 py-2',
-            isDarkMode ? 'border-gray-700 bg-gray-800' : 'bg-white',
+            isDarkMode ? 'border-gray-700 bg-neutral-800' : 'bg-white',
             isFavorite || isMealPlan ? 'border-ut-burnt-orange' : 'border-ut-grey/15',
           )}
         >

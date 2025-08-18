@@ -98,7 +98,7 @@ const FilterBar = ({
                 selectedItem === item.id
                   ? 'border-ut-burnt-orange bg-ut-burnt-orange text-white'
                   : isDarkMode
-                    ? 'border-gray-700 bg-gray-800 text-gray-200'
+                    ? 'border-gray-700 bg-neutral-800 text-gray-200'
                     : 'border border-gray-200 bg-white text-ut-grey',
               )}
             >

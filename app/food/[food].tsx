@@ -51,7 +51,7 @@ const FoodScreen = () => {
   }, []);
   return (
     <SheetProvider context="food">
-      <View style={{ flex: 1, backgroundColor: isDarkMode ? '#111827' : '#fff' }}>
+      <View style={{ flex: 1, backgroundColor: isDarkMode ? '#171717' : '#fff' }}>
         <Stack.Screen options={{ title: 'Food' }} />
         {/* Pull Down Indicator (outside FlashList) */}
         <View
@@ -59,7 +59,7 @@ const FoodScreen = () => {
             alignItems: 'center',
             paddingTop: 8,
             paddingBottom: 8,
-            backgroundColor: isDarkMode ? '#111827' : '#fff',
+            backgroundColor: isDarkMode ? '#171717' : '#fff',
           }}
         >
           <View
