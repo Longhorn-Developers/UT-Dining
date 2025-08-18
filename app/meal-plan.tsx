@@ -156,7 +156,7 @@ const MealPlanComponent = ({
               } else if (quantity > 99) {
                 quantity = 99;
               }
-              
+
               quantity = Math.round(quantity * 100) / 100;
               setQuantityInput(quantity.toString());
               updateMealPlanItemQuantity(food.name || '', quantity);
@@ -227,7 +227,7 @@ const MealPlan = () => {
             >
               <View className="flex-1 items-center">
                 <Text className="text-center font-bold text-lg text-ut-burnt-orange">
-                  {totalCalories} kcal
+                  {totalCalories.toFixed(1)} kcal
                 </Text>
                 <Text
                   className={cn(
