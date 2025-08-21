@@ -16,6 +16,25 @@ function chunkArray<T>(array: T[], chunkSize: number = 1000): T[][] {
   return chunks;
 }
 
+/**
+ * Inserts data into a SQLite table in chunks to avoid "too many SQL variables" error
+ * SQLite has a limit of 999 variables per SQL statement
+ */
+async function insertInChunks<T>(
+  db: ExpoSQLiteDatabase<typeof schema>,
+  // biome-ignore lint/suspicious/noExplicitAny: Drizzle table types are complex
+  table: any,
+  data: T[],
+  chunkSize: number = 100,
+) {
+  if (data.length === 0) return;
+
+  const chunks = chunkArray(data, chunkSize);
+  const insertPromises = chunks.map((chunk) => db.insert(table).values(chunk));
+
+  await Promise.all(insertPromises);
+}
+
 // Type mapping for table names to their corresponding schema types
 type TableTypeMap = {
   food_item: schema.FoodItem;
@@ -312,39 +331,53 @@ export const insertDataIntoSQLiteDB = async (
         db.delete(schema.notification_types).execute(),
       ]);
 
-      // Insert data from Supabase (with proper type casting)
+      // Insert data from Supabase using chunked insertions to avoid SQLite variable limits
       const insertPromises = [];
 
       if (data.location.length > 0) {
-        insertPromises.push(db.insert(location).values(data.location as schema.Location[]));
+        insertPromises.push(insertInChunks(db, location, data.location as schema.Location[], 45));
       }
       if (data.location_type.length > 0) {
         insertPromises.push(
-          db.insert(schema.location_type).values(data.location_type as schema.LocationType[]),
+          insertInChunks(
+            db,
+            schema.location_type,
+            data.location_type as schema.LocationType[],
+            150,
+          ),
         );
       }
       if (data.menu.length > 0) {
-        insertPromises.push(db.insert(menu).values(data.menu as schema.Menu[]));
+        insertPromises.push(insertInChunks(db, menu, data.menu as schema.Menu[], 150));
       }
       if (data.menu_category.length > 0) {
         insertPromises.push(
-          db.insert(menu_category).values(data.menu_category as schema.MenuCategory[]),
+          insertInChunks(db, menu_category, data.menu_category as schema.MenuCategory[], 200),
         );
       }
       if (data.food_item.length > 0) {
-        insertPromises.push(db.insert(food_item).values(data.food_item as schema.FoodItem[]));
+        insertPromises.push(
+          insertInChunks(db, food_item, data.food_item as schema.FoodItem[], 150),
+        );
       }
       if (data.nutrition.length > 0) {
-        insertPromises.push(db.insert(nutrition).values(data.nutrition as schema.Nutrition[]));
+        insertPromises.push(
+          insertInChunks(db, nutrition, data.nutrition as schema.Nutrition[], 60),
+        );
       }
       if (data.allergens.length > 0) {
-        insertPromises.push(db.insert(allergens).values(data.allergens as schema.Allergens[]));
+        insertPromises.push(
+          insertInChunks(db, allergens, data.allergens as schema.Allergens[], 60),
+        );
       }
       if (data.app_information.length > 0) {
         insertPromises.push(
-          db
-            .insert(schema.app_information)
-            .values(data.app_information as (typeof schema.app_information.$inferInsert)[]),
+          insertInChunks(
+            db,
+            schema.app_information,
+            data.app_information as (typeof schema.app_information.$inferInsert)[],
+            150,
+          ),
         );
       }
       if (data.notifications && data.notifications.length > 0) {
@@ -356,11 +389,18 @@ export const insertDataIntoSQLiteDB = async (
           return { ...notification, sent_at: notification.created_at };
         });
         insertPromises.push(
-          db.insert(schema.notifications).values(notificationsWithSentAt as schema.Notification[]),
+          insertInChunks(
+            db,
+            schema.notifications,
+            notificationsWithSentAt as schema.Notification[],
+            150,
+          ),
         );
       }
       if (data.notification_types && data.notification_types.length > 0) {
-        insertPromises.push(db.insert(schema.notification_types).values(data.notification_types));
+        insertPromises.push(
+          insertInChunks(db, schema.notification_types, data.notification_types, 200),
+        );
       }
 
       if (insertPromises.length > 0) {
