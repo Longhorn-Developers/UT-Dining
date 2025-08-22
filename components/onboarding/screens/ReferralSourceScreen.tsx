@@ -59,7 +59,7 @@ const ReferralSourceScreen = ({ width, onSelectionChange, onSelectionUpdate }: P
             isDark ? 'text-white' : 'text-gray-900',
           )}
         >
-          How'd you find out about us?
+          How’d you hear about us?
         </Text>
         <Text className={cn('text-center text-lg', isDark ? 'text-gray-300' : 'text-gray-600')}>
           Select the option that best fits.
