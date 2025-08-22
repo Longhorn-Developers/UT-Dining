@@ -24,6 +24,7 @@ interface OnboardingState {
 export const ONBOARDING_STEPS = {
   WELCOME: 'welcome',
   DATA_COLLECTION: 'data_collection',
+  REFERRAL_SOURCE: 'referral_source',
   FEATURES_MENUS: 'features_menus',
   FEATURES_MAP: 'features_map',
   FEATURES_FAVORITES: 'features_favorites',

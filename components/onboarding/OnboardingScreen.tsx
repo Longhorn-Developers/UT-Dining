@@ -24,11 +24,13 @@ import FavoritesFeatureScreen from './screens/FavoritesFeatureScreen';
 import MapFeatureScreen from './screens/MapFeatureScreen';
 import MenusFeatureScreen from './screens/MenusFeatureScreen';
 import PermissionsScreen from './screens/PermissionsScreen';
+import ReferralSourceScreen from './screens/ReferralSourceScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 
 const ONBOARDING_SCREENS = [
   ONBOARDING_STEPS.WELCOME,
   ONBOARDING_STEPS.DATA_COLLECTION,
+  ONBOARDING_STEPS.REFERRAL_SOURCE,
   ONBOARDING_STEPS.FEATURES_MENUS,
   ONBOARDING_STEPS.FEATURES_MAP,
   ONBOARDING_STEPS.FEATURES_FAVORITES,
@@ -52,6 +54,8 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
   const { currentStep, setCurrentStep, completeOnboarding } = useOnboardingStore();
   const [hasDataSelection, setHasDataSelection] = React.useState(false);
   const [selectedMotivations, setSelectedMotivations] = React.useState<string[]>([]);
+  const [hasReferralSource, setHasReferralSource] = React.useState(false);
+  const [referralSource, setReferralSource] = React.useState<string | null>(null);
   const [permissionStatus, setPermissionStatus] = React.useState<{
     location: string;
     notifications: string;
@@ -112,9 +116,10 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
     analytics.capture('onboarding_completed', {
       selected_motivations: selectedMotivations,
       motivation_count: selectedMotivations.length,
+      referral_source: referralSource || 'undetermined',
       location_permission: permissionStatus?.location || 'undetermined',
       notifications_permission: permissionStatus?.notifications || 'undetermined',
-      onboarding_version: '1.0',
+      onboarding_version: '1.1',
     });
 
     completeOnboarding();
@@ -131,6 +136,15 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
             width={width}
             onSelectionChange={setHasDataSelection}
             onSelectionUpdate={setSelectedMotivations}
+          />
+        );
+      case ONBOARDING_STEPS.REFERRAL_SOURCE:
+        return (
+          <ReferralSourceScreen
+            key={index}
+            width={width}
+            onSelectionChange={setHasReferralSource}
+            onSelectionUpdate={setReferralSource}
           />
         );
       case ONBOARDING_STEPS.FEATURES_MENUS:
@@ -244,7 +258,8 @@ const OnboardingScreen = ({ isOnboardingComplete }: OnboardingScreenProps) => {
             <Text className="py-2 text-center font-semibold text-white">
               {currentStep === ONBOARDING_SCREENS.length - 1
                 ? 'Finish'
-                : currentStep === 1 && !hasDataSelection
+                : (currentStep === 1 && !hasDataSelection) ||
+                    (currentStep === 2 && !hasReferralSource)
                   ? 'Skip'
                   : 'Continue'}
             </Text>
