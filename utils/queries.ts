@@ -33,7 +33,7 @@ export const fetchMenuData = async (
       const timeSinceLastSync = syncStore.getTimeSinceLastSync();
       const hoursUntilNextSync = Math.max(
         0,
-        (6 * 60 * 60 * 1000 - timeSinceLastSync) / (60 * 60 * 1000),
+        (6 * 60 * 60 * 1000 - timeSinceLastSync) / (60 * 60 * 1000), // 6 hours in milliseconds
       );
       console.log(
         `ℹ️  Using cached data (${(timeSinceLastSync / (60 * 60 * 1000)).toFixed(1)}h since last sync, next sync in ${hoursUntilNextSync.toFixed(1)}h)`,

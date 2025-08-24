@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import * as Application from 'expo-application';
 import { Link, router } from 'expo-router';
 import {
@@ -32,9 +33,11 @@ import { getAppInformation } from '~/services/database/database';
 import type { AppInformation } from '~/services/database/schema';
 import { getOrCreateDeviceId } from '~/services/device/deviceId';
 import { useAppLaunchStore } from '~/store/useAppLaunchStore';
+import { useDataSyncStore } from '~/store/useDataSyncStore';
 import { useOnboardingStore } from '~/store/useOnboardingStore';
 import { useSettingsStore } from '~/store/useSettingsStore';
 import { getColor } from '~/utils/colors';
+import { fetchMenuData } from '~/utils/queries';
 import { cn } from '~/utils/utils';
 
 interface SettingItemProps {
@@ -49,6 +52,8 @@ interface SettingItemProps {
   onPress?: () => void;
   isDarkMode: boolean;
 }
+
+const ITUNES_ITEM_ID = '6743042002';
 
 const SettingItem = ({
   title,
@@ -366,6 +371,88 @@ const LocationSettingsSection = ({ isDarkMode }: { isDarkMode: boolean }): JSX.E
   );
 };
 
+const SyncDataSection = ({ isDarkMode }: { isDarkMode: boolean }): JSX.Element => {
+  const { getTimeSinceLastSync } = useDataSyncStore();
+  const db = useDatabase();
+  const queryClient = useQueryClient();
+  const [isSyncing, setIsSyncing] = React.useState(false);
+  const [syncError, setSyncError] = React.useState<string | null>(null);
+  const [currentTime, setCurrentTime] = React.useState(Date.now());
+
+  // Update every minute to keep the time display current
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60000); // Update every 60 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const timeSinceSync = getTimeSinceLastSync();
+  const lastSyncText = formatTimeSinceSync(timeSinceSync);
+
+  const handleSync = async () => {
+    if (!db || isSyncing) return;
+
+    setIsSyncing(true);
+    setSyncError(null);
+
+    try {
+      await fetchMenuData(db, true);
+      await queryClient.invalidateQueries({ queryKey: ['menuData'] });
+    } catch (error) {
+      setSyncError('Failed to sync data');
+      console.warn('Sync failed:', error);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const getDescriptionText = () => {
+    if (isSyncing) return 'Syncing...';
+    if (syncError) return syncError;
+    return `Last synced: ${lastSyncText}`;
+  };
+
+  return (
+    <TouchableOpacity
+      className={cn(
+        'flex-row items-center justify-between border-b py-3',
+        isDarkMode ? 'border-neutral-800' : 'border-gray-100',
+      )}
+      onPress={handleSync}
+      disabled={isSyncing}
+      activeOpacity={isSyncing ? 1 : 0.7}
+    >
+      <View className="flex-row items-center">
+        <View
+          className={cn(
+            'mr-3 h-8 w-8 items-center justify-center rounded-full',
+            isDarkMode ? 'bg-neutral-800' : 'bg-orange-100',
+          )}
+        >
+          <RefreshCcw size={16} color={getColor('ut-burnt-orange', false)} />
+        </View>
+        <View className="flex-1">
+          <Text
+            className={cn('font-medium text-base', isDarkMode ? 'text-gray-100' : 'text-gray-800')}
+          >
+            Sync Data
+          </Text>
+          <Text
+            className={cn(
+              'text-sm',
+              syncError ? 'text-red-500' : isDarkMode ? 'text-gray-400' : 'text-gray-500',
+            )}
+          >
+            {getDescriptionText()}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 const VersionInfo = ({ isDarkMode }: VersionInfoProps): JSX.Element => {
   const deviceId = getOrCreateDeviceId();
 
@@ -383,7 +470,26 @@ const VersionInfo = ({ isDarkMode }: VersionInfoProps): JSX.Element => {
   );
 };
 
-const itunesItemId = '6743042002';
+const formatTimeSinceSync = (timeSinceSync: number): string => {
+  if (timeSinceSync === Infinity) {
+    return 'Never synced';
+  }
+
+  const seconds = Math.floor(timeSinceSync / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (days > 0) {
+    return `${days} day${days === 1 ? '' : 's'} ago`;
+  } else if (hours > 0) {
+    return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+  } else if (minutes > 0) {
+    return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+  } else {
+    return 'Just now';
+  }
+};
 
 const SettingsPage = () => {
   const {
@@ -487,6 +593,9 @@ const SettingsPage = () => {
             onToggle={toggleColloquialNames}
             isDarkMode={isDarkMode}
           />
+          <SectionHeader title="Data" className="mt-4" isDarkMode={isDarkMode} />
+          <SyncDataSection isDarkMode={isDarkMode} />
+
           <SectionHeader title="App Permissions" className="mt-4" isDarkMode={isDarkMode} />
           <NotificationSettingsSection isDarkMode={isDarkMode} />
           <LocationSettingsSection isDarkMode={isDarkMode} />
@@ -509,7 +618,7 @@ const SettingsPage = () => {
             isDarkMode={isDarkMode}
             onPress={() =>
               Linking.openURL(
-                `itms-apps://itunes.apple.com/app/viewContentsUserReviews/id${itunesItemId}?action=write-review`,
+                `itms-apps://itunes.apple.com/app/viewContentsUserReviews/id${ITUNES_ITEM_ID}?action=write-review`,
               )
             }
             subtitle="Leave a quick review — it means a lot!"
