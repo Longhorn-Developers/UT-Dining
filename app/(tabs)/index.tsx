@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { eq } from 'drizzle-orm';
 import { drizzle, type ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
@@ -107,6 +107,7 @@ export default function Home() {
   const db = useSQLiteContext();
   const drizzleDb: DrizzleDB = drizzle(db, { schema });
   const isDarkMode = useSettingsStore((state) => state.isDarkMode);
+  const queryClient = useQueryClient();
 
   useDrizzleStudio(db);
 
@@ -118,13 +119,13 @@ export default function Home() {
   }, []);
 
   // Use TanStack Query for menu/location data
-  const { data, isLoading, isError, refetch, isFetching } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['menuData'],
     queryFn: () => fetchMenuData(drizzleDb),
-    staleTime: 3 * 60 * 60 * 1000, // 3 hour
-    refetchInterval: 1000 * 60 * 3, // 3 minutes polling while in app
+    staleTime: 3 * 60 * 60 * 1000, // 3 hours
+    refetchInterval: 30 * 60 * 1000, // 15 minutes polling while in app
     refetchOnMount: false,
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
     retry: false, // Don't retry on failure - just use cached data
   });
 
@@ -149,7 +150,13 @@ export default function Home() {
         setTimeout(() => reject(new Error('Request timeout')), 30000);
       });
 
-      await Promise.race([refetch(), timeoutPromise]);
+      // Force sync with Supabase and then refetch the query
+      await Promise.race([
+        fetchMenuData(drizzleDb, true).then(() =>
+          queryClient.invalidateQueries({ queryKey: ['menuData'] }),
+        ),
+        timeoutPromise,
+      ]);
 
       setRefreshKey((prev) => prev + 1);
 
