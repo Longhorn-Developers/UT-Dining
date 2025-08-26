@@ -1,29 +1,56 @@
 import { eq, sql } from 'drizzle-orm';
 import type { ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
+import type { Database } from '~/types/database.types';
 import { getTodayInCentralTime } from '~/utils/date';
 import * as schema from './schema';
 import { allergens, food_item, location, menu, menu_category, nutrition } from './schema';
 
+type LocationDB = Database['public']['Tables']['location']['Row'];
+type LocationTypeDB = Database['public']['Tables']['location_type']['Row'];
+type MenuDB = Database['public']['Tables']['menu']['Row'];
+type MenuCategoryDB = Database['public']['Tables']['menu_category']['Row'];
+type FoodItemDB = Database['public']['Tables']['food_item']['Row'];
+type NutritionDB = Database['public']['Tables']['nutrition']['Row'];
+type AllergensDB = Database['public']['Tables']['allergens']['Row'];
+type AppInformationDB = Database['public']['Tables']['app_information']['Row'];
+type NotificationDB = Database['public']['Tables']['notifications']['Row'];
+type NotificationTypeDB = Database['public']['Tables']['notification_types']['Row'];
+
 // Type for the complete Supabase response data
 export interface SupabaseResponse {
-  location: unknown[];
-  location_type: unknown[];
-  menu: unknown[];
-  menu_category: unknown[];
-  food_item: unknown[];
-  nutrition: unknown[];
-  allergens: unknown[];
-  app_information: unknown[];
-  notifications?: Array<{
-    id: string;
-    title: string;
-    body: string;
-    redirect_url?: string;
-    type?: string;
-    created_at: string;
-    scheduled_at?: string;
-  }>;
-  notification_types?: unknown[];
+  location: LocationDB[];
+  location_type: LocationTypeDB[];
+  menu: MenuDB[];
+  menu_category: MenuCategoryDB[];
+  food_item: FoodItemDB[];
+  nutrition: NutritionDB[];
+  allergens: AllergensDB[];
+  app_information: AppInformationDB[];
+  notifications: NotificationDB[];
+  notification_types: NotificationTypeDB[];
+}
+
+export interface Location extends schema.Location {
+  location_name: schema.Location['name'];
+  type: schema.LocationType['name'];
+  menus: Menu[];
+}
+
+export interface Menu {
+  menu_name: schema.Menu['name'];
+  menu_categories: MenuCategory[];
+}
+
+export interface MenuCategory {
+  category_title: schema.MenuCategory['title'];
+  food_items: FoodItem[];
+}
+
+export interface FoodItem {
+  name: schema.FoodItem['name'];
+  link: schema.FoodItem['link'];
+  allergens?: schema.Allergens;
+  nutrition?: schema.Nutrition;
 }
 
 /**
@@ -56,83 +83,6 @@ async function insertInChunks<T>(
   await Promise.all(insertPromises);
 }
 
-// Type mapping for table names to their corresponding schema types
-// type TableTypeMap = {
-//   food_item: schema.FoodItem;
-//   nutrition: schema.Nutrition;
-//   allergens: schema.Allergens;
-//   menu_category: schema.MenuCategory;
-// };
-
-// type TableTypeMapKeys = keyof TableTypeMap;
-
-// /**
-//  * Fetches data from Supabase in chunks to avoid hitting the 1000 item limit
-//  */
-// async function fetchInChunks<T extends TableTypeMapKeys>(
-//   tableName: T,
-//   column: string,
-//   ids: (string | number)[],
-//   chunkSize: number = 1000,
-// ) {
-//   if (ids.length === 0) {
-//     return { data: [], error: null };
-//   }
-
-//   const chunks = chunkArray(ids, chunkSize);
-//   const results: TableTypeMap[T][] = [];
-
-//   // console.log(
-//   //   `📊 Fetching ${tableName} in ${chunks.length} chunks of ${chunkSize} items each (${ids.length} total)`
-//   // );
-
-//   for (let i = 0; i < chunks.length; i++) {
-//     const chunk = chunks[i];
-//     // console.log(`  📄 Processing chunk ${i + 1}/${chunks.length} with ${chunk.length} items`);
-
-//     const result = await supabase
-//       .from(tableName as TableTypeMapKeys)
-//       .select('*')
-//       .in(column, chunk);
-
-//     if (result.error) {
-//       console.error(`❌ Error in chunk ${i + 1}/${chunks.length}:`, result.error);
-//       return { data: null, error: result.error };
-//     }
-
-//     if (result.data) {
-//       results.push(...(result.data as TableTypeMap[T][]));
-//       // console.log(`  ✅ Chunk ${i + 1}/${chunks.length} completed: ${result.data.length} records`);
-//     }
-//   }
-
-//   // console.log(`✅ ${tableName} chunked fetch completed: ${results.length} total records`);
-//   return { data: results, error: null };
-// }
-
-export interface Location extends schema.Location {
-  location_name: schema.Location['name'];
-  type: schema.LocationType['name'];
-  menus: Menu[];
-}
-
-export interface Menu {
-  menu_name: schema.Menu['name'];
-  menu_categories: MenuCategory[];
-}
-
-export interface MenuCategory {
-  category_title: schema.MenuCategory['title'];
-  food_items: FoodItem[];
-}
-
-export interface FoodItem {
-  name: schema.FoodItem['name'];
-  link: schema.FoodItem['link'];
-  allergens?: schema.Allergens;
-  nutrition?: schema.Nutrition;
-}
-
 /**
  * Fetches all relevant data from Supabase tables including locations, menus, notifications, and nutrition/allergens.
  *
@@ -150,184 +100,6 @@ const querySupabase = async (): Promise<SupabaseResponse | null> => {
 
   console.log('✅ Supabase data fetched');
   return data;
-
-  // return;
-  // try {
-  //   // Use provided date or default to today's date in Central Time Zone
-  //   const formattedDate = date || getTodayInCentralTime();
-
-  //   // Fetch base data in parallel (independent queries)
-  //   const [
-  //     locationResult,
-  //     locationTypeResult,
-  //     menuResult,
-  //     appInformationResult,
-  //     notificationResult,
-  //     notificationTypeResult,
-  //   ] = await Promise.all([
-  //     supabase.from('location').select('*'),
-  //     supabase.from('location_type').select('*'),
-  //     supabase.from('menu').select('*'),
-  //     supabase.from('app_information').select('*'),
-  //     supabase.from('notifications').select('*'),
-  //     supabase.from('notification_types').select('*'),
-  //   ]);
-
-  //   // Check for errors in base queries
-  //   if (locationResult.error) {
-  //     console.error('❌ Error fetching location:', locationResult.error);
-  //     throw new Error(`location: ${locationResult.error.message}`);
-  //   }
-  //   if (locationTypeResult.error) {
-  //     console.error('❌ Error fetching location_type:', locationTypeResult.error);
-  //     throw new Error(`location_type: ${locationTypeResult.error.message}`);
-  //   }
-  //   if (menuResult.error) {
-  //     console.error('❌ Error fetching menu:', menuResult.error);
-  //     throw new Error(`menu: ${menuResult.error.message}`);
-  //   }
-  //   if (appInformationResult.error) {
-  //     console.error('❌ Error fetching app_information:', appInformationResult.error);
-  //     throw new Error(`app_information: ${appInformationResult.error.message}`);
-  //   }
-
-  //   if (notificationResult.error) {
-  //     console.error('❌ Error fetching notifications:', notificationResult.error);
-  //     throw new Error(`notifications: ${notificationResult.error.message}`);
-  //   }
-  //   if (notificationTypeResult.error) {
-  //     console.error('❌ Error fetching notification_types:', notificationTypeResult.error);
-  //     throw new Error(`notification_types: ${notificationTypeResult.error.message}`);
-  //   }
-
-  //   const locationData = locationResult.data ?? [];
-  //   const locationTypeData = locationTypeResult.data ?? [];
-  //   const menuData = menuResult.data ?? [];
-  //   const appInformationData = appInformationResult.data ?? [];
-  //   const notificationData = notificationResult.data ?? [];
-  //   const notificationTypeData = notificationTypeResult.data ?? [];
-
-  //   // Early return if no menus for today
-  //   if (menuData.length === 0) {
-  //     console.log('ℹ️ No menus found for today:', formattedDate);
-  //     return {
-  //       location: locationData,
-  //       location_type: locationTypeData,
-  //       menu: [],
-  //       menu_category: [],
-  //       food_item: [],
-  //       nutrition: [],
-  //       allergens: [],
-  //       app_information: appInformationData,
-  //       notifications: notificationData,
-  //       notification_types: notificationTypeData,
-  //     };
-  //   }
-
-  //   // Extract IDs for subsequent queries
-  //   const menuIds = menuData.map((menu) => menu.id);
-
-  //   // Fetch menu categories (with chunking to avoid 1000 item limit)
-  //   const menuCategoryResult = await fetchInChunks('menu_category', 'menu_id', menuIds);
-
-  //   if (menuCategoryResult.error) {
-  //     console.error('❌ Error fetching menu_category:', menuCategoryResult.error);
-  //     throw new Error(`menu_category: ${menuCategoryResult.error.message}`);
-  //   }
-
-  //   const menuCategoryData = menuCategoryResult.data ?? [];
-
-  //   // Early return if no menu categories
-  //   if (menuCategoryData.length === 0) {
-  //     console.log('ℹ️  No menu categories found for menus:', menuIds);
-  //     return {
-  //       location: locationData,
-  //       location_type: locationTypeData,
-  //       menu: menuData,
-  //       menu_category: [],
-  //       food_item: [],
-  //       nutrition: [],
-  //       allergens: [],
-  //       app_information: appInformationData,
-  //     };
-  //   }
-
-  //   const menuCategoryIds = menuCategoryData.map((category) => category.id);
-
-  //   // Fetch food items (with chunking to avoid 1000 item limit)
-  //   const foodItemResult = await fetchInChunks('food_item', 'menu_category_id', menuCategoryIds);
-
-  //   if (foodItemResult.error) {
-  //     console.error('❌ Error fetching food_item:', foodItemResult.error);
-  //     throw new Error(`food_item: ${foodItemResult.error.message}`);
-  //   }
-
-  //   const foodItemData = foodItemResult.data ?? [];
-
-  //   // Early return if no food items
-  //   if (foodItemData.length === 0) {
-  //     console.log('ℹ️ No food items found for categories:', menuCategoryIds);
-  //     return {
-  //       location: locationData,
-  //       location_type: locationTypeData,
-  //       menu: menuData,
-  //       menu_category: menuCategoryData,
-  //       food_item: [],
-  //       nutrition: [],
-  //       allergens: [],
-  //       app_information: appInformationData,
-  //       notifications: notificationData,
-  //       notification_types: notificationTypeData,
-  //     };
-  //   }
-
-  //   // Extract nutrition and allergen IDs from food items
-  //   const nutritionIds = foodItemData.map((item) => item.nutrition_id).filter((id) => id !== null);
-  //   const allergenIds = foodItemData.map((item) => item.allergens_id).filter((id) => id !== null);
-
-  //   // Fetch nutrition and allergens data in parallel (with chunking to avoid 1000 item limit)
-  //   const nutritionPromise =
-  //     nutritionIds.length > 0
-  //       ? fetchInChunks('nutrition', 'id', nutritionIds)
-  //       : Promise.resolve({ data: [], error: null });
-
-  //   const allergensPromise =
-  //     allergenIds.length > 0
-  //       ? fetchInChunks('allergens', 'id', allergenIds)
-  //       : Promise.resolve({ data: [], error: null });
-
-  //   const [nutritionResult, allergensResult] = await Promise.all([
-  //     nutritionPromise,
-  //     allergensPromise,
-  //   ]);
-
-  //   // Check for errors in nutrition and allergens queries
-  //   if (nutritionResult.error) {
-  //     console.error('❌ Error fetching nutrition:', nutritionResult.error);
-  //     throw new Error(`nutrition: ${nutritionResult.error.message}`);
-  //   }
-  //   if (allergensResult.error) {
-  //     console.error('❌ Error fetching allergens:', allergensResult.error);
-  //     throw new Error(`allergens: ${allergensResult.error.message}`);
-  //   }
-
-  //   console.log('✅ Successfully fetched all Supabase data');
-  //   return {
-  //     location: locationData,
-  //     location_type: locationTypeData,
-  //     menu: menuData,
-  //     menu_category: menuCategoryData,
-  //     food_item: foodItemData,
-  //     nutrition: nutritionResult.data ?? [],
-  //     allergens: allergensResult.data ?? [],
-  //     app_information: appInformationData,
-  //     notifications: notificationData,
-  //     notification_types: notificationTypeData,
-  //   };
-  // } catch (error) {
-  //   console.error('❌ Unexpected error fetching Supabase data:', error);
-  //   return null;
-  // }
 };
 
 /**
