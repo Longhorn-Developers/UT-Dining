@@ -1,7 +1,15 @@
 import * as Haptics from 'expo-haptics';
 import { BicepsFlexed, Flame, Wheat } from 'lucide-react-native';
 import { useState } from 'react';
-import { FlatList, Image, Text, TextInput, View } from 'react-native';
+import {
+  FlatList,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Notifier } from 'react-native-notifier';
 
@@ -193,9 +201,14 @@ const MealPlan = () => {
 
   return (
     <Container className="m-0">
-      <FlatList
-        keyExtractor={(item) => `${item.name}-${item.categoryName}-${item.menuName}`}
-        ListHeaderComponent={
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={0}
+      >
+        <FlatList
+          keyExtractor={(item) => `${item.name}-${item.categoryName}-${item.menuName}`}
+          ListHeaderComponent={
           <View className={cn('flex gap-y-5 py-6', isDarkMode ? 'bg-neutral-900' : 'bg-white')}>
             <TopBar variant="back" />
             <View>
@@ -215,7 +228,7 @@ const MealPlan = () => {
               </Text>
               <Text className={cn('mt-2 text-sm', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}>
                 <Text className="font-bold text-ut-burnt-orange">Note: </Text>
-                Your meal plan will reset at the end of the day.
+                Your meal plan will reset daily at midnight.
               </Text>
             </View>
 
@@ -272,38 +285,39 @@ const MealPlan = () => {
                 isDarkMode ? 'border-neutral-800' : 'border-b-ut-grey/15',
               )}
             />
-          </View>
-        }
-        data={mealPlanItems}
-        contentContainerClassName="px-6"
-        renderItem={({ item }) => (
-          <MealPlanComponent
-            categoryName={item.categoryName}
-            food={item}
-            location={item.locationName}
-            selectedMenu={item.menuName}
-            quantity={item.quantity || 1}
-          />
-        )}
-        ListEmptyComponent={
-          <View className="mt-12 flex items-center justify-center">
-            <Text
-              className={cn(
-                'font-bold text-lg',
-                isDarkMode ? 'text-white' : 'text-ut-burnt-orange',
-              )}
-            >
-              Empty Meal Plan!
-            </Text>
-            <Text
-              className={cn('max-w-64 text-center', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}
-            >
-              Swipe right on a food item to add to your meal plan.
-            </Text>
-          </View>
-        }
-        stickyHeaderIndices={[0]} // Makes the header sticky
-      />
+            </View>
+          }
+          data={mealPlanItems}
+          contentContainerClassName="px-6"
+          renderItem={({ item }) => (
+            <MealPlanComponent
+              categoryName={item.categoryName}
+              food={item}
+              location={item.locationName}
+              selectedMenu={item.menuName}
+              quantity={item.quantity || 1}
+            />
+          )}
+          ListEmptyComponent={
+            <View className="mt-12 flex items-center justify-center">
+              <Text
+                className={cn(
+                  'font-bold text-lg',
+                  isDarkMode ? 'text-white' : 'text-ut-burnt-orange',
+                )}
+              >
+                Empty Meal Plan!
+              </Text>
+              <Text
+                className={cn('max-w-64 text-center', isDarkMode ? 'text-gray-300' : 'text-ut-grey')}
+              >
+                Swipe right on a food item to add to your meal plan.
+              </Text>
+            </View>
+          }
+          stickyHeaderIndices={[0]} // Makes the header sticky
+        />
+      </KeyboardAvoidingView>
     </Container>
   );
 };
