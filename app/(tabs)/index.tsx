@@ -199,6 +199,16 @@ export default function Home() {
     }
   }, [layoutLoaded, isLoading, isFetching]);
 
+  // Show onboarding screen even while loading
+  if (!isOnboardingComplete) {
+    return (
+      <View style={{ flex: 1, backgroundColor: isDarkMode ? '#171717' : '#fff' }}>
+        <Stack.Screen options={{ title: 'Home' }} />
+        <OnboardingScreen isOnboardingComplete={isOnboardingComplete} />
+      </View>
+    );
+  }
+
   if (isLoading) {
     return (
       <View
@@ -261,8 +271,6 @@ export default function Home() {
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#171717' : '#fff' }}>
       <Stack.Screen options={{ title: 'Home' }} />
       <Container disableBottomPadding onLayout={onLayoutRootView}>
-        <OnboardingScreen isOnboardingComplete={isOnboardingComplete} />
-
         {isLoading ? (
           <View className="flex-1 items-center justify-center">
             <ActivityIndicator size="small" />

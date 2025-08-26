@@ -8,7 +8,7 @@ import { useDatabase } from '~/hooks/useDatabase';
 import { useLocationDetails } from '~/hooks/useLocationDetails';
 import { location as location_schema, menu } from '~/services/database/schema';
 import { useSettingsStore } from '~/store/useSettingsStore';
-import { useLocationName, useMealTimes } from '~/utils/locations';
+import { useLocationName } from '~/utils/locations';
 import { generateSchedule, isLocationOpen } from '~/utils/time';
 import { cn } from '~/utils/utils';
 import DateNavigator from './DateNavigator';
@@ -46,7 +46,6 @@ const LocationHeader = React.memo(
 
     const { useColloquialNames } = useSettingsStore();
     const displayName = useLocationName(location, useColloquialNames);
-    const mealTimes = useMealTimes(location);
 
     const isDarkMode = useSettingsStore((state) => state.isDarkMode);
 
@@ -182,9 +181,7 @@ const LocationHeader = React.memo(
               <FilterBar
                 selectedItem={selectedMenu as string}
                 setSelectedItem={setSelectedMenu}
-                useTimeOfDayDefault={filters.length > 1}
                 items={filters}
-                mealTimes={mealTimes || undefined}
                 showFilterButton
               />
             </View>

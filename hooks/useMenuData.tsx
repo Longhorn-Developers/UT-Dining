@@ -6,7 +6,16 @@ import {
   type Location,
 } from '~/services/database/database';
 import { getTodayInCentralTime } from '~/utils/date';
+import { getMealTimes } from '~/utils/locations';
+import { timeOfDay } from '~/utils/time';
 import { useDatabase } from './useDatabase';
+
+// Define the proper meal order
+const MEAL_ORDER = {
+  Breakfast: 1,
+  Lunch: 2,
+  Dinner: 3,
+};
 
 export function useMenuData(location: string, date?: string) {
   const db = useDatabase();
@@ -32,8 +41,43 @@ export function useMenuData(location: string, date?: string) {
     enabled: !!location,
   });
 
-  // Auto-select first menu if none selected
-  const defaultMenu = selectedMenu || menuNames[0];
+  // Smart menu selection logic
+  const defaultMenu = useMemo(() => {
+    // If user has manually selected a menu, use that
+    if (selectedMenu) return selectedMenu;
+
+    // If no menus available, return null
+    if (menuNames.length === 0) return null;
+
+    // If there's only one menu, automatically select it
+    if (menuNames.length === 1) {
+      return menuNames[0];
+    }
+
+    // Use time-of-day logic to determine appropriate menu
+    const mealTimes = getMealTimes(db, location);
+    const tod = mealTimes ? timeOfDay(new Date(), mealTimes) : timeOfDay(new Date());
+    let targetMenu = '';
+
+    if (tod === 'morning') targetMenu = 'Breakfast';
+    else if (tod === 'afternoon') targetMenu = 'Lunch';
+    else if (tod === 'evening') targetMenu = 'Dinner';
+
+    // Find menu with matching title
+    const matchingMenu = menuNames.find((menuName) => menuName === targetMenu);
+
+    if (matchingMenu) {
+      return matchingMenu;
+    } else {
+      // Sort menus by meal order and fallback to first available
+      const sortedMenus = [...menuNames].sort((a, b) => {
+        const orderA = MEAL_ORDER[a as keyof typeof MEAL_ORDER] || 999;
+        const orderB = MEAL_ORDER[b as keyof typeof MEAL_ORDER] || 999;
+        return orderA - orderB;
+      });
+      return sortedMenus[0];
+    }
+  }, [selectedMenu, menuNames, location, db]);
 
   // Prefetch all menu data for instant switching
   useEffect(() => {
@@ -63,11 +107,6 @@ export function useMenuData(location: string, date?: string) {
     refetchOnWindowFocus: false,
     enabled: !!location && !!defaultMenu,
   });
-
-  // Reset selected menu when date changes
-  useEffect(() => {
-    setSelectedMenu(null);
-  }, []);
 
   // Track menu switching state
   useEffect(() => {
