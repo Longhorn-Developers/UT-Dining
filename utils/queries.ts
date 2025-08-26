@@ -15,10 +15,10 @@ export const fetchMenuData = async (
     // Get sync store state directly (not using hook since this is not a React component)
     const syncStore = useDataSyncStore.getState();
 
-    // Sync with Supabase if 6 hours have passed since last sync OR if manually forced
+    // Sync with Supabase if 3 hours have passed since last sync OR if manually forced
     if (forceSync || syncStore.shouldSyncWithSupabase()) {
       try {
-        const reason = forceSync ? 'Manual refresh requested' : '6+ hours since last sync';
+        const reason = forceSync ? 'Manual refresh requested' : '3+ hours since last sync';
         console.log(`🔄 ${reason}, fetching fresh data from Supabase...`);
         await insertDataIntoSQLiteDB(drizzleDb); // Sync with remote when conditions are met
 
@@ -33,7 +33,7 @@ export const fetchMenuData = async (
       const timeSinceLastSync = syncStore.getTimeSinceLastSync();
       const hoursUntilNextSync = Math.max(
         0,
-        (6 * 60 * 60 * 1000 - timeSinceLastSync) / (60 * 60 * 1000), // 6 hours in milliseconds
+        (3 * 60 * 60 * 1000 - timeSinceLastSync) / (60 * 60 * 1000), // 3 hours in milliseconds
       );
       console.log(
         `ℹ️  Using cached data (${(timeSinceLastSync / (60 * 60 * 1000)).toFixed(1)}h since last sync, next sync in ${hoursUntilNextSync.toFixed(1)}h)`,

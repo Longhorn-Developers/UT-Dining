@@ -10,7 +10,7 @@ interface DataSyncState {
   getTimeSinceLastSync: () => number;
 }
 
-const SIX_HOURS_IN_MS = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+const THREE_HOURS_IN_MS = 3 * 60 * 60 * 1000; // 3 hours in milliseconds
 
 export const useDataSyncStore = create<DataSyncState>()(
   persist(
@@ -32,8 +32,8 @@ export const useDataSyncStore = create<DataSyncState>()(
         const now = Date.now();
         const timeSinceLastSync = now - lastSupabaseQueryTime;
 
-        // Should sync if more than 6 hours have passed
-        return timeSinceLastSync >= SIX_HOURS_IN_MS;
+        // Should sync if more than 3 hours have passed
+        return timeSinceLastSync >= THREE_HOURS_IN_MS;
       },
 
       getTimeSinceLastSync: () => {
