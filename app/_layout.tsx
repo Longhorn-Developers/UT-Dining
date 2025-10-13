@@ -5,7 +5,6 @@ import { Stack } from 'expo-router';
 import { openDatabaseSync, SQLiteProvider } from 'expo-sqlite';
 import { PostHogProvider } from 'posthog-react-native';
 import { Suspense, useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
 import { SheetProvider } from 'react-native-actions-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NotifierWrapper } from 'react-native-notifier';
@@ -59,7 +58,7 @@ const AppContent = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Suspense fallback={<ActivityIndicator size="small" />}>
+      <Suspense>
         <SQLiteProvider
           databaseName={DATABASE_NAME}
           options={{ enableChangeListener: true }}

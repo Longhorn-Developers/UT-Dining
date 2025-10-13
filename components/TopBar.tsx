@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { Link, router, useLocalSearchParams } from 'expo-router';
-import { ChefHat, ChevronLeft, Heart, Info, MessageSquare } from 'lucide-react-native';
+import { ChefHat, ChevronLeft, Heart, Info, MapIcon, MessageSquare } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { SheetManager } from 'react-native-actions-sheet';
@@ -56,6 +56,15 @@ const LocationTopBar = () => {
       </TouchableOpacity>
 
       <View className="flex flex-row gap-x-5">
+        <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push({ pathname: '/map', params: { location: location } });
+          }}
+        >
+          <MapIcon size={20} color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']} />
+        </TouchableOpacity>
+
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

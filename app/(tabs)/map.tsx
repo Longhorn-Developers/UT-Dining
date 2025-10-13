@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
-import { Stack } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import {
   ChevronDown,
   ChevronLeft,
@@ -347,6 +347,11 @@ const MapPage = () => {
     Awaited<ReturnType<typeof getAllLocationsWithCoordinates>>
   >([]);
   const isColorBlindMode = useSettingsStore((state) => state.isColorBlindMode);
+  const { location: openedLocation } = useLocalSearchParams<{
+    location?: string;
+  }>();
+  const didOpenRef = useRef(false);
+
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -573,6 +578,52 @@ const MapPage = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (didOpenRef.current) return;
+    if (!mergedLocations.length) return; // wait until locations are ready
+
+    const normalize = (s: string) => s.trim().toLowerCase();
+
+    let target = undefined as (typeof mergedLocations)[number] | undefined;
+
+    if (!target && openedLocation) {
+      const norm = normalize(openedLocation);
+      target =
+        mergedLocations.find((l) => normalize(l.name) === norm) ??
+        // fallback: partial match
+        mergedLocations.find((l) => normalize(l.name).includes(norm));
+    }
+
+    if (!target) return;
+    didOpenRef.current = true;
+
+    // animate map
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    const targetLatitude = target.coordinates.latitude - 0.00031; // Offset north by a small amount
+
+    mapRef.current?.animateToRegion(
+      {
+        latitude: targetLatitude,
+        longitude: target.coordinates.longitude,
+        latitudeDelta: 0.00125,
+        longitudeDelta: 0.00125,
+      },
+      500,
+    );
+
+    // open location sheet for more information
+    SheetManager.show('map-location', {
+      payload: {
+        name: target.name,
+        address: target.address,
+        description: target.description ?? '',
+        type: target.type,
+        hasMenu: target.hasMenu,
+      },
+    });
+  }, [mergedLocations, openedLocation]);
 
   return (
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#171717' : '#fff' }}>

@@ -1,6 +1,7 @@
 import * as Device from 'expo-device';
+import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Clock, MapPin } from 'lucide-react-native';
+import { Clock, MapIcon, MapPin } from 'lucide-react-native';
 import { usePostHog } from 'posthog-react-native';
 import { useEffect, useState } from 'react';
 import {
@@ -189,6 +190,22 @@ export default function LocationGenericScreen() {
                   />
                   <Text className={cn(isDarkMode ? 'text-ut-grey-dark-mode' : 'text-ut-grey')}>
                     {locationData.address}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    router.replace({ pathname: '/map', params: { location } });
+                  }}
+                  className="flex flex-row items-center"
+                >
+                  <MapIcon
+                    size={16}
+                    color={isDarkMode ? COLORS['ut-grey-dark-mode'] : COLORS['ut-grey']}
+                  />
+                  <Text className={cn(isDarkMode ? 'text-ut-grey-dark-mode' : 'text-ut-grey')}>
+                    &nbsp;Show on Map
                   </Text>
                 </TouchableOpacity>
               </View>

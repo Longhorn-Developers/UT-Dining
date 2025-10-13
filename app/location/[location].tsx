@@ -2,9 +2,10 @@ import { FlashList } from '@shopify/flash-list';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import * as Haptics from 'expo-haptics';
 import { Stack, useLocalSearchParams } from 'expo-router';
+import { Skeleton } from 'moti/skeleton';
 import { usePostHog } from 'posthog-react-native';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { Container } from '~/components/Container';
 import type { ListItem } from '~/hooks/useCategoryExpansion';
 import { useCategoryExpansion } from '~/hooks/useCategoryExpansion';
@@ -22,7 +23,6 @@ import CategoryHeader from './components/CategoryHeader';
 import FoodItemRow from './components/FoodItemRow';
 import LocationHeader from './components/LocationHeader';
 import ScrollToTopButton from './components/ScrollToTopButton';
-import SkeletonItem from './components/SkeletonItem';
 
 /**
  * Filter items based on search query and user-selected filters
@@ -162,6 +162,7 @@ const Location = () => {
     activeFilters,
     favorites,
   );
+
   const skeletonItems = useSkeletonItems();
 
   // Scroll to top functionality
@@ -194,7 +195,7 @@ const Location = () => {
 
   // Memoize the displayed items to prevent unnecessary recalculations
   const displayedItems = useMemo(() => {
-    if (loading) return skeletonItems;
+    if (loading || isSwitchingMenus) return skeletonItems;
     if (error) return []; // Return empty array on error, EmptyState will handle the display
     return debouncedSearchQuery ||
       Object.values(activeFilters).some(
@@ -210,6 +211,7 @@ const Location = () => {
     flattenedItems,
     skeletonItems,
     activeFilters,
+    isSwitchingMenus,
   ]);
 
   // In your renderItem function in [location].tsx
@@ -237,27 +239,46 @@ const Location = () => {
           }
 
           return (
-            <FoodItemRow
-              item={item}
-              selectedMenu={selectedMenu ?? ''}
-              location={location as string}
-              db={db}
-              favorites={favorites}
-            />
+            <View>
+              <FoodItemRow
+                item={item}
+                selectedMenu={selectedMenu ?? ''}
+                location={location as string}
+                db={db}
+                favorites={favorites}
+              />
+            </View>
           );
         }
 
         case 'skeleton_header':
-          return <SkeletonItem isHeader />;
+          return (
+            <View className="mt-4 px-6">
+              <CategoryHeader title={'skeleton'} isExpanded={true} onToggle={() => {}} />
+            </View>
+          );
 
         case 'skeleton_item':
-          return <SkeletonItem />;
+          return (
+            <View className="mb-[8px] px-6">
+              <Skeleton.Group show={true}>
+                <Skeleton radius={3} colorMode={isDarkMode ? 'dark' : 'light'}>
+                  <Pressable
+                    className={cn(
+                      'h-16 flex-row items-center justify-between rounded border px-3 py-2',
+                      isDarkMode ? 'border-neutral-800 bg-neutral-800' : 'bg-white',
+                    )}
+                  ></Pressable>
+                </Skeleton>
+              </Skeleton.Group>
+            </View>
+          );
 
         default:
           return null;
       }
     },
-    [selectedMenu, location, toggleCategory, favorites, db],
+    [selectedMenu, location, toggleCategory, favorites, db, isDarkMode],
   );
 
   // Empty state component
@@ -298,7 +319,7 @@ const Location = () => {
       <Container className="relative mx-0 w-full flex-1">
         <FlashList
           estimatedItemSize={60}
-          extraData={favorites}
+          extraData={[favorites]}
           ref={listRef}
           onScroll={handleScroll}
           scrollEventThrottle={16}
@@ -306,47 +327,26 @@ const Location = () => {
           data={displayedItems}
           removeClippedSubviews
           scrollEnabled={!isSwitchingMenus}
-          ListHeaderComponent=<LocationHeader
-            location={location}
-            selectedMenu={selectedMenu ?? null}
-            setSelectedMenu={setSelectedMenu}
-            filters={menuFilters}
-            query={searchQuery}
-            setQuery={(query) => {
-              resetExpandedCategories();
-              setSearchQuery(query);
-            }}
-            selectedDate={selectedDate}
-            onDateChange={handleDateChange}
-          />
+          ListHeaderComponent={
+            <LocationHeader
+              location={location}
+              selectedMenu={selectedMenu ?? null}
+              setSelectedMenu={setSelectedMenu}
+              filters={menuFilters}
+              query={searchQuery}
+              setQuery={(query) => {
+                resetExpandedCategories();
+                setSearchQuery(query);
+              }}
+              selectedDate={selectedDate}
+              onDateChange={handleDateChange}
+            />
+          }
           ListEmptyComponent={<EmptyState />}
           renderItem={renderItem}
           getItemType={(item) => ('type' in item ? item.type : 'unknown')}
           keyboardShouldPersistTaps="always"
         />
-
-        {/* Loading indicator for menu switching */}
-        {isSwitchingMenus && (
-          <View
-            className="absolute inset-0 z-10 flex h-screen items-center justify-center"
-            style={{
-              backgroundColor: isDarkMode ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)',
-            }}
-          >
-            <View
-              className="flex items-center justify-center rounded-lg p-4"
-              style={{
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-                elevation: 5,
-              }}
-            >
-              <ActivityIndicator size="small" style={{ marginBottom: 8 }} />
-            </View>
-          </View>
-        )}
 
         <ScrollToTopButton
           visible={showScrollToTop}
