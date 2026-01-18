@@ -20,9 +20,10 @@ import { filterFoodItems } from '~/utils/filter';
 import { cn } from '~/utils/utils';
 import CategoryHeader from './components/CategoryHeader';
 import FoodItemRow from './components/FoodItemRow';
-import LocationHeader from './components/LocationHeader';
+import { LocationHeaderBody } from './components/LocationHeader';
 import ScrollToTopButton from './components/ScrollToTopButton';
 import SkeletonItem from './components/SkeletonItem';
+import TopBar from '~/components/TopBar';
 
 /**
  * Filter items based on search query and user-selected filters
@@ -295,7 +296,14 @@ const Location = () => {
   return (
     <View style={{ flex: 1, backgroundColor: isDarkMode ? '#171717' : '#fff' }}>
       <Stack.Screen options={{ title: 'Location' }} />
+
+      {/* Sticky TopBar positioned above the list - outside Container to avoid padding */}
+      <View className={cn('flex px-6 py-6 z-10 justify-center items-center', isDarkMode ? 'bg-neutral-900' : 'bg-white')}>
+        <TopBar variant="location" />
+      </View>
+
       <Container className="relative mx-0 w-full flex-1">
+
         <FlashList
           estimatedItemSize={60}
           extraData={favorites}
@@ -306,7 +314,7 @@ const Location = () => {
           data={displayedItems}
           removeClippedSubviews
           scrollEnabled={!isSwitchingMenus}
-          ListHeaderComponent=<LocationHeader
+          ListHeaderComponent=<LocationHeaderBody
             location={location}
             selectedMenu={selectedMenu ?? null}
             setSelectedMenu={setSelectedMenu}

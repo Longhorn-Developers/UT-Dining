@@ -26,7 +26,7 @@ interface LocationHeaderProps {
   onDateChange: (date: string) => void;
 }
 
-const LocationHeader = React.memo(
+export const LocationHeaderBody = React.memo(
   ({
     location,
     selectedMenu,
@@ -78,12 +78,10 @@ const LocationHeader = React.memo(
     }, [location, locationData, db.select]);
 
     return (
-      <View className="mx-6 mt-6 flex gap-y-5">
+      <View className="mx-6 flex gap-y-5">
         {/* Content that's hidden when search is focused */}
         {!isSearchFocused && (
           <>
-            <TopBar variant="location" />
-
             <View className="gap-y-4">
               {/* Temporarily Closed Banner */}
               {locationData?.force_close && (
@@ -190,6 +188,36 @@ const LocationHeader = React.memo(
             </View>
           </View>
         )}
+      </View>
+    );
+  },
+);
+
+const LocationHeader = React.memo(
+  ({
+    location,
+    selectedMenu,
+    setSelectedMenu,
+    filters,
+    query,
+    setQuery,
+    selectedDate,
+    onDateChange,
+  }: LocationHeaderProps) => {
+    // Backward-compatible wrapper
+    return (
+      <View>
+        <TopBar variant="location" />
+        <LocationHeaderBody
+          location={location}
+          selectedMenu={selectedMenu}
+          setSelectedMenu={setSelectedMenu}
+          filters={filters}
+          query={query}
+          setQuery={setQuery}
+          selectedDate={selectedDate}
+          onDateChange={onDateChange}
+        />
       </View>
     );
   },
